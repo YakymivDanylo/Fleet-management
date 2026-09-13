@@ -104,11 +104,44 @@ docker run --rm `
 | 1 | New Bugs | New Code, Reliability | = 0 |
 | 2 | New Security Hotspots Reviewed | New Code, Security | = 100% |
 | 3 | Duplicated Lines % | Overall Code, Duplication | ≤ 3% |
-| 4 | Cognitive Complexity | Overall Code, Maintainability | ≤ 15 |
+| 4 | Maintainability Rating | Overall Code, Maintainability | = A |
 
 Архітектурне обґрунтування (під стек FastAPI + async SQLAlchemy + PostgreSQL):
 
 1. **New Bugs = 0** — async I/O (await/coroutines, спільний стан по кількох воркерах) — типове джерело нових багів (unawaited coroutine, race condition). Блокує їх на вході, а не після мержу.
 2. **New Security Hotspots Reviewed = 100%** — застосунок ходить у PostgreSQL напряму (`text()` для raw SQL вже є в `main.py`) — SQL injection головний ризик. Кожен hotspot має пройти ручний рев'ю перед мержем.
 3. **Duplicated Lines % ≤ 3%** — шарова CRUD-архітектура (models/schemas/services/api на кожну сутність: Vehicle, Station, Renter, Rental) природньо тягне copy-paste між сутностями. Ліміт стримує це змасштабуванням проєкту.
-4. **Cognitive Complexity ≤ 15** — бізнес-правила живуть у `services/` (розрахунок вартості оренди, перевірка доступності авто/місця). Саме такі функції найшвидше обростають вкладеними умовами під нові edge-cases.
+4. **Maintainability Rating = A** — бізнес-правила живуть у `services/` (розрахунок вартості оренди, перевірка доступності авто/місця, право на оренду). Саме такі функції найшвидше обростають вкладеними умовами під нові edge-cases. Первісно критерій був заданий як `Cognitive Complexity (Overall) ≤ 15`, але ця метрика — сира сума складності по всьому проєкту, тому механічно росте з кожним новим (навіть простим) методом і не відображає реальну якість. Замінено на `Maintainability Rating = A` — нормалізований показник (співвідношення технічного боргу до розміру коду), а per-method ліміт ≤15 і далі контролює правило аналізатора `S3776`.
+
+### Завд.4: рефакторинг найгірших методів (Maintainability / Technical Debt)
+
+Ідентифіковано через звіт аналізатора (правило `S3776`, сортування по `sqale_index`) два методи з найгіршими показниками:
+
+| Метод | Файл | Cognitive Complexity (До → Після) | Technical Debt (До → Після) |
+|---|---|---|---|
+| `validate_rental_eligibility` | `services/rental_service.py` | **58 → 8** (критичний рівень) | 48 хв → 0 |
+| `rentals_summary` | `api/rentals.py` | **19 → ~4** | 9 хв → 0 |
+
+Після рефакторингу: 0 залишкових порушень `S3776`, `code_smells` та `sqale_index` (Technical Debt) проєкту повернулись до рівня Baseline.
+
+**Застосовані техніки:**
+- **Guard Clauses** — у `validate_rental_eligibility` прибрано 4 рівні вкладеного `if/else`, кожна умова виходу тепер на верхньому рівні.
+- **Extract Variable** — повторювана умова "потрібна застава на вихідних" рахувалась двічі в різних гілках; винесена в одну змінну `deposit_missing`.
+- **Делегування сервісу замість дублювання** — `rentals_summary` дублював формулу розрахунку вартості з `calculate_cost`; замінено прямим викликом сервісу (усунуто і складність, і порушення шарової архітектури).
+- **Extract Method через `Counter`** — ручний цикл з `if/elif` для підрахунку оренд за статусами замінено на `collections.Counter`.
+
+Всі рефакторинги верифіковано на еквівалентність поведінки: `validate_rental_eligibility` — 1152 комбінації вхідних параметрів, `calculate_cost`-делегування — 1000 значень тривалості, розбіжностей 0.
+
+**Git-історія кейсу (До/Після для Code Review):**
+- `1cb64a7` — навмисно нерефакторений код (До)
+- `b0063cf` — рефакторинг (Після)
+
+**Порівняльна таблиця станів проєкту (Завд.3 + Завд.4):**
+
+| Показник | Baseline | Failed (Завд.3) | Fixed (Завд.3) | Fixed (Завд.4) |
+|---|---|---|---|---|
+| Bugs | 0 | 0 | 0 | 0 |
+| Code Smells | 6 | 8 | 6 | 6 |
+| Duplicated Lines % | 0.0% | 13.6% | 0.0% | 0.0% |
+| Technical Debt (sqale_index) | 30 хв | — | 30 хв | 30 хв |
+| Quality Gate | PASS | **FAIL** | PASS | PASS |
