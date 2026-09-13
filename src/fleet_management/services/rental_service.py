@@ -63,6 +63,31 @@ async def end_rental(db: AsyncSession, rental_id: int, end_station_id: int) -> R
     return rental
 
 
+ZONE_DISCOUNTS = {"center": 1, "suburb": -1}
+
+
+def _vip_discount(rental_count: int, vehicle_type: str) -> float:
+    if rental_count > 10:
+        return 5 if vehicle_type == "premium" else 10
+    return 2 if vehicle_type == "premium" else 5
+
+
+def _regular_discount(rental_count: int, has_coupon: bool) -> float:
+    if rental_count > 20:
+        return 3
+    if rental_count <= 5:
+        return 0
+    return 4 if has_coupon else 1
+
+
+def _weekend_zone_discount(station_zones: list[str]) -> float:
+    return sum(ZONE_DISCOUNTS.get(zone, 0) for zone in station_zones)
+
+
+def _holiday_discount(has_coupon: bool) -> float:
+    return 2 if has_coupon else 1
+
+
 def calculate_discount(
     rental_count: int,
     is_vip: bool,
@@ -72,38 +97,15 @@ def calculate_discount(
     is_weekend: bool,
     is_holiday: bool,
 ) -> float:
-    discount = 0.0
-    if is_vip:
-        if rental_count > 10:
-            if vehicle_type == "premium":
-                discount += 5
-            else:
-                discount += 10
-        else:
-            if vehicle_type == "premium":
-                discount += 2
-            else:
-                discount += 5
-    else:
-        if rental_count > 20:
-            discount += 3
-        elif rental_count > 5:
-            if has_coupon:
-                discount += 4
-            else:
-                discount += 1
+    discount = (
+        _vip_discount(rental_count, vehicle_type)
+        if is_vip
+        else _regular_discount(rental_count, has_coupon)
+    )
 
     if is_weekend:
-        for zone in station_zones:
-            if zone == "center":
-                discount += 1
-            elif zone == "suburb":
-                discount -= 1
-
+        discount += _weekend_zone_discount(station_zones)
     if is_holiday:
-        if has_coupon:
-            discount += 2
-        else:
-            discount += 1
+        discount += _holiday_discount(has_coupon)
 
     return discount
