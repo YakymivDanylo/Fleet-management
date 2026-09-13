@@ -124,26 +124,22 @@ def validate_rental_eligibility(
 ) -> tuple[bool, str]:
     if renter_is_blacklisted:
         return False, "Renter is blacklisted"
-    else:
-        if license_expired:
-            return False, "License expired"
-        else:
-            if has_unpaid_fees:
-                if active_rental_count > 0:
-                    return False, "Unpaid fees with an active rental"
-                else:
-                    if is_weekend:
-                        if weekend_requires_deposit:
-                            if not has_deposit_on_file:
-                                return False, "Deposit required for unpaid fees on weekend"
-            if vehicle_status != VehicleStatus.AVAILABLE:
-                return False, "Vehicle not available"
-            else:
-                if not station_is_open:
-                    return False, "Station is closed"
-                else:
-                    if is_weekend:
-                        if weekend_requires_deposit:
-                            if not has_deposit_on_file:
-                                return False, "Deposit required on weekend"
+    if license_expired:
+        return False, "License expired"
+
+    deposit_missing = is_weekend and weekend_requires_deposit and not has_deposit_on_file
+
+    if has_unpaid_fees:
+        if active_rental_count > 0:
+            return False, "Unpaid fees with an active rental"
+        if deposit_missing:
+            return False, "Deposit required for unpaid fees on weekend"
+
+    if vehicle_status != VehicleStatus.AVAILABLE:
+        return False, "Vehicle not available"
+    if not station_is_open:
+        return False, "Station is closed"
+    if deposit_missing:
+        return False, "Deposit required on weekend"
+
     return True, "OK"
