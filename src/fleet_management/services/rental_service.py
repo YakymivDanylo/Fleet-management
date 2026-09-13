@@ -109,3 +109,41 @@ def calculate_discount(
         discount += _holiday_discount(has_coupon)
 
     return discount
+
+
+def validate_rental_eligibility(
+    renter_is_blacklisted: bool,
+    license_expired: bool,
+    has_unpaid_fees: bool,
+    active_rental_count: int,
+    vehicle_status: VehicleStatus,
+    station_is_open: bool,
+    is_weekend: bool,
+    weekend_requires_deposit: bool,
+    has_deposit_on_file: bool,
+) -> tuple[bool, str]:
+    if renter_is_blacklisted:
+        return False, "Renter is blacklisted"
+    else:
+        if license_expired:
+            return False, "License expired"
+        else:
+            if has_unpaid_fees:
+                if active_rental_count > 0:
+                    return False, "Unpaid fees with an active rental"
+                else:
+                    if is_weekend:
+                        if weekend_requires_deposit:
+                            if not has_deposit_on_file:
+                                return False, "Deposit required for unpaid fees on weekend"
+            if vehicle_status != VehicleStatus.AVAILABLE:
+                return False, "Vehicle not available"
+            else:
+                if not station_is_open:
+                    return False, "Station is closed"
+                else:
+                    if is_weekend:
+                        if weekend_requires_deposit:
+                            if not has_deposit_on_file:
+                                return False, "Deposit required on weekend"
+    return True, "OK"
