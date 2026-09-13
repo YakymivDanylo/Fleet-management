@@ -69,3 +69,28 @@ graph TD
 6. **Redis Cache** — зберігає часто запитувані, швидкозмінні дані (поточна доступність авто на станції, останні координати), щоб API не звертався до PostgreSQL при кожному запиті пошуку авто.
 
 7. **PostgreSQL** — основне реляційне сховище сутностей `Vehicle`, `Station`, `Renter`, `Rental` та історії `TelemetryReading`.
+
+## Статичний аналіз якості коду (SonarQube)
+
+Локальний SonarQube Community Edition піднімається через Docker Compose:
+
+```powershell
+docker compose -f config/docker-compose.yml up -d sonarqube
+```
+
+Дашборд: http://localhost:9000 (проєкт `fleet-management`).
+
+Токен сканера генерується один раз у `http://localhost:9000/account/security`.
+
+Запуск сканування (вручну, коли потрібно перевірити поточний стан коду):
+
+```powershell
+docker run --rm `
+    -e SONAR_HOST_URL="http://host.docker.internal:9000" `
+    -e SONAR_TOKEN="<твій токен>" `
+    -v "${PWD}:/usr/src" `
+    -w /usr/src `
+    sonarsource/sonar-scanner-cli
+```
+
+Результат — у Quality Gate на дашборді проєкту.
