@@ -61,3 +61,49 @@ async def end_rental(db: AsyncSession, rental_id: int, end_station_id: int) -> R
     await db.commit()
     await db.refresh(rental)
     return rental
+
+
+def calculate_discount(
+    rental_count: int,
+    is_vip: bool,
+    vehicle_type: str,
+    station_zones: list[str],
+    has_coupon: bool,
+    is_weekend: bool,
+    is_holiday: bool,
+) -> float:
+    discount = 0.0
+    if is_vip:
+        if rental_count > 10:
+            if vehicle_type == "premium":
+                discount += 5
+            else:
+                discount += 10
+        else:
+            if vehicle_type == "premium":
+                discount += 2
+            else:
+                discount += 5
+    else:
+        if rental_count > 20:
+            discount += 3
+        elif rental_count > 5:
+            if has_coupon:
+                discount += 4
+            else:
+                discount += 1
+
+    if is_weekend:
+        for zone in station_zones:
+            if zone == "center":
+                discount += 1
+            elif zone == "suburb":
+                discount -= 1
+
+    if is_holiday:
+        if has_coupon:
+            discount += 2
+        else:
+            discount += 1
+
+    return discount
