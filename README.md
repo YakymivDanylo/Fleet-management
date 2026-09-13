@@ -94,3 +94,21 @@ docker run --rm `
 ```
 
 Результат — у Quality Gate на дашборді проєкту.
+
+### Quality Gate: критерії та обґрунтування
+
+Проєкту прив'язано кастомний профіль `Fleet Management Custom Gate` (відмінний від стандартного `Sonar way`), з 4 обов'язковими критеріями:
+
+| # | Критерій | Категорія | Поріг |
+|---|---|---|---|
+| 1 | New Bugs | New Code, Reliability | = 0 |
+| 2 | New Security Hotspots Reviewed | New Code, Security | = 100% |
+| 3 | Duplicated Lines % | Overall Code, Duplication | ≤ 3% |
+| 4 | Cognitive Complexity | Overall Code, Maintainability | ≤ 15 |
+
+Архітектурне обґрунтування (під стек FastAPI + async SQLAlchemy + PostgreSQL):
+
+1. **New Bugs = 0** — async I/O (await/coroutines, спільний стан по кількох воркерах) — типове джерело нових багів (unawaited coroutine, race condition). Блокує їх на вході, а не після мержу.
+2. **New Security Hotspots Reviewed = 100%** — застосунок ходить у PostgreSQL напряму (`text()` для raw SQL вже є в `main.py`) — SQL injection головний ризик. Кожен hotspot має пройти ручний рев'ю перед мержем.
+3. **Duplicated Lines % ≤ 3%** — шарова CRUD-архітектура (models/schemas/services/api на кожну сутність: Vehicle, Station, Renter, Rental) природньо тягне copy-paste між сутностями. Ліміт стримує це змасштабуванням проєкту.
+4. **Cognitive Complexity ≤ 15** — бізнес-правила живуть у `services/` (розрахунок вартості оренди, перевірка доступності авто/місця). Саме такі функції найшвидше обростають вкладеними умовами під нові edge-cases.
