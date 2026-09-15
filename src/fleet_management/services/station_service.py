@@ -2,7 +2,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..exceptions import NotFoundError
-from ..models import Station, Vehicle
+from ..models import Station, Vehicle, VehicleStatus
 
 
 async def get_station(db: AsyncSession, station_id: int) -> Station:
@@ -14,7 +14,9 @@ async def get_station(db: AsyncSession, station_id: int) -> Station:
 
 async def count_parked_vehicles(db: AsyncSession, station_id: int) -> int:
     result = await db.execute(
-        select(func.count()).select_from(Vehicle).where(Vehicle.station_id == station_id)
+        select(func.count())
+        .select_from(Vehicle)
+        .where(Vehicle.station_id == station_id, Vehicle.status != VehicleStatus.RENTED)
     )
     return result.scalar_one()
 
