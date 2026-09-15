@@ -4,10 +4,11 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .api import router as api_router
+from .config import settings
 from .database import get_db
 from .exceptions import NotFoundError, StationFullError, VehicleNotAvailableError
 
-app = FastAPI(title="Fleet Management")
+app = FastAPI(title=settings.app_name)
 app.include_router(api_router)
 
 
