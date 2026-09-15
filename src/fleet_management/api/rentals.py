@@ -31,14 +31,6 @@ async def list_rentals(db: AsyncSession = Depends(get_db)):
     return result.scalars().all()
 
 
-@router.get("/{rental_id}", response_model=RentalRead)
-async def get_rental(rental_id: int, db: AsyncSession = Depends(get_db)):
-    rental = await db.get(Rental, rental_id)
-    if rental is None:
-        raise HTTPException(status_code=404, detail="Rental not found")
-    return rental
-
-
 def _completed_rental_revenue(rental: Rental) -> float:
     if rental.ended_at is None:
         return 0.0
@@ -63,3 +55,11 @@ async def rentals_summary(db: AsyncSession = Depends(get_db)):
         "cancelled": counts[RentalStatus.CANCELLED],
         "total_revenue": round(total_revenue, 2),
     }
+
+
+@router.get("/{rental_id}", response_model=RentalRead)
+async def get_rental(rental_id: int, db: AsyncSession = Depends(get_db)):
+    rental = await db.get(Rental, rental_id)
+    if rental is None:
+        raise HTTPException(status_code=404, detail="Rental not found")
+    return rental
