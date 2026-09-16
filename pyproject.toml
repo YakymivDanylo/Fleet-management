@@ -15,7 +15,12 @@ dependencies = [
   "pydantic-settings>=2.15",
   "python-dotenv>=1.2",
   "alembic>=1.20",
+  "aio-pika>=10.0",
+  "redis>=8.1",
 ]
+
+[project.scripts]
+telemetry-worker = 'fleet_management.telemetry.worker:main'
 
 [project.optional-dependencies]
 dev = [
