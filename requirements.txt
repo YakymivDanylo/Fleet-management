@@ -5,3 +5,5 @@ asyncpg==0.31.0
 pydantic-settings==2.15.0
 python-dotenv==1.2.3
 alembic==1.20.0
+aio-pika==10.0.1
+redis==8.1.0

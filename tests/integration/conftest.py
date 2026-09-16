@@ -2,6 +2,7 @@ import os
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -21,9 +22,21 @@ async def db_engine():
 
 
 @pytest.fixture
-async def client(db_engine):
-    session_factory = async_sessionmaker(db_engine, expire_on_commit=False)
+def session_factory(db_engine):
+    return async_sessionmaker(db_engine, expire_on_commit=False)
 
+
+@pytest.fixture
+async def redis_client():
+    client = Redis.from_url(os.environ["REDIS_URL"], decode_responses=True)
+    await client.flushdb()
+    yield client
+    await client.flushdb()
+    await client.aclose()
+
+
+@pytest.fixture
+async def client(session_factory):
     async def override_get_db():
         async with session_factory() as session:
             yield session
