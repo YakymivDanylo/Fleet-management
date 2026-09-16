@@ -29,7 +29,7 @@ async def handle_message(
     try:
         telemetry = TelemetryMessage.model_validate_json(message.body)
     except ValidationError as exc:
-        logger.warning("Droping invalid telemetry message: %s", exc)
+        logger.warning("Dropping invalid telemetry message: %s", exc)
         await message.reject(requeue=False)
         return
 
@@ -38,7 +38,7 @@ async def handle_message(
             await save_reading(db, telemetry)
         await update_vehicle_state(redis, telemetry)
     except NotFoundError as exc:
-        logger.warning("Droping telemetry for unknown vehicle: %s", exc)
+        logger.warning("Dropping telemetry for unknown vehicle: %s", exc)
         await message.reject(requeue=False)
     except Exception:
         logger.exception("Failed to process telemetry, requeueing")
