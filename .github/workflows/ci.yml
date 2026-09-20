@@ -83,7 +83,8 @@ jobs:
             requirements-dev.txt
             
       - name: Build (install dependencies)
-        run: pip install -r requirements-dev.txt
+        run: | 
+            pip install --only-binary :all: -r requirements-dev.txt
       - name: Ruff check
         run: ruff check .
       - name: Ruff format check
