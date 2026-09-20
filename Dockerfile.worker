@@ -1,21 +1,33 @@
+FROM python:3.13-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN python -m venv --without-pip /opt/venv
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --python /opt/venv/bin/python -r requirements.txt
+
+COPY pyproject.toml .
+COPY src ./src
+RUN pip install --python /opt/venv/bin/python --no-deps .
+
+
 FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-RUN pip install --upgrade pip setuptools
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY --from=builder /opt/venv /opt/venv
 
-COPY pyproject.toml .
-COPY src ./src
-RUN pip install --no-deps .
+RUN /usr/local/bin/python -m pip uninstall -y pip setuptools wheel \
+    && useradd --create-home appuser
 
-RUN useradd --create-home appuser
 USER appuser
 
 CMD ["telemetry-worker"]
