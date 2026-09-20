@@ -154,15 +154,17 @@ router = APIRouter(prefix="/vehicles", tags=["vehicles"])
 
 
 @router.post("", response_model=VehicleRead, status_code=201)
-async def create_vehicle(payload: VehicleCreate, db: AsyncSession = Depends(get_db)):
-    ...  # тіло функції ідентичне оригіналу
+async def create_vehicle(
+    payload: VehicleCreate, db: AsyncSession = Depends(get_db)
+): ...  # тіло функції ідентичне оригіналу
 ```
 
 **Порушення 2 — критична Cognitive Complexity (Overall Code).** У `services/rental_service.py` додано `calculate_discount` з 4 рівнями вкладених `if/else` (без Guard Clauses):
 
 ```python
-def calculate_discount(rental_count, is_vip, vehicle_type, station_zones,
-                        has_coupon, is_weekend, is_holiday):
+def calculate_discount(
+    rental_count, is_vip, vehicle_type, station_zones, has_coupon, is_weekend, is_holiday
+):
     discount = 0.0
     if is_vip:
         if rental_count > 10:
