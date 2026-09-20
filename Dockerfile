@@ -8,11 +8,11 @@ RUN python -m venv --without-pip /opt/venv
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --python /opt/venv/bin/python -r requirements.txt
+RUN pip --python /opt/venv/bin/python install -r requirements.txt
 
 COPY pyproject.toml .
 COPY src ./src
-RUN pip install --python /opt/venv/bin/python --no-deps .
+RUN pip --python /opt/venv/bin/python install --no-deps .
 
 
 FROM python:3.13-slim
