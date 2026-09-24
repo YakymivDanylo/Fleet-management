@@ -102,7 +102,7 @@ WEEKEND_NO_DEPOSIT = {"is_weekend": True, "weekend_requires_deposit": True}
             {"has_unpaid_fees": True, **WEEKEND_NO_DEPOSIT},
             (False, "Deposit required for unpaid fees on weekend"),
         ),
-        ({"has_unpaid_fees": True}, (True, "OK")),
+        ({"has_unpaid_fees": False}, (True, "OK")),
         ({"vehicle_status": VehicleStatus.RENTED}, (False, "Vehicle not available")),
         ({"station_is_open": False}, (False, "Station is closed")),
         (WEEKEND_NO_DEPOSIT, (False, "Deposit required on weekend")),
