@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -68,3 +69,18 @@ class RentalRead(BaseModel):
     ended_at: datetime | None
     status: RentalStatus
     cost: float | None = None
+
+
+class VehicleStateRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    vehicle_id: int
+    recorded_at: datetime
+    latitude: float
+    longitude: float
+    fuel_level: float
+    is_locked: bool
+    # "cache" = hot state from Redis; "database" = last reading from Postgres.
+    source: Literal["cache", "database"]
+    # True when the answer is a fallback caused by a failed dependency.
+    degraded: bool = False
