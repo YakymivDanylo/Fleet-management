@@ -12,3 +12,7 @@ class VehicleNotAvailableError(DomainError):
 
 class StationFullError(DomainError):
     """Raised when a station has no free capacity for a returning vehicle."""
+
+
+class DependencyUnavailableError(DomainError):
+    """Raised when a dependency failed and no degraded answer can be produced."""

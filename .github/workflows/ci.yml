@@ -62,7 +62,10 @@ jobs:
 
       - name: Test (api)
         if: matrix.service == 'api'
-        run: pytest tests/unit/test_rental_service.py tests/integration/test_api.py -v
+        run: >-
+          pytest tests/unit/test_rental_service.py tests/integration/test_api.py
+          tests/unit/test_resilience.py tests/unit/test_vehicle_state_service.py
+          tests/integration/test_vehicle_state_api.py -v
 
       - name: Test (worker)
         if: matrix.service == 'worker'
