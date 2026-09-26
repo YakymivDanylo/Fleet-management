@@ -12,6 +12,7 @@ from .config import settings
 from .database import get_db
 from .exceptions import (
     DependencyUnavailableError,
+    EmailAlreadyRegisteredError,
     NotFoundError,
     StationFullError,
     VehicleNotAvailableError,
@@ -24,6 +25,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if not settings.jwt_secret_key:
+        raise RuntimeError("JWT_SECRET_KEY is not set; the API cannot issue access tokens")
     yield
     await close_redis()
 
@@ -44,6 +47,11 @@ async def handle_vehicle_unavailable(request: Request, exc: VehicleNotAvailableE
 
 @app.exception_handler(StationFullError)
 async def handle_station_full(request: Request, exc: StationFullError):
+    return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+
+@app.exception_handler(EmailAlreadyRegisteredError)
+async def handle_email_taken(request: Request, exc: EmailAlreadyRegisteredError):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
 
 
