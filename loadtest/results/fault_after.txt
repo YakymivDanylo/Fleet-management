@@ -1,0 +1,180 @@
+ Container fleet_management-k6-run-3e691a84d001 Creating 
+ Container fleet_management-k6-run-3e691a84d001 Created 
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/vehicle_state.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 400 max VUs, 1m10s max duration (incl. graceful stop):
+              * fault: 30.00 iterations/s for 40s (maxVUs: 50-400, gracefulStop: 30s)
+
+
+running (0m01.0s), 022/050 VUs, 8 complete and 0 interrupted iterations
+fault   [   2% ] 022/050 VUs  01.0s/40s  30.00 iters/s
+
+running (0m02.0s), 022/050 VUs, 38 complete and 0 interrupted iterations
+fault   [   5% ] 022/050 VUs  02.0s/40s  30.00 iters/s
+
+running (0m03.0s), 022/050 VUs, 68 complete and 0 interrupted iterations
+fault   [   7% ] 022/050 VUs  03.0s/40s  30.00 iters/s
+
+running (0m04.0s), 022/050 VUs, 98 complete and 0 interrupted iterations
+fault   [  10% ] 022/050 VUs  04.0s/40s  30.00 iters/s
+
+running (0m05.0s), 021/050 VUs, 129 complete and 0 interrupted iterations
+fault   [  12% ] 021/050 VUs  05.0s/40s  30.00 iters/s
+
+running (0m06.0s), 022/050 VUs, 158 complete and 0 interrupted iterations
+fault   [  15% ] 022/050 VUs  06.0s/40s  30.00 iters/s
+
+running (0m07.0s), 022/050 VUs, 188 complete and 0 interrupted iterations
+fault   [  17% ] 022/050 VUs  07.0s/40s  30.00 iters/s
+
+running (0m08.0s), 021/050 VUs, 219 complete and 0 interrupted iterations
+fault   [  20% ] 021/050 VUs  08.0s/40s  30.00 iters/s
+
+running (0m09.0s), 021/050 VUs, 249 complete and 0 interrupted iterations
+fault   [  22% ] 021/050 VUs  09.0s/40s  30.00 iters/s
+
+running (0m10.0s), 021/050 VUs, 279 complete and 0 interrupted iterations
+fault   [  25% ] 021/050 VUs  10.0s/40s  30.00 iters/s
+
+running (0m11.0s), 021/050 VUs, 309 complete and 0 interrupted iterations
+fault   [  27% ] 021/050 VUs  11.0s/40s  30.00 iters/s
+
+running (0m12.0s), 021/050 VUs, 339 complete and 0 interrupted iterations
+fault   [  30% ] 021/050 VUs  12.0s/40s  30.00 iters/s
+
+running (0m13.0s), 022/050 VUs, 368 complete and 0 interrupted iterations
+fault   [  32% ] 022/050 VUs  13.0s/40s  30.00 iters/s
+
+running (0m14.0s), 022/050 VUs, 398 complete and 0 interrupted iterations
+fault   [  35% ] 022/050 VUs  14.0s/40s  30.00 iters/s
+
+running (0m15.0s), 022/050 VUs, 428 complete and 0 interrupted iterations
+fault   [  37% ] 022/050 VUs  15.0s/40s  30.00 iters/s
+
+running (0m16.0s), 022/050 VUs, 458 complete and 0 interrupted iterations
+fault   [  40% ] 022/050 VUs  16.0s/40s  30.00 iters/s
+
+running (0m17.0s), 021/050 VUs, 489 complete and 0 interrupted iterations
+fault   [  42% ] 021/050 VUs  17.0s/40s  30.00 iters/s
+
+running (0m18.0s), 021/050 VUs, 519 complete and 0 interrupted iterations
+fault   [  45% ] 021/050 VUs  18.0s/40s  30.00 iters/s
+
+running (0m19.0s), 021/050 VUs, 549 complete and 0 interrupted iterations
+fault   [  47% ] 021/050 VUs  19.0s/40s  30.00 iters/s
+
+running (0m20.0s), 022/050 VUs, 578 complete and 0 interrupted iterations
+fault   [  50% ] 022/050 VUs  20.0s/40s  30.00 iters/s
+
+running (0m21.0s), 021/050 VUs, 609 complete and 0 interrupted iterations
+fault   [  52% ] 021/050 VUs  21.0s/40s  30.00 iters/s
+
+running (0m22.0s), 021/050 VUs, 639 complete and 0 interrupted iterations
+fault   [  55% ] 021/050 VUs  22.0s/40s  30.00 iters/s
+
+running (0m23.0s), 022/050 VUs, 668 complete and 0 interrupted iterations
+fault   [  57% ] 022/050 VUs  23.0s/40s  30.00 iters/s
+
+running (0m24.0s), 022/050 VUs, 698 complete and 0 interrupted iterations
+fault   [  60% ] 022/050 VUs  24.0s/40s  30.00 iters/s
+
+running (0m25.0s), 022/050 VUs, 728 complete and 0 interrupted iterations
+fault   [  62% ] 022/050 VUs  25.0s/40s  30.00 iters/s
+
+running (0m26.0s), 021/050 VUs, 759 complete and 0 interrupted iterations
+fault   [  65% ] 021/050 VUs  26.0s/40s  30.00 iters/s
+
+running (0m27.0s), 021/050 VUs, 789 complete and 0 interrupted iterations
+fault   [  67% ] 021/050 VUs  27.0s/40s  30.00 iters/s
+
+running (0m28.0s), 022/050 VUs, 818 complete and 0 interrupted iterations
+fault   [  70% ] 022/050 VUs  28.0s/40s  30.00 iters/s
+
+running (0m29.0s), 022/050 VUs, 848 complete and 0 interrupted iterations
+fault   [  72% ] 022/050 VUs  29.0s/40s  30.00 iters/s
+
+running (0m30.0s), 022/050 VUs, 878 complete and 0 interrupted iterations
+fault   [  75% ] 022/050 VUs  30.0s/40s  30.00 iters/s
+
+running (0m31.0s), 021/050 VUs, 909 complete and 0 interrupted iterations
+fault   [  77% ] 021/050 VUs  31.0s/40s  30.00 iters/s
+
+running (0m32.0s), 022/050 VUs, 938 complete and 0 interrupted iterations
+fault   [  80% ] 022/050 VUs  32.0s/40s  30.00 iters/s
+
+running (0m33.0s), 021/050 VUs, 969 complete and 0 interrupted iterations
+fault   [  82% ] 021/050 VUs  33.0s/40s  30.00 iters/s
+
+running (0m34.0s), 021/050 VUs, 999 complete and 0 interrupted iterations
+fault   [  85% ] 021/050 VUs  34.0s/40s  30.00 iters/s
+
+running (0m35.0s), 022/050 VUs, 1028 complete and 0 interrupted iterations
+fault   [  87% ] 022/050 VUs  35.0s/40s  30.00 iters/s
+
+running (0m36.0s), 022/050 VUs, 1058 complete and 0 interrupted iterations
+fault   [  90% ] 022/050 VUs  36.0s/40s  30.00 iters/s
+
+running (0m37.0s), 022/050 VUs, 1088 complete and 0 interrupted iterations
+fault   [  92% ] 022/050 VUs  37.0s/40s  30.00 iters/s
+
+running (0m38.0s), 021/050 VUs, 1119 complete and 0 interrupted iterations
+fault   [  95% ] 021/050 VUs  38.0s/40s  30.00 iters/s
+
+running (0m39.0s), 022/050 VUs, 1148 complete and 0 interrupted iterations
+fault   [  97% ] 022/050 VUs  39.0s/40s  30.00 iters/s
+
+running (0m40.0s), 022/050 VUs, 1178 complete and 0 interrupted iterations
+fault   [ 100% ] 022/050 VUs  40.0s/40s  30.00 iters/s
+
+
+  █ THRESHOLDS 
+
+    http_req_duration
+    ✓ 'p(95)<1000' p(95)=743.62ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2400    58.927043/s
+    checks_succeeded...: 100.00% 2400 out of 2400
+    checks_failed......: 0.00%   0 out of 2400
+
+    ✓ status is 200
+    ✓ body has vehicle state
+
+    CUSTOM
+    degraded_responses.............: 100.00% 1200 out of 1200
+
+    HTTP
+    http_req_duration..............: avg=716.43ms med=717.14ms p(90)=739.75ms p(95)=743.62ms p(99)=749.87ms max=767.73ms
+      { expected_response:true }...: avg=716.43ms med=717.14ms p(90)=739.75ms p(95)=743.62ms p(99)=749.87ms max=767.73ms
+    http_req_failed................: 0.00%   0 out of 1201
+    http_reqs......................: 1201    29.488074/s
+
+    EXECUTION
+    iteration_duration.............: avg=717.33ms med=717.41ms p(90)=740.12ms p(95)=744.02ms p(99)=750.1ms  max=769.58ms
+    iterations.....................: 1200    29.463521/s
+    vus............................: 22      min=21           max=22
+    vus_max........................: 50      min=50           max=50
+
+    NETWORK
+    data_received..................: 372 kB  9.1 kB/s
+    data_sent......................: 97 kB   2.4 kB/s
+
+
+
+
+running (0m40.7s), 000/050 VUs, 1200 complete and 0 interrupted iterations
+fault ✓ [ 100% ] 000/050 VUs  40s  30.00 iters/s

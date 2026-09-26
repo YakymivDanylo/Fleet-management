@@ -35,17 +35,36 @@ services:
       timeout: 5s
       retries: 10
 
+  # Fault-injection proxy between api and Redis (Lab 2). The api reaches Redis only
+  # through it, so latency/timeouts/outages can be injected via its HTTP API (:8474)
+  # without stopping any container. The worker keeps writing to Redis directly.
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.12.0
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    volumes:
+      - ./loadtest/toxiproxy.json:/config/toxiproxy.json:ro
+    ports:
+      - "8474:8474"
+    depends_on:
+      redis:
+        condition: service_healthy
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://fleet_user:fleet_password@db:5432/fleet_management
+      REDIS_URL: redis://toxiproxy:26379/0
+      # false = unprotected baseline for the "before" fault-injection run
+      RESILIENCE_ENABLED: ${RESILIENCE_ENABLED:-true}
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+      toxiproxy:
+        condition: service_started
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -69,6 +88,18 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+
+  # Load generator, started on demand: docker compose run --rm k6 run ...
+  k6:
+    image: grafana/k6:1.3.0
+    profiles: ["loadtest"]
+    environment:
+      BASE_URL: http://api:8000
+    volumes:
+      - ./loadtest:/scripts
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   pgdata:
