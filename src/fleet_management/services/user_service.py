@@ -37,8 +37,6 @@ async def create_user(
     try:
         await db.commit()
     except IntegrityError as exc:
-        # The unique index is the source of truth: a pre-check SELECT would still
-        # race with a concurrent registration of the same email.
         await db.rollback()
         raise EmailAlreadyRegisteredError(f"Email {user.email} is already registered") from exc
     await db.refresh(user)

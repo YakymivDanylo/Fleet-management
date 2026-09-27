@@ -9,7 +9,6 @@ from .database import get_db
 from .models import User, UserRole
 from .security import InvalidTokenError, decode_access_token
 
-# tokenUrl makes the "Authorize" button in Swagger UI log in through /auth/login.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 _UNAUTHORIZED = HTTPException(
@@ -27,8 +26,6 @@ async def get_current_user(
     except InvalidTokenError:
         raise _UNAUTHORIZED from None
 
-    # The role is read from the database, not from the token claim, so a demoted
-    # or deactivated user loses access immediately instead of when the token expires.
     user = await db.get(User, user_id)
     if user is None or not user.is_active:
         raise _UNAUTHORIZED

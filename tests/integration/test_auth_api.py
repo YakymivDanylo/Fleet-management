@@ -37,9 +37,6 @@ async def admin_headers(client: AsyncClient, session_factory) -> dict:
     return await auth_headers(client, "admin@example.com")
 
 
-# --- registration -----------------------------------------------------------
-
-
 async def test_register_creates_regular_user(client: AsyncClient):
     response = await register(client)
 
@@ -74,9 +71,6 @@ async def test_register_rejects_invalid_payload(client: AsyncClient, overrides: 
     response = await register(client, **overrides)
 
     assert response.status_code == 422
-
-
-# --- login ------------------------------------------------------------------
 
 
 async def test_login_returns_token_and_user_home(client: AsyncClient):
@@ -123,9 +117,6 @@ async def test_me_returns_current_user(client: AsyncClient, user_headers):
     assert response.json()["email"] == "renter@example.com"
 
 
-# --- anonymous and invalid tokens --------------------------------------------
-
-
 @pytest.mark.parametrize("path", ["/auth/me", "/home/user", "/home/admin", "/admin/users"])
 async def test_protected_routes_reject_anonymous(client: AsyncClient, path: str):
     response = await client.get(path)
@@ -149,9 +140,6 @@ async def test_deactivated_user_loses_access(client: AsyncClient, user_headers, 
     response = await client.get("/auth/me", headers=user_headers)
 
     assert response.status_code == 401
-
-
-# --- role-based home pages and admin panel ----------------------------------
 
 
 async def test_user_home_page_for_user(client: AsyncClient, user_headers):

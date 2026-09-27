@@ -8,8 +8,6 @@ from ..models import User, UserRole
 from ..schemas import UserRead, UserRegister
 from ..services import user_service
 
-# The dependency on the router protects every current and future admin endpoint,
-# so a new route cannot be left open by forgetting a per-route check.
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
 

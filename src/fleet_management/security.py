@@ -5,8 +5,6 @@ from pwdlib import PasswordHash
 
 from .config import settings
 
-# Argon2id with the library's recommended parameters: memory-hard, so offline
-# brute force of a leaked hash is expensive on GPUs as well.
 _password_hash = PasswordHash.recommended()
 
 
@@ -31,12 +29,10 @@ def create_access_token(user_id: int, role: str, expires_delta: timedelta | None
 
 
 def decode_access_token(token: str) -> int:
-    """Return the user id stored in a valid token."""
     try:
         payload = jwt.decode(
             token,
             settings.jwt_secret_key,
-            # Pinning the algorithm blocks "alg: none" and key-confusion attacks.
             algorithms=[settings.jwt_algorithm],
             options={"require": ["sub", "exp"]},
         )

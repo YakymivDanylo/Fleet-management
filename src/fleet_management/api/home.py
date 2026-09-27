@@ -15,7 +15,6 @@ HOME_URLS = {
 
 
 def _stub_page(title: str, user: User, sections: list[str]) -> str:
-    # full_name is user input: escaping it prevents stored XSS on the page.
     items = "".join(f"<li>{escape(section)}</li>" for section in sections)
     return (
         "<!doctype html><html lang='uk'><head><meta charset='utf-8'>"
