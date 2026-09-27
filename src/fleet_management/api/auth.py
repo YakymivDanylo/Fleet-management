@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Form, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
@@ -15,20 +16,19 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserRead, status_code=201)
 async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
-    # The role is not part of the payload: self-registration always yields a
-    # regular user, otherwise anyone could register themselves as an admin.
     return await user_service.create_user(
         db, payload.email, payload.password, payload.full_name, role=UserRole.USER
     )
 
 
 @router.post("/login", response_model=Token)
-async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
-    # OAuth2 password flow names the field "username"; here it carries the email.
-    user = await user_service.authenticate(db, form.username, form.password)
+async def login(
+    username: Annotated[str, Form(description="Email користувача", examples=["petro@example.com"])],
+    password: Annotated[str, Form(json_schema_extra={"format": "password"})],
+    db: AsyncSession = Depends(get_db),
+):
+    user = await user_service.authenticate(db, username, password)
     if user is None:
-        # One message for "no such email" and "wrong password" so the endpoint
-        # cannot be used to find out which emails are registered.
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
