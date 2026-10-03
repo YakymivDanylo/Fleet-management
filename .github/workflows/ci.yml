@@ -63,7 +63,8 @@ jobs:
       - name: Test (api)
         if: matrix.service == 'api'
         run: >-
-          pytest tests/unit/test_rental_service.py tests/integration/test_api.py
+          pytest tests/unit/test_rental_service.py tests/unit/test_rental_eligibility_characterization.py
+          tests/integration/test_api.py
           tests/unit/test_resilience.py tests/unit/test_vehicle_state_service.py
           tests/integration/test_vehicle_state_api.py tests/unit/test_security.py
           tests/integration/test_auth_api.py -v
@@ -93,6 +94,48 @@ jobs:
         run: ruff check .
       - name: Ruff format check
         run: ruff format --check .
+  complexity:
+    name: Complexity gate (xenon + complexipy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install analyzers
+        run: pip install radon==6.0.1 xenon==0.9.3 complexipy==8.0.1
+      - name: Cyclomatic Complexity report (radon)
+        run: radon cc src -s -a
+      - name: Cyclomatic Complexity <= 10 per block (xenon rank B)
+        run: xenon --max-absolute B src
+      - name: Cognitive Complexity <= 15 per function (complexipy)
+        run: complexipy src --max-complexity-allowed 15
+  sca:
+    name: SCA (pip-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install pip-audit
+        run: pip install pip-audit==2.10.1
+      - name: Audit declared dependencies (direct + transitive)
+        run: pip-audit -r requirements-dev.txt --desc
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (full git history)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git --redact -v /repo
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
@@ -109,7 +152,7 @@ jobs:
   build:
     name: Build Image (${{matrix.service}})
     runs-on: ubuntu-latest
-    needs: [test, lint, sonarcloud]
+    needs: [test, lint, sonarcloud, complexity, sca, secrets]
     strategy:
       fail-fast: false
       matrix:
