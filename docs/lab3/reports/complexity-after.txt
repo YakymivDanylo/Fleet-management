@@ -1,0 +1,50 @@
+## radon cc (Cyclomatic Complexity), radon 6.0.1
+src/fleet_management/services/rental_service.py
+    F 46:0 end_rental - A (4)
+    F 72:0 _vip_discount - A (4)
+    F 78:0 _regular_discount - A (4)
+    F 94:0 calculate_discount - A (4)
+    F 25:0 start_rental - A (3)
+    F 163:0 validate_rental_eligibility - A (3)
+    C 118:0 RentalEligibilityContext - A (3)
+    M 130:4 RentalEligibilityContext.deposit_missing - A (3)
+    F 86:0 _weekend_zone_discount - A (2)
+    F 90:0 _holiday_discount - A (2)
+    M 133:4 RentalEligibilityContext.unpaid_fees_with_active_rental - A (2)
+    M 136:4 RentalEligibilityContext.unpaid_fees_without_deposit - A (2)
+    F 17:0 calculate_cost - A (1)
+    M 139:4 RentalEligibilityContext.vehicle_unavailable - A (1)
+    M 142:4 RentalEligibilityContext.station_closed - A (1)
+
+## complexipy (Cognitive Complexity), complexipy 8.0.1
+src\fleet_management\services\rental_service.py RentalEligibilityContext::station_closed 0
+src\fleet_management\services\rental_service.py RentalEligibilityContext::vehicle_unavailable 0
+src\fleet_management\services\rental_service.py calculate_cost 0
+src\fleet_management\services\rental_service.py RentalEligibilityContext::deposit_missing 1
+src\fleet_management\services\rental_service.py RentalEligibilityContext::unpaid_fees_with_active_rental 1
+src\fleet_management\services\rental_service.py RentalEligibilityContext::unpaid_fees_without_deposit 1
+src\fleet_management\services\rental_service.py _holiday_discount 1
+src\fleet_management\services\rental_service.py _weekend_zone_discount 1
+src\fleet_management\services\rental_service.py start_rental 2
+src\fleet_management\services\rental_service.py _regular_discount 3
+src\fleet_management\services\rental_service.py calculate_discount 3
+src\fleet_management\services\rental_service.py end_rental 3
+src\fleet_management\services\rental_service.py validate_rental_eligibility 3
+src\fleet_management\services\rental_service.py _vip_discount 4
+
+## radon mi (Maintainability Index)
+src/fleet_management/services/rental_service.py - A (38.94)
+
+## radon raw
+src/fleet_management/services/rental_service.py
+    LOC: 188
+    LLOC: 107
+    SLOC: 146
+    Comments: 1
+    Single comments: 1
+    Multi: 0
+    Blank: 41
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 1%
