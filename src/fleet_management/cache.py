@@ -10,7 +10,6 @@ _redis: Redis | None = None
 
 def _create_client() -> Redis:
     if not settings.resilience_enabled:
-        # Baseline: library defaults (5 s socket timeout, no handling above it).
         return Redis.from_url(settings.redis_url, decode_responses=True)
 
     timeout = settings.redis_attempt_timeout_ms / 1000
@@ -19,8 +18,6 @@ def _create_client() -> Redis:
         decode_responses=True,
         socket_timeout=timeout,
         socket_connect_timeout=timeout,
-        # Retries are owned by resilience.call_with_retry; a second hidden retry
-        # layer inside the driver would multiply the number of calls.
         retry=Retry(NoBackoff(), 0),
     )
 

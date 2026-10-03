@@ -6,8 +6,6 @@ from ..exceptions import EmailAlreadyRegisteredError
 from ..models import User, UserRole
 from ..security import hash_password, verify_password
 
-# Verified when the email is unknown, so a login for a missing account takes as
-# long as one with a wrong password and response time does not reveal which emails exist.
 _DUMMY_PASSWORD_HASH = hash_password("dummy-password-for-timing")
 
 

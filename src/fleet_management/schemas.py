@@ -80,15 +80,12 @@ class VehicleStateRead(BaseModel):
     longitude: float
     fuel_level: float
     is_locked: bool
-    # "cache" = hot state from Redis; "database" = last reading from Postgres.
     source: Literal["cache", "database"]
-    # True when the answer is a fallback caused by a failed dependency.
     degraded: bool = False
 
 
 class UserRegister(BaseModel):
     email: EmailStr
-    # Upper bound keeps a single request from burning CPU on hashing a huge string.
     password: str = Field(min_length=8, max_length=128)
     full_name: str = Field(min_length=1, max_length=150)
 
@@ -97,8 +94,6 @@ class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    # Plain str on output: the address was validated on input, and re-validating
-    # stored data here would turn one odd row into a 500 for the whole list.
     email: str
     full_name: str
     role: UserRole
@@ -110,5 +105,4 @@ class Token(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"
     role: UserRole
-    # Where the client should navigate after login: each role has its own home page.
     home_url: str
