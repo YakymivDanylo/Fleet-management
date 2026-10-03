@@ -1,0 +1,15 @@
+Found 8 known vulnerabilities in 1 package
+Name       Version ID              Fix Versions
+---------- ------- --------------- ------------
+virtualenv 21.7.8  PYSEC-2026-4011 21.7.12
+virtualenv 21.7.8  PYSEC-2026-4012 21.7.11
+virtualenv 21.7.8  PYSEC-2026-4014 21.7.12
+virtualenv 21.7.8  PYSEC-2026-4013 21.7.13
+virtualenv 21.7.8  PYSEC-2026-4011 21.7.12
+virtualenv 21.7.8  PYSEC-2026-4012 21.7.11
+virtualenv 21.7.8  PYSEC-2026-4013 21.7.13
+virtualenv 21.7.8  PYSEC-2026-4014 21.7.12
+
+Name             Skip Reason
+---------------- -------------------------------------------------------------------------------
+fleet-management Dependency not found on PyPI and could not be audited: fleet-management (0.1.0)

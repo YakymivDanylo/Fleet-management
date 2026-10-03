@@ -4,3 +4,10 @@ pre-commit==4.6.2
 pytest==9.1.1
 pytest-asyncio==1.4.0
 httpx==0.28.1
+# Transitive dep of pre-commit, pinned to fix GHSA-94p9-xgh2-xp45, GHSA-9h9j-4vrj-gf7g,
+# GHSA-x78j-v8h9-3j2q, GHSA-p58f-9548-mpm2 (vulnerable < 21.7.13)
+virtualenv==21.14.5
+radon==6.0.1
+xenon==0.9.3
+complexipy==8.0.1
+pip-audit==2.10.1
