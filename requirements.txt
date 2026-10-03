@@ -7,3 +7,7 @@ python-dotenv==1.2.3
 alembic==1.20.0
 aio-pika==10.0.1
 redis==8.1.0
+pyjwt==2.15.0
+pwdlib[argon2]==0.3.1
+python-multipart==0.0.32
+email-validator==2.3.0

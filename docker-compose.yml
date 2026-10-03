@@ -58,6 +58,8 @@ services:
       REDIS_URL: redis://toxiproxy:26379/0
       # false = unprotected baseline for the "before" fault-injection run
       RESILIENCE_ENABLED: ${RESILIENCE_ENABLED:-true}
+      # Taken from .env (not committed); compose stops with this message if it is missing.
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
     ports:
       - "8000:8000"
     depends_on:

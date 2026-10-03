@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from .models import RentalStatus, VehicleStatus
+from .models import RentalStatus, UserRole, VehicleStatus
 
 
 class StationCreate(BaseModel):
@@ -80,7 +80,29 @@ class VehicleStateRead(BaseModel):
     longitude: float
     fuel_level: float
     is_locked: bool
-    # "cache" = hot state from Redis; "database" = last reading from Postgres.
     source: Literal["cache", "database"]
-    # True when the answer is a fallback caused by a failed dependency.
     degraded: bool = False
+
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    full_name: str = Field(min_length=1, max_length=150)
+
+
+class UserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    full_name: str
+    role: UserRole
+    is_active: bool
+    created_at: datetime
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: Literal["bearer"] = "bearer"
+    role: UserRole
+    home_url: str

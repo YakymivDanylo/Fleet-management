@@ -1,11 +1,3 @@
-"""Bounded retry with per-attempt timeout and exponential backoff with jitter.
-
-Used to protect calls to external dependencies (Redis). Retrying is always
-finite: at most ``max_attempts`` calls, each capped by ``attempt_timeout``,
-separated by growing randomized pauses, so a struggling dependency is never
-hammered by a synchronous retry storm.
-"""
-
 import asyncio
 import logging
 import random

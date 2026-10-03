@@ -16,3 +16,7 @@ class StationFullError(DomainError):
 
 class DependencyUnavailableError(DomainError):
     """Raised when a dependency failed and no degraded answer can be produced."""
+
+
+class EmailAlreadyRegisteredError(DomainError):
+    """Raised when a user tries to register with an email that is already taken."""

@@ -1,13 +1,3 @@
-"""Seed data for the Lab 2 load test (stdlib only, runs from the host).
-
-Creates one station with N vehicles through the public API, then publishes one
-telemetry message per vehicle to RabbitMQ (via the management HTTP API). The
-telemetry-worker stores each reading in Postgres and caches it in Redis - the
-same path real telemetry takes - so both the cache and the fallback have data.
-
-Usage:  python scripts/seed_loadtest.py [--vehicles 50]
-"""
-
 import argparse
 import base64
 import json
