@@ -111,3 +111,28 @@ WEEKEND_NO_DEPOSIT = {"is_weekend": True, "weekend_requires_deposit": True}
 )
 def test_validate_rental_eligibility(overrides, expected):
     assert _eligibility(**overrides) == expected
+
+
+@pytest.mark.parametrize(
+    ("overrides", "expected"),
+    [
+        (
+            {"has_unpaid_fees": True, "active_rental_count": 1, **WEEKEND_NO_DEPOSIT},
+            (False, "Unpaid fees with an active rental"),
+        ),
+        ({"has_unpaid_fees": True, "active_rental_count": 0}, (True, "OK")),
+        (
+            {"has_unpaid_fees": True, **WEEKEND_NO_DEPOSIT, "vehicle_status": VehicleStatus.RENTED},
+            (False, "Deposit required for unpaid fees on weekend"),
+        ),
+        ({"vehicle_status": VehicleStatus.MAINTENANCE}, (False, "Vehicle not available")),
+        (
+            {"vehicle_status": VehicleStatus.RENTED, "station_is_open": False},
+            (False, "Vehicle not available"),
+        ),
+        ({"is_weekend": True, "weekend_requires_deposit": False}, (True, "OK")),
+        ({"is_weekend": False, "weekend_requires_deposit": True}, (True, "OK")),
+    ],
+)
+def test_validate_rental_eligibility_rule_priority_and_edges(overrides, expected):
+    assert _eligibility(**overrides) == expected

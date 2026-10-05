@@ -1,0 +1,9 @@
+# False positives: IDE editor-tab metadata (session ids / tab titles), not credentials.
+# The .idea/ directory was removed from version control in f08bb56.
+82cbc5129f304e4c7c80573b50bf1bf6581adf81:.idea/claudeCodeEditorTabs.xml:generic-api-key:12
+82cbc5129f304e4c7c80573b50bf1bf6581adf81:.idea/claudeCodeEditorTabs.xml:generic-api-key:17
+
+# Accepted risk: token of a local-only SonarQube (http://localhost:9000, not exposed outside the dev
+# machine), committed in 4e159b8 and replaced with a placeholder in a later commit.
+4e159b83b79e94c5de7dc9a7334517505cacfbb8:README.md:sonar-api-token:276
+4e159b83b79e94c5de7dc9a7334517505cacfbb8:README.md:sonar-api-token:284

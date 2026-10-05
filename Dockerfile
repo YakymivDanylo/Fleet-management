@@ -28,7 +28,10 @@ COPY --from=builder /opt/venv /opt/venv
 COPY alembic.ini .
 COPY alembic ./alembic
 
-RUN /usr/local/bin/python -m pip uninstall -y pip setuptools wheel \
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && /usr/local/bin/python -m pip uninstall -y pip setuptools wheel \
     && useradd --create-home appuser
 
 USER appuser

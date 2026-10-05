@@ -87,7 +87,7 @@ docker compose -f config/docker-compose.yml up -d sonarqube
 ```powershell
 docker run --rm `
     -e SONAR_HOST_URL="http://host.docker.internal:9000" `
-    -e SONAR_TOKEN="<твій токен>" `
+    -e SONAR_TOKEN="<токен>" `
     -v "${PWD}:/usr/src" `
     -w /usr/src `
     sonarsource/sonar-scanner-cli

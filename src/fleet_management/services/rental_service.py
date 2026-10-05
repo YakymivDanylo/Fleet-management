@@ -1,5 +1,8 @@
 import math
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
+from operator import attrgetter
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -111,6 +114,52 @@ def calculate_discount(
     return discount
 
 
+@dataclass(frozen=True)
+class RentalEligibilityContext:
+    renter_is_blacklisted: bool
+    license_expired: bool
+    has_unpaid_fees: bool
+    active_rental_count: int
+    vehicle_status: VehicleStatus
+    station_is_open: bool
+    is_weekend: bool
+    weekend_requires_deposit: bool
+    has_deposit_on_file: bool
+
+    @property
+    def deposit_missing(self) -> bool:
+        return self.is_weekend and self.weekend_requires_deposit and not self.has_deposit_on_file
+
+    def unpaid_fees_with_active_rental(self) -> bool:
+        return self.has_unpaid_fees and self.active_rental_count > 0
+
+    def unpaid_fees_without_deposit(self) -> bool:
+        return self.has_unpaid_fees and self.deposit_missing
+
+    def vehicle_unavailable(self) -> bool:
+        return self.vehicle_status != VehicleStatus.AVAILABLE
+
+    def station_closed(self) -> bool:
+        return not self.station_is_open
+
+
+EligibilityRule = tuple[Callable[[RentalEligibilityContext], bool], str]
+
+# Ordered by priority: the first violated rule determines the rejection reason.
+ELIGIBILITY_RULES: tuple[EligibilityRule, ...] = (
+    (attrgetter("renter_is_blacklisted"), "Renter is blacklisted"),
+    (attrgetter("license_expired"), "License expired"),
+    (RentalEligibilityContext.unpaid_fees_with_active_rental, "Unpaid fees with an active rental"),
+    (
+        RentalEligibilityContext.unpaid_fees_without_deposit,
+        "Deposit required for unpaid fees on weekend",
+    ),
+    (RentalEligibilityContext.vehicle_unavailable, "Vehicle not available"),
+    (RentalEligibilityContext.station_closed, "Station is closed"),
+    (attrgetter("deposit_missing"), "Deposit required on weekend"),
+)
+
+
 def validate_rental_eligibility(
     renter_is_blacklisted: bool,
     license_expired: bool,
@@ -122,24 +171,18 @@ def validate_rental_eligibility(
     weekend_requires_deposit: bool,
     has_deposit_on_file: bool,
 ) -> tuple[bool, str]:
-    if renter_is_blacklisted:
-        return False, "Renter is blacklisted"
-    if license_expired:
-        return False, "License expired"
-
-    deposit_missing = is_weekend and weekend_requires_deposit and not has_deposit_on_file
-
-    if has_unpaid_fees:
-        if active_rental_count > 0:
-            return False, "Unpaid fees with an active rental"
-        if deposit_missing:
-            return False, "Deposit required for unpaid fees on weekend"
-
-    if vehicle_status != VehicleStatus.AVAILABLE:
-        return False, "Vehicle not available"
-    if not station_is_open:
-        return False, "Station is closed"
-    if deposit_missing:
-        return False, "Deposit required on weekend"
-
+    ctx = RentalEligibilityContext(
+        renter_is_blacklisted=renter_is_blacklisted,
+        license_expired=license_expired,
+        has_unpaid_fees=has_unpaid_fees,
+        active_rental_count=active_rental_count,
+        vehicle_status=vehicle_status,
+        station_is_open=station_is_open,
+        is_weekend=is_weekend,
+        weekend_requires_deposit=weekend_requires_deposit,
+        has_deposit_on_file=has_deposit_on_file,
+    )
+    for is_violated, reason in ELIGIBILITY_RULES:
+        if is_violated(ctx):
+            return False, reason
     return True, "OK"
