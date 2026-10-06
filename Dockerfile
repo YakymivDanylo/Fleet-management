@@ -34,6 +34,9 @@ RUN apt-get update \
     && /usr/local/bin/python -m pip uninstall -y pip setuptools wheel \
     && useradd --create-home appuser
 
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 USER appuser
 
 EXPOSE 8000

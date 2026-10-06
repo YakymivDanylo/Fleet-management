@@ -1,4 +1,5 @@
 import logging
+import socket
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
@@ -62,6 +63,20 @@ async def handle_dependency_unavailable(request: Request, exc: DependencyUnavail
         content={"detail": str(exc)},
         headers={"Retry-After": str(DEPENDENCY_RETRY_AFTER_SECONDS)},
     )
+
+
+@app.get("/livez")
+async def liveness_check():
+    return {"status": "alive"}
+
+
+@app.get("/info")
+async def app_info():
+    return {
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "pod": socket.gethostname(),
+    }
 
 
 @app.get("/health")
