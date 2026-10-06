@@ -30,7 +30,10 @@ spec:
       initContainers:
         - name: wait-for-postgres
           image: postgres:16
-          command: ["sh", "-c", "until pg_isready -h postgres -p 5432; do echo waiting for postgres; sleep 2; done"]
+          command: ["sh", "-c", "until pg_isready -h postgres -p 5432 -U \"$POSTGRES_USER\"; do echo waiting for postgres; sleep 2; done"]
+          env:
+            - name: POSTGRES_USER
+              valueFrom: { configMapKeyRef: { name: fleet-config, key: POSTGRES_USER } }
           resources:
             requests: { cpu: 10m, memory: 16Mi }
             limits:   { cpu: 100m, memory: 64Mi }
