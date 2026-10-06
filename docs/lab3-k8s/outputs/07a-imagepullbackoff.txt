@@ -1,0 +1,29 @@
+$ kubectl set image deployment/api api=fleet-management-api:9.9.9
+deployment.apps/api image updated
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS            RESTARTS   AGE
+api-6cdb7b775d-6b4nl   1/1     Running           0          2m26s
+api-6cdb7b775d-6lqmd   1/1     Running           0          2m20s
+api-6cdb7b775d-j6jnx   1/1     Running           0          2m5s
+api-6cdb7b775d-t2t8k   1/1     Running           0          2m14s
+api-798f45f9f8-7lj74   0/1     PodInitializing   0          5s
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS             RESTARTS   AGE
+api-6cdb7b775d-6b4nl   1/1     Running            0          3m6s
+api-6cdb7b775d-6lqmd   1/1     Running            0          3m
+api-6cdb7b775d-j6jnx   1/1     Running            0          2m45s
+api-6cdb7b775d-t2t8k   1/1     Running            0          2m54s
+api-798f45f9f8-7lj74   0/1     ImagePullBackOff   0          45s
+
+$ kubectl get deployment api
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+api    4/4     1            4           6m49s
+
+$ kubectl get rs -l app.kubernetes.io/name=api
+NAME             DESIRED   CURRENT   READY   AGE
+api-6cdb7b775d   4         4         4       6m49s
+api-798f45f9f8   1         1         0       45s
+api-7f77fc476c   0         0         0       3m49s
+

@@ -1,0 +1,41 @@
+$ kubectl describe pod api-798f45f9f8-7lj74 | sed -n '/^Containers:/,/Ready:/p'
+Containers:
+  api:
+    Container ID:   
+    Image:          fleet-management-api:9.9.9
+    Image ID:       
+    Port:           8000/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Waiting
+      Reason:       ErrImagePull
+    Ready:          False
+
+$ kubectl describe pod api-798f45f9f8-7lj74 | sed -n '/^Events:/,$p'
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  55s                default-scheduler  Successfully assigned fleet-management/api-798f45f9f8-7lj74 to minikube
+  Normal   Pulled     54s                kubelet            spec.initContainers{wait-for-postgres}: Container image "postgres:16" already present on machine and can be accessed by the pod
+  Normal   Created    54s                kubelet            spec.initContainers{wait-for-postgres}: Container created
+  Normal   Started    54s                kubelet            spec.initContainers{wait-for-postgres}: Container started
+  Normal   Pulling    13s (x3 over 53s)  kubelet            spec.containers{api}: Pulling image "fleet-management-api:9.9.9"
+  Warning  Failed     12s (x3 over 53s)  kubelet            spec.containers{api}: Failed to pull image "fleet-management-api:9.9.9": failed to pull and unpack image "docker.io/library/fleet-management-api:9.9.9": failed to resolve reference "docker.io/library/fleet-management-api:9.9.9": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+  Warning  Failed     12s (x3 over 53s)  kubelet            spec.containers{api}: Error: ErrImagePull
+  Normal   BackOff    1s (x2 over 25s)   kubelet            spec.containers{api}: Back-off pulling image "fleet-management-api:9.9.9"
+  Warning  Failed     1s (x2 over 25s)   kubelet            spec.containers{api}: Error: ImagePullBackOff
+
+$ kubectl get events --field-selector involvedObject.name=api-798f45f9f8-7lj74 --sort-by=.lastTimestamp
+LAST SEEN   TYPE      REASON      OBJECT                     MESSAGE
+55s         Normal    Scheduled   pod/api-798f45f9f8-7lj74   Successfully assigned fleet-management/api-798f45f9f8-7lj74 to minikube
+54s         Normal    Pulled      pod/api-798f45f9f8-7lj74   Container image "postgres:16" already present on machine and can be accessed by the pod
+54s         Normal    Created     pod/api-798f45f9f8-7lj74   Container created
+54s         Normal    Started     pod/api-798f45f9f8-7lj74   Container started
+13s         Normal    Pulling     pod/api-798f45f9f8-7lj74   Pulling image "fleet-management-api:9.9.9"
+12s         Warning   Failed      pod/api-798f45f9f8-7lj74   Failed to pull image "fleet-management-api:9.9.9": failed to pull and unpack image "docker.io/library/fleet-management-api:9.9.9": failed to resolve reference "docker.io/library/fleet-management-api:9.9.9": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+12s         Warning   Failed      pod/api-798f45f9f8-7lj74   Error: ErrImagePull
+1s          Normal    BackOff     pod/api-798f45f9f8-7lj74   Back-off pulling image "fleet-management-api:9.9.9"
+1s          Warning   Failed      pod/api-798f45f9f8-7lj74   Error: ImagePullBackOff
+
+$ kubectl logs api-798f45f9f8-7lj74 -c api
+Error from server (BadRequest): container "api" in pod "api-798f45f9f8-7lj74" is waiting to start: image can't be pulled
+
