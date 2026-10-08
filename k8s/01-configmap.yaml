@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fleet-config
+  namespace: fleet-management
+  labels:
+    app.kubernetes.io/part-of: fleet-management
+data:
+  APP_NAME: "Fleet Management (k8s)"    
+  REDIS_URL: "redis://redis:6379/0"     
+  TELEMETRY_QUEUE: "telemetry"          
+  RESILIENCE_ENABLED: "true"           
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"      
+  POSTGRES_DB: "fleet_management"       
+  POSTGRES_USER: "fleet_user"           

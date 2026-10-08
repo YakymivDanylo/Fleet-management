@@ -1,0 +1,38 @@
+$ kubectl rollout history deployment/api
+deployment.apps/api 
+REVISION  CHANGE-CAUSE
+2         upgrade to 1.1.0
+3         deploy 1.0.0
+4         broken tag 9.9.9
+
+
+$ kubectl rollout undo deployment/api
+Warning: resource deployments/api was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/api rolled back
+
+$ kubectl rollout status deployment/api
+deployment "api" successfully rolled out
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS    RESTARTS   AGE
+api-6cdb7b775d-6b4nl   1/1     Running   0          3m31s
+api-6cdb7b775d-6lqmd   1/1     Running   0          3m25s
+api-6cdb7b775d-j6jnx   1/1     Running   0          3m10s
+api-6cdb7b775d-t2t8k   1/1     Running   0          3m19s
+
+$ kubectl get rs -l app.kubernetes.io/name=api
+NAME             DESIRED   CURRENT   READY   AGE
+api-6cdb7b775d   4         4         4       7m14s
+api-798f45f9f8   0         0         0       70s
+api-7f77fc476c   0         0         0       4m14s
+
+$ kubectl rollout history deployment/api
+deployment.apps/api 
+REVISION  CHANGE-CAUSE
+2         upgrade to 1.1.0
+4         broken tag 9.9.9
+5         deploy 1.0.0
+
+
+$ curl -s -H 'Host: fleet.local' http://127.0.0.1:8080/info
+{"app":"Fleet Management (k8s)","version":"1.0.0","pod":"api-6cdb7b775d-t2t8k"}

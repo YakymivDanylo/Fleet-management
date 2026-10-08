@@ -1,0 +1,9 @@
+Availability monitor during ImagePullBackOff (tag 9.9.9) and rollback
+first: 19:47:26.233 OK   1.0.0 api-6cdb7b775d-t2t8k
+last:  19:49:26.008 OK   1.0.0 api-6cdb7b775d-t2t8k
+total requests: 325
+HTTP 200: 325
+failures: 0
+
+responses per version:
+    325 1.0.0

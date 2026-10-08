@@ -1,7 +1,7 @@
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool
+from sqlalchemy import pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -18,6 +18,8 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+MIGRATION_LOCK_KEY = 7262001
+
 
 def run_migrations_offline() -> None:
     context.configure(
@@ -31,6 +33,10 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
+    if connection.dialect.name == "postgresql":
+        # Several API replicas start at once; only one may migrate at a time.
+        connection.execute(text("SELECT pg_advisory_lock(:key)"), {"key": MIGRATION_LOCK_KEY})
+        connection.commit()
     context.configure(connection=connection, target_metadata=target_metadata)
     with context.begin_transaction():
         context.run_migrations()

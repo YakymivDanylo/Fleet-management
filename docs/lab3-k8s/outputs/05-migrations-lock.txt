@@ -1,0 +1,19 @@
+$ kubectl logs pod/api-6cdb7b775d-7rplf | grep -iE 'alembic|Running upgrade|Uvicorn running|Application startup'
+Defaulted container "api" out of: api, wait-for-postgres (init)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 945d8fb7f540, initial schema
+INFO  [alembic.runtime.migration] Running upgrade 945d8fb7f540 -> d9c208b5f3b7, add telemetry readings
+INFO  [alembic.runtime.migration] Running upgrade d9c208b5f3b7 -> b7e4a1c2d3f5, add users
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+
+$ kubectl logs pod/api-6cdb7b775d-jlxqr | grep -iE 'alembic|Running upgrade|Uvicorn running|Application startup'
+Defaulted container "api" out of: api, wait-for-postgres (init)
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+

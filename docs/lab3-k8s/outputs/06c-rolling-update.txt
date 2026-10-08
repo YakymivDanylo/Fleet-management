@@ -1,0 +1,62 @@
+$ kubectl get rs -l app.kubernetes.io/name=api
+NAME             DESIRED   CURRENT   READY   AGE
+api-6cdb7b775d   4         4         4       3m
+
+$ kubectl set image deployment/api api=fleet-management-api:1.1.0
+deployment.apps/api image updated
+
+$ kubectl annotate deployment/api kubernetes.io/change-cause="upgrade to 1.1.0" --overwrite
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS     RESTARTS   AGE
+api-6cdb7b775d-bp9ts   1/1     Running    0          34s
+api-6cdb7b775d-j9svb   1/1     Running    0          54s
+api-6cdb7b775d-jlxqr   1/1     Running    0          3m
+api-6cdb7b775d-xtsmf   1/1     Running    0          34s
+api-7f77fc476c-6zh6t   0/1     Init:0/1   0          0s
+
+$ kubectl rollout status deployment/api
+Waiting for deployment "api" rollout to finish: 1 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 1 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 1 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 2 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 2 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 2 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 2 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 3 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 3 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 3 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 3 out of 4 new replicas have been updated...
+Waiting for deployment "api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api" rollout to finish: 1 old replicas are pending termination...
+deployment "api" successfully rolled out
+
+$ kubectl get rs -l app.kubernetes.io/name=api -o wide
+NAME             DESIRED   CURRENT   READY   AGE     CONTAINERS   IMAGES                       SELECTOR
+api-6cdb7b775d   0         0         0       3m26s   api          fleet-management-api:1.0.0   app.kubernetes.io/name=api,pod-template-hash=6cdb7b775d
+api-7f77fc476c   4         4         4       26s     api          fleet-management-api:1.1.0   app.kubernetes.io/name=api,pod-template-hash=7f77fc476c
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS        RESTARTS   AGE
+api-6cdb7b775d-jlxqr   1/1     Terminating   0          3m26s
+api-7f77fc476c-6zh6t   1/1     Running       0          26s
+api-7f77fc476c-7kfgl   1/1     Running       0          13s
+api-7f77fc476c-9dwlt   1/1     Running       0          20s
+api-7f77fc476c-sfknr   1/1     Running       0          7s
+
+$ kubectl describe deployment api | sed -n '/^Events:/,$p'
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  3m26s  deployment-controller  Scaled up replica set api-6cdb7b775d from 0 to 2
+  Normal  ScalingReplicaSet  60s    deployment-controller  Scaled up replica set api-6cdb7b775d from 2 to 4
+  Normal  ScalingReplicaSet  26s    deployment-controller  Scaled up replica set api-7f77fc476c from 0 to 1
+  Normal  ScalingReplicaSet  20s    deployment-controller  Scaled down replica set api-6cdb7b775d from 4 to 3
+  Normal  ScalingReplicaSet  20s    deployment-controller  Scaled up replica set api-7f77fc476c from 1 to 2
+  Normal  ScalingReplicaSet  13s    deployment-controller  Scaled down replica set api-6cdb7b775d from 3 to 2
+  Normal  ScalingReplicaSet  13s    deployment-controller  Scaled up replica set api-7f77fc476c from 2 to 3
+  Normal  ScalingReplicaSet  7s     deployment-controller  Scaled down replica set api-6cdb7b775d from 2 to 1
+  Normal  ScalingReplicaSet  7s     deployment-controller  Scaled up replica set api-7f77fc476c from 3 to 4
+  Normal  ScalingReplicaSet  1s     deployment-controller  (combined from similar events): Scaled down replica set api-6cdb7b775d from 1 to 0
+

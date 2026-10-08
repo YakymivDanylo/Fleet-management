@@ -1,0 +1,32 @@
+$ kubectl scale deployment/api --replicas=4
+deployment.apps/api scaled
+
+$ kubectl get deployment api
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+api    4/4     4            4           2m37s
+
+$ kubectl get pods -l app.kubernetes.io/name=api -o wide
+NAME                   READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+api-6cdb7b775d-bp9ts   1/1     Running   0          11s     10.244.0.19   minikube   <none>           <none>
+api-6cdb7b775d-j9svb   1/1     Running   0          31s     10.244.0.18   minikube   <none>           <none>
+api-6cdb7b775d-jlxqr   1/1     Running   0          2m37s   10.244.0.15   minikube   <none>           <none>
+api-6cdb7b775d-xtsmf   1/1     Running   0          11s     10.244.0.20   minikube   <none>           <none>
+
+$ kubectl get endpointslices -l kubernetes.io/service-name=api
+NAME        ADDRESSTYPE   PORTS   ENDPOINTS                                         AGE
+api-6bcrp   IPv4          8000    10.244.0.15,10.244.0.18,10.244.0.20 + 1 more...   2m38s
+
+$ for i in $(seq 1 40); do curl -s -H 'Host: fleet.local' http://127.0.0.1:8080/info | sed -E 's/.*"pod":"([^"]+)".*/\1/'; echo; done | sort | uniq -c
+     10 api-6cdb7b775d-bp9ts
+      8 api-6cdb7b775d-j9svb
+     11 api-6cdb7b775d-jlxqr
+     11 api-6cdb7b775d-xtsmf
+
+$ kubectl top pods
+NAME                        CPU(cores)   MEMORY(bytes)   
+api-6cdb7b775d-jlxqr        5m           66Mi            
+postgres-5999845566-g9tgk   10m          42Mi            
+rabbitmq-59b6ccb856-8spvn   138m         88Mi            
+redis-6dcd67b5f7-p5t79      6m           3Mi             
+worker-776fcddd6-b2qhw      1m           56Mi            
+

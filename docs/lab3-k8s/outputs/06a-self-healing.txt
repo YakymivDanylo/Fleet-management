@@ -1,0 +1,31 @@
+$ kubectl get pods -l app.kubernetes.io/name=api -o wide
+NAME                   READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES
+api-6cdb7b775d-7rplf   1/1     Running   0          2m6s   10.244.0.14   minikube   <none>           <none>
+api-6cdb7b775d-jlxqr   1/1     Running   0          2m6s   10.244.0.15   minikube   <none>           <none>
+
+$ kubectl delete pod api-6cdb7b775d-7rplf --wait=false
+pod "api-6cdb7b775d-7rplf" deleted from fleet-management namespace
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS        RESTARTS   AGE
+api-6cdb7b775d-7rplf   1/1     Terminating   0          2m6s
+api-6cdb7b775d-j9svb   0/1     Init:0/1      0          0s
+api-6cdb7b775d-jlxqr   1/1     Running       0          2m6s
+
+$ kubectl get pods -l app.kubernetes.io/name=api
+NAME                   READY   STATUS        RESTARTS   AGE
+api-6cdb7b775d-7rplf   1/1     Terminating   0          2m10s
+api-6cdb7b775d-j9svb   0/1     Running       0          4s
+api-6cdb7b775d-jlxqr   1/1     Running       0          2m10s
+
+$ kubectl get pods -l app.kubernetes.io/name=api -o wide
+NAME                   READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+api-6cdb7b775d-j9svb   1/1     Running   0          13s     10.244.0.18   minikube   <none>           <none>
+api-6cdb7b775d-jlxqr   1/1     Running   0          2m19s   10.244.0.15   minikube   <none>           <none>
+
+$ kubectl get events --field-selector involvedObject.kind=ReplicaSet --sort-by=.lastTimestamp | tail -4
+2m19s       Normal   SuccessfulCreate   replicaset/rabbitmq-59b6ccb856   Created pod: rabbitmq-59b6ccb856-8spvn
+2m19s       Normal   SuccessfulCreate   replicaset/redis-6dcd67b5f7      Created pod: redis-6dcd67b5f7-p5t79
+2m19s       Normal   SuccessfulCreate   replicaset/worker-776fcddd6      Created pod: worker-776fcddd6-b2qhw
+13s         Normal   SuccessfulCreate   replicaset/api-6cdb7b775d        Created pod: api-6cdb7b775d-j9svb
+

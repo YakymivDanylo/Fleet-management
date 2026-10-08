@@ -1,0 +1,48 @@
+$ kubectl rollout status deployment/api
+deployment "api" successfully rolled out
+
+$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES
+api-6cdb7b775d-7rplf        1/1     Running   0          37s   10.244.0.14   minikube   <none>           <none>
+api-6cdb7b775d-jlxqr        1/1     Running   0          37s   10.244.0.15   minikube   <none>           <none>
+postgres-5999845566-g9tgk   1/1     Running   0          37s   10.244.0.11   minikube   <none>           <none>
+rabbitmq-59b6ccb856-8spvn   1/1     Running   0          37s   10.244.0.13   minikube   <none>           <none>
+redis-6dcd67b5f7-p5t79      1/1     Running   0          37s   10.244.0.12   minikube   <none>           <none>
+worker-776fcddd6-b2qhw      1/1     Running   0          37s   10.244.0.16   minikube   <none>           <none>
+
+$ kubectl get deploy,rs -o wide
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                          SELECTOR
+deployment.apps/api        2/2     2            2           37s   api          fleet-management-api:1.0.0      app.kubernetes.io/name=api
+deployment.apps/postgres   1/1     1            1           37s   postgres     postgres:16                     app.kubernetes.io/name=postgres
+deployment.apps/rabbitmq   1/1     1            1           37s   rabbitmq     rabbitmq:4-management-alpine    app.kubernetes.io/name=rabbitmq
+deployment.apps/redis      1/1     1            1           37s   redis        redis:7-alpine                  app.kubernetes.io/name=redis
+deployment.apps/worker     1/1     1            1           37s   worker       fleet-management-worker:1.0.0   app.kubernetes.io/name=worker
+
+NAME                                  DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                          SELECTOR
+replicaset.apps/api-6cdb7b775d        2         2         2       37s   api          fleet-management-api:1.0.0      app.kubernetes.io/name=api,pod-template-hash=6cdb7b775d
+replicaset.apps/postgres-5999845566   1         1         1       37s   postgres     postgres:16                     app.kubernetes.io/name=postgres,pod-template-hash=5999845566
+replicaset.apps/rabbitmq-59b6ccb856   1         1         1       37s   rabbitmq     rabbitmq:4-management-alpine    app.kubernetes.io/name=rabbitmq,pod-template-hash=59b6ccb856
+replicaset.apps/redis-6dcd67b5f7      1         1         1       37s   redis        redis:7-alpine                  app.kubernetes.io/name=redis,pod-template-hash=6dcd67b5f7
+replicaset.apps/worker-776fcddd6      1         1         1       37s   worker       fleet-management-worker:1.0.0   app.kubernetes.io/name=worker,pod-template-hash=776fcddd6
+
+$ kubectl get svc,ingress,pvc,configmap,secret
+NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)              AGE
+service/api        NodePort    10.103.247.101   <none>        80:30080/TCP         38s
+service/postgres   ClusterIP   10.109.23.130    <none>        5432/TCP             38s
+service/rabbitmq   ClusterIP   10.109.94.123    <none>        5672/TCP,15672/TCP   38s
+service/redis      ClusterIP   10.105.141.237   <none>        6379/TCP             38s
+
+NAME                            CLASS   HOSTS         ADDRESS   PORTS   AGE
+ingress.networking.k8s.io/api   nginx   fleet.local             80      38s
+
+NAME                                  STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/postgres-data   Bound    pvc-9afbebba-f5c8-416f-8f33-8fd01dcd2e84   1Gi        RWO            standard       <unset>                 38s
+persistentvolumeclaim/rabbitmq-data   Bound    pvc-fa4ab687-d213-4609-ac45-5edc5d4ce272   1Gi        RWO            standard       <unset>                 38s
+
+NAME                         DATA   AGE
+configmap/fleet-config       7      38s
+configmap/kube-root-ca.crt   1      38s
+
+NAME                  TYPE     DATA   AGE
+secret/fleet-secret   Opaque   4      38s
+
