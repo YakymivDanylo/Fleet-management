@@ -4,16 +4,17 @@
 
 ## 1. Що реалізовано
 
-| Вимога | Реалізація |
-|---|---|
-| Конфігурація без hardcode | `src/fleet_management/config.py` (pydantic-settings) читає `.env.<APP_ENV>`; у коді та `docker-compose.yml` немає жодного пароля чи ключа |
-| Файли оточень | шаблони `.env.sandbox.example`, `.env.production.example` (у git), реальні `.env.sandbox`, `.env.production` (у `.gitignore`) |
-| Ізоляція БД | окремі БД `fleet_sandbox` / `fleet_production`, окремі compose-проєкти (контейнери, мережа, томи, порти) |
-| Захист від плутанини | `Settings` не створюється, якщо ім'я БД не відповідає оточенню (production ↔ `*_production`, sandbox ↔ `*_sandbox`/`*_test`); alembic і `create-admin` теж проходять цю перевірку |
-| `DEBUG=False` у production | валідатор: `APP_ENV=production` + `DEBUG=true` → застосунок не стартує; FastAPI створюється з `debug=settings.debug` |
-| Безпечні 500 | глобальний обробник: клієнту `{"detail":"Internal server error","request_id":"…"}`, traceback — лише у лог сервера з тим самим `request_id` |
-| Додатково (production) | `/docs`, `/redoc`, `/openapi.json` вимкнені; потрібен `JWT_SECRET_KEY` ≥ 32 символів; Toxiproxy у production не запускається |
-| CI/CD (варіант A) | `.github/workflows/ci.yml`: на кожен PR у `main` і push у `main` — ruff (check + format) та весь `pytest tests` |
+| Вимога | Реалізація | Де перевірити (файл:рядок) |
+|---|---|---|
+| Конфігурація без hardcode | `config.py` (pydantic-settings) читає `.env.<APP_ENV>`; у коді та `docker-compose.yml` немає жодного пароля чи ключа | `src/fleet_management/config.py:20-22` (вибір файлу за `APP_ENV`), `:25-52` (клас `Settings`, `model_config`); `docker-compose.yml:11-13, 25-26, 65, 68, 90-91` (усе через `${VAR}`) |
+| Файли оточень | шаблони `.env.sandbox.example`, `.env.production.example` (у git), реальні `.env.sandbox`, `.env.production` (у `.gitignore`) | `.env.sandbox.example`, `.env.production.example`; `.gitignore:10-11`; `.dockerignore:5-6` |
+| Ізоляція БД | окремі БД `fleet_sandbox` / `fleet_production`, окремі compose-проєкти (контейнери, мережа, томи, порти) | `.env.sandbox.example:10,13,20` та `.env.production.example:10,12,19` (проєкт, порт, ім'я БД); `docker-compose.yml:5` (`name: ${COMPOSE_PROJECT_NAME}`), `:15, 30, 113-115` (томи), `:28, 70` (порти) |
+| Захист від плутанини | `Settings` не створюється, якщо ім'я БД не відповідає оточенню (production ↔ `*_production`, sandbox ↔ `*_sandbox`/`*_test`); alembic і `create-admin` теж проходять цю перевірку | `config.py:14` (дозволені суфікси), `:58-63` (валідатор), `:65-73` (перевірка імені БД); тести `tests/unit/test_config.py:54, 59` |
+| `DEBUG=False` у production | валідатор: `APP_ENV=production` + `DEBUG=true` → застосунок не стартує; FastAPI створюється з `debug=settings.debug` | `config.py:75-77` (перевірка DEBUG); `main.py:108` (`debug=cfg.debug`); тест `tests/unit/test_config.py:37` |
+| Безпечні 500 | глобальний обробник: клієнту `{"detail":"Internal server error","request_id":"…"}`, traceback — лише у лог сервера з тим самим `request_id` | `main.py:65-80` (обробник `Exception`); тести `tests/unit/test_error_handling.py:44, 58` |
+| Додатково (production) | `/docs`, `/redoc`, `/openapi.json` вимкнені; потрібен `JWT_SECRET_KEY` ≥ 32 символів; Toxiproxy у production не запускається | `main.py:102-113` (`docs_url`/`redoc_url`/`openapi_url`); `config.py:10, 78-81` (довжина секрету); `docker-compose.yml:48` (`profiles: ["fault"]`); тест `tests/unit/test_error_handling.py:94` |
+| Узгодження k8s | ConfigMap отримав `APP_ENV` та БД `fleet_sandbox`, інакше перевірка імені БД не пустила б деплой | `k8s/01-configmap.yaml:9, 15` |
+| CI/CD (варіант A) | `.github/workflows/ci.yml`: на кожен PR у `main` і push у `main` — ruff (check + format) та весь `pytest tests` | `.github/workflows/ci.yml:5-8` (тригери), `:44-46` (`APP_ENV`, `DEBUG`), `:68-81` (pytest), `:90-111` (job `lint`, ruff) |
 
 ## 2. Підготовка
 
@@ -63,7 +64,7 @@ docker compose -p fleet_production --env-file .env.production ps
 Створити запис у sandbox і переконатися, що в production його немає:
 
 ```powershell
-curl.exe -s -X POST http://localhost:8000/stations -H "Content-Type: application/json" -d '{\"address\":\"Sandbox st\",\"capacity\":3}'
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/stations -ContentType "application/json" -Body (@{address="Sandbox st"; capacity=3} | ConvertTo-Json)
 curl.exe -s http://localhost:8000/stations   # є запис
 curl.exe -s http://localhost:8080/stations   # []
 ```

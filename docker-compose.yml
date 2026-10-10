@@ -42,10 +42,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # Fault-injection proxy between api and Redis (Lab 2), sandbox only: enabled by
-  # COMPOSE_PROFILES=fault in .env.sandbox, so the production stack never contains it.
-  # When REDIS_URL points at it, latency/timeouts/outages can be injected via its HTTP API
-  # without stopping any container. The worker keeps writing to Redis directly.
+
   toxiproxy:
     image: ghcr.io/shopify/toxiproxy:2.12.0
     profiles: ["fault"]
@@ -67,9 +64,7 @@ services:
       DEBUG: ${DEBUG:-false}
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-      # false = unprotected baseline for the "before" fault-injection run
       RESILIENCE_ENABLED: ${RESILIENCE_ENABLED:-true}
-      # Taken from the env file (not committed); compose stops with this message if missing.
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in the env file}
     ports:
       - "${API_PORT:-8000}:8000"
@@ -104,7 +99,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # Load generator, started on demand: docker compose run --rm k6 run ...
   k6:
     image: grafana/k6:1.3.0
     profiles: ["loadtest"]
