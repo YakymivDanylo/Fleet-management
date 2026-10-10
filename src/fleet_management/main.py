@@ -1,4 +1,3 @@
-import logging
 import socket
 from contextlib import asynccontextmanager
 
@@ -12,16 +11,19 @@ from .cache import close_redis
 from .config import settings
 from .database import get_db
 from .exceptions import (
+    ConsentDeniedError,
     DependencyUnavailableError,
     EmailAlreadyRegisteredError,
     NotFoundError,
     StationFullError,
     VehicleNotAvailableError,
 )
+from .privacy import configure_logging
+from .privacy.middleware import CorrelationIdMiddleware
 
 DEPENDENCY_RETRY_AFTER_SECONDS = 5
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+configure_logging()
 
 
 @asynccontextmanager
@@ -33,6 +35,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+app.add_middleware(CorrelationIdMiddleware)
 app.include_router(api_router)
 
 
@@ -54,6 +57,14 @@ async def handle_station_full(request: Request, exc: StationFullError):
 @app.exception_handler(EmailAlreadyRegisteredError)
 async def handle_email_taken(request: Request, exc: EmailAlreadyRegisteredError):
     return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+
+@app.exception_handler(ConsentDeniedError)
+async def handle_consent_denied(request: Request, exc: ConsentDeniedError):
+    return JSONResponse(
+        status_code=403,
+        content={"decision": "DENY", "purpose": exc.purpose, "reason": exc.reason},
+    )
 
 
 @app.exception_handler(DependencyUnavailableError)

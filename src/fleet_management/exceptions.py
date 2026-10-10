@@ -20,3 +20,12 @@ class DependencyUnavailableError(DomainError):
 
 class EmailAlreadyRegisteredError(DomainError):
     """Raised when a user tries to register with an email that is already taken."""
+
+
+class ConsentDeniedError(DomainError):
+    """Raised by the consent policy gate when a consent-dependent action must not run."""
+
+    def __init__(self, purpose: str, reason: str) -> None:
+        super().__init__(f"Consent for {purpose} denied: {reason}")
+        self.purpose = purpose
+        self.reason = reason
