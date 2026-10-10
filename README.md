@@ -322,3 +322,9 @@ kubectl rollout status deployment/api -n fleet-management
 | `POSTGRES_PASSWORD` | Пароль БД; з нього складається `DATABASE_URL` |
 | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` | Облікові дані брокера; з них складається `RABBITMQ_URL` |
 | `JWT_SECRET_KEY` | Ключ підпису access-токенів |
+
+
+## Privacy Engineering / GDPR (Лабораторна робота №4)
+
+Безпечне логування, експорт персональних даних, анонімізація та керування згодами — інструкція запуску,
+демо-сценарій, PII inventory, політика erasure та висновок: [`docs/lab4-privacy-gdpr.md`](docs/lab4-privacy-gdpr.md).
