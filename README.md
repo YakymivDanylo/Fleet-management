@@ -70,6 +70,63 @@ graph TD
 
 7. **PostgreSQL** — основне реляційне сховище сутностей `Vehicle`, `Station`, `Renter`, `Rental` та історії `TelemetryReading`.
 
+## Запуск у sandbox і production
+
+Застосунок має два оточення, які задаються змінною `APP_ENV` (`sandbox` або `production`). Налаштування (БД, паролі, ключі) беруться зі змінних оточення / файлу `.env.<APP_ENV>`; у коді та `docker-compose.yml` жодних секретів немає. Кожне оточення має власну БД (`fleet_sandbox`, `fleet_production`), власні контейнери, томи й порти, тому тестові дані не потрапляють у робоче середовище. Застосунок не стартує, якщо ім'я БД не відповідає оточенню, а у production — якщо `DEBUG=true` або слабкий `JWT_SECRET_KEY`.
+
+| | sandbox | production |
+|---|---|---|
+| Файл конфігурації | `.env.sandbox` | `.env.production` |
+| `DEBUG` | дозволено `true` | завжди `false` (інакше помилка старту) |
+| БД | `fleet_sandbox` | `fleet_production` |
+| API | http://localhost:8000 | http://localhost:8080 |
+| `/docs`, `/redoc`, `/openapi.json` | доступні | вимкнені (404) |
+| Помилка 500 | `{"detail":"Internal server error","request_id":"…"}`, traceback лише в логах | те саме |
+
+### 1. Підготовка
+
+```powershell
+Copy-Item .env.sandbox.example .env.sandbox
+Copy-Item .env.production.example .env.production
+python -c "import secrets; print(secrets.token_urlsafe(48))"   # значення для JWT_SECRET_KEY (різне для кожного оточення)
+```
+
+Заповніть порожні поля в обох файлах (`JWT_SECRET_KEY`; у production також `POSTGRES_PASSWORD`, `RABBITMQ_DEFAULT_PASS`). Файли `.env.sandbox` та `.env.production` у git не потрапляють.
+
+### 2. Запуск
+
+```powershell
+# sandbox
+docker compose -p fleet_sandbox --env-file .env.sandbox up -d --build
+
+# production (можна одночасно зі sandbox)
+docker compose -p fleet_production --env-file .env.production up -d --build
+```
+
+Міграції (`alembic upgrade head`) виконуються автоматично при старті контейнера `api`.
+
+### 3. Адміністратор, зупинка
+
+```powershell
+docker compose -p fleet_sandbox --env-file .env.sandbox exec -it api create-admin --email admin@example.com
+docker compose -p fleet_sandbox --env-file .env.sandbox down        # додайте -v, щоб видалити дані БД
+```
+
+Для production — ті самі команди з `-p fleet_production --env-file .env.production`.
+
+### 4. Тести та лінтер
+
+```powershell
+docker run -d --name test-pg -e POSTGRES_USER=test_user -e POSTGRES_PASSWORD=test_pass -e POSTGRES_DB=fleet_management_test -p 55432:5432 postgres:16
+docker run -d --name test-redis -p 56379:6379 redis:7-alpine
+$env:TEST_DATABASE_URL = "postgresql+asyncpg://test_user:test_pass@localhost:55432/fleet_management_test"
+$env:TEST_REDIS_URL = "redis://localhost:56379/15"
+pytest tests -v
+ruff check . ; ruff format --check .
+```
+
+CI (GitHub Actions) запускає лінтер і всі тести на кожен pull request та push у `main`. Покрокова демонстрація (перевірка ізоляції БД, `DEBUG=False`, помилки 500) — у [docs/lab3-web-env-cicd.md](docs/lab3-web-env-cicd.md).
+
 ## Статичний аналіз якості коду (SonarQube)
 
 Локальний SonarQube Community Edition піднімається через Docker Compose:
@@ -306,6 +363,7 @@ kubectl rollout status deployment/api -n fleet-management
 
 | Ключ | Призначення |
 |---|---|
+| `APP_ENV` | Оточення (`sandbox`); ім'я БД `POSTGRES_DB` має закінчуватися на `_sandbox` |
 | `APP_NAME` | Назва застосунку (у `/info` та заголовку OpenAPI) |
 | `REDIS_URL` | Підключення до кешу Redis |
 | `TELEMETRY_QUEUE` | Черга RabbitMQ, яку обробляє worker |
