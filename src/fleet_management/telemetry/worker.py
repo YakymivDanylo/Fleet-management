@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from ..config import settings
 from ..database import SessionLocal
 from ..exceptions import NotFoundError
+from ..privacy import configure_logging
 from .processor import save_reading, update_vehicle_state
 from .schemas import TelemetryMessage
 
@@ -81,9 +82,7 @@ def _stop(signum, frame):
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
-    )
+    configure_logging()
     signal.signal(signal.SIGTERM, _stop)
     try:
         asyncio.run(run())
