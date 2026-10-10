@@ -1,24 +1,31 @@
-name: fleet_management
+# One compose file serves both environments. Pick the environment with the env file and a
+# distinct project name (separate containers, network and volumes per environment):
+#   docker compose -p fleet_sandbox    --env-file .env.sandbox    up -d --build
+#   docker compose -p fleet_production --env-file .env.production up -d --build
+name: ${COMPOSE_PROJECT_NAME:-fleet_management}
 
 services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: fleet_user
-      POSTGRES_PASSWORD: fleet_password
-      POSTGRES_DB: fleet_management
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in the env file}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in the env file}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in the env file}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fleet_user -d fleet_management"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   rabbitmq:
     image:  rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?set RABBITMQ_DEFAULT_USER in the env file}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?set RABBITMQ_DEFAULT_PASS in the env file}
     ports:
-      - "15672:15672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -35,16 +42,18 @@ services:
       timeout: 5s
       retries: 10
 
-  # Fault-injection proxy between api and Redis (Lab 2). The api reaches Redis only
-  # through it, so latency/timeouts/outages can be injected via its HTTP API (:8474)
+  # Fault-injection proxy between api and Redis (Lab 2), sandbox only: enabled by
+  # COMPOSE_PROFILES=fault in .env.sandbox, so the production stack never contains it.
+  # When REDIS_URL points at it, latency/timeouts/outages can be injected via its HTTP API
   # without stopping any container. The worker keeps writing to Redis directly.
   toxiproxy:
     image: ghcr.io/shopify/toxiproxy:2.12.0
+    profiles: ["fault"]
     command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
     volumes:
       - ./loadtest/toxiproxy.json:/config/toxiproxy.json:ro
     ports:
-      - "8474:8474"
+      - "${TOXIPROXY_PORT:-8474}:8474"
     depends_on:
       redis:
         condition: service_healthy
@@ -54,19 +63,22 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql+asyncpg://fleet_user:fleet_password@db:5432/fleet_management
-      REDIS_URL: redis://toxiproxy:26379/0
+      APP_ENV: ${APP_ENV:?set APP_ENV in the env file}
+      DEBUG: ${DEBUG:-false}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       # false = unprotected baseline for the "before" fault-injection run
       RESILIENCE_ENABLED: ${RESILIENCE_ENABLED:-true}
-      # Taken from .env (not committed); compose stops with this message if it is missing.
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in .env}
+      # Taken from the env file (not committed); compose stops with this message if missing.
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in the env file}
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
       toxiproxy:
         condition: service_started
+        required: false
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -79,8 +91,9 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     environment:
-      DATABASE_URL: postgresql+asyncpg://fleet_user:fleet_password@db:5432/fleet_management
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      APP_ENV: ${APP_ENV:?set APP_ENV in the env file}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/
       REDIS_URL: redis://redis:6379/0
     depends_on:
       api:
