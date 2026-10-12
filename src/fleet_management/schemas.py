@@ -88,6 +88,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
     full_name: str = Field(min_length=1, max_length=150)
+    phone: str | None = Field(default=None, pattern=r"^\+?[0-9 ()-]{7,20}$")
 
 
 class UserRead(BaseModel):
@@ -96,6 +97,7 @@ class UserRead(BaseModel):
     id: int
     email: str
     full_name: str
+    phone: str | None = None
     role: UserRole
     is_active: bool
     created_at: datetime
