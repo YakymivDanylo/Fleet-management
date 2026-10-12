@@ -1,15 +1,22 @@
 import argparse
 import base64
 import json
+import os
 import time
 import urllib.error
 import urllib.request
 from datetime import UTC, datetime
 
-API_URL = "http://localhost:8000"
-RABBITMQ_API_URL = "http://localhost:15672/api/exchanges/%2F/amq.default/publish"
-RABBITMQ_AUTH = base64.b64encode(b"guest:guest").decode()
+API_URL = os.environ.get("API_URL", "http://localhost:8000")
+RABBITMQ_MGMT_URL = os.environ.get("RABBITMQ_MGMT_URL", "http://localhost:15672")
+RABBITMQ_API_URL = f"{RABBITMQ_MGMT_URL}/api/exchanges/%2F/amq.default/publish"
 PLATE_PREFIX = "LT-"
+
+
+def rabbitmq_auth() -> str:
+    # Same variables as in .env.sandbox, so the script never carries credentials itself.
+    credentials = f"{os.environ['RABBITMQ_DEFAULT_USER']}:{os.environ['RABBITMQ_DEFAULT_PASS']}"
+    return base64.b64encode(credentials.encode()).decode()
 
 
 def request(method: str, url: str, body: dict | None = None, headers: dict | None = None):
@@ -69,7 +76,7 @@ def publish_telemetry(vehicle_id: int, recorded_at: str) -> None:
             "payload": json.dumps(payload),
             "payload_encoding": "string",
         },
-        headers={"Authorization": f"Basic {RABBITMQ_AUTH}"},
+        headers={"Authorization": f"Basic {rabbitmq_auth()}"},
     )
     if not result.get("routed"):
         raise RuntimeError("Telemetry was not routed: is the telemetry-worker running?")
