@@ -1,0 +1,51 @@
+$ helm template fleet chart/fleet-management   (rendered, hooks/tests excluded)
+ConfigMap	fleet-fleet-management-config
+Deployment	fleet-fleet-management-api
+Deployment	fleet-fleet-management-postgres
+Deployment	fleet-fleet-management-rabbitmq
+Deployment	fleet-fleet-management-redis
+Deployment	fleet-fleet-management-worker
+Job	fleet-fleet-management-pre-upgrade
+PersistentVolumeClaim	fleet-fleet-management-postgres-data
+PersistentVolumeClaim	fleet-fleet-management-rabbitmq-data
+Secret	fleet-fleet-management-secret
+Service	fleet-fleet-management-api
+Service	fleet-fleet-management-postgres
+Service	fleet-fleet-management-rabbitmq
+Service	fleet-fleet-management-redis
+
+--- kinds in lab 3 (k8s/*.yaml) vs chart, count per kind (dev defaults with ingress+all objects)
+lab3:
+      1 kind: ConfigMap
+      5 kind: Deployment
+      1 kind: Ingress
+      1 kind: Namespace
+      2 kind: PersistentVolumeClaim
+      1 kind: Secret
+      4 kind: Service
+chart (ingress enabled, tests/hooks skipped):
+      1 kind: ConfigMap
+      5 kind: Deployment
+      1 kind: Ingress
+      1 kind: Job
+      2 kind: PersistentVolumeClaim
+      1 kind: Secret
+      4 kind: Service
+
+$ helm template second ... (same chart, release names fleet-a and fleet-b -> no name collisions)
+1,10c1,10
+<   name: fleet-a-fleet-management-api
+<   name: fleet-a-fleet-management-config
+<   name: fleet-a-fleet-management-postgres
+<   name: fleet-a-fleet-management-postgres-data
+<   name: fleet-a-fleet-management-pre-upgrade
+<   name: fleet-a-fleet-management-rabbitmq
+<   name: fleet-a-fleet-management-rabbitmq-data
+(all names differ => both releases can live in one cluster)
+
+--- hard-coded check in templates: release name / image tag / replicas
+chart/fleet-management/templates/api-deployment.yaml:41:        - name: api
+chart/fleet-management/templates/postgres-deployment.yaml:21:        - name: postgres
+chart/fleet-management/templates/rabbitmq-deployment.yaml:21:        - name: rabbitmq
+chart/fleet-management/templates/redis-deployment.yaml:19:        - name: redis
+chart/fleet-management/templates/worker-deployment.yaml:24:        - name: worker

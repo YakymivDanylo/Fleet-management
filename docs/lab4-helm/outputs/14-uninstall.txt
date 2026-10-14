@@ -1,0 +1,18 @@
+$ helm uninstall fleet -n fleet-management
+release "fleet" uninstalled
+
+$ helm list -n fleet-management
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+
+$ kubectl get all,cm,secret,pvc,ingress,jobs -n fleet-management   (executed ~40 s later, after graceful termination of the pods)
+NAME                         DATA   AGE
+configmap/kube-root-ca.crt   1      2m14s
+
+$ kubectl get pv  (the two Released volumes are stale leftovers of lab 3 pvc-1e52.. / pvc-ff5d..; chart volumes are gone)
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM                            STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-1e5282bc-df3a-4de9-9991-7a1bf529614d   1Gi        RWO            Delete           Released   fleet-management/rabbitmq-data   standard       <unset>                          7d1h
+pvc-ff5d48e0-a936-4238-bb6a-5a664ceb1149   1Gi        RWO            Delete           Released   fleet-management/postgres-data   standard       <unset>                          7d1h
+
+$ kubectl get ns fleet-management  (namespace is not owned by the release)
+NAME               STATUS   AGE
+fleet-management   Active   2m14s

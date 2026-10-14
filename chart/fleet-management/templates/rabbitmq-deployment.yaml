@@ -1,0 +1,55 @@
+{{- $ctx := dict "root" . "component" "rabbitmq" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fleet.componentName" $ctx }}
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+spec:
+  replicas: {{ .Values.rabbitmq.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "fleet.selectorLabels" $ctx | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "fleet.labels" $ctx | nindent 8 }}
+    spec:
+      containers:
+        - name: rabbitmq
+          image: {{ include "fleet.image" (dict "image" .Values.rabbitmq.image "root" .) }}
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - name: RABBITMQ_NODENAME
+              value: rabbit@localhost
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom: { secretKeyRef: { name: {{ include "fleet.secretName" . }}, key: RABBITMQ_DEFAULT_USER } }
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom: { secretKeyRef: { name: {{ include "fleet.secretName" . }}, key: RABBITMQ_DEFAULT_PASS } }
+          resources:
+            {{- toYaml .Values.rabbitmq.resources | nindent 12 }}
+          readinessProbe:
+            exec: { command: ["rabbitmq-diagnostics", "-q", "ping"] }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 10
+          livenessProbe:
+            exec: { command: ["rabbitmq-diagnostics", "-q", "ping"] }
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: data
+          {{- if .Values.rabbitmq.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "fleet.componentName" $ctx }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

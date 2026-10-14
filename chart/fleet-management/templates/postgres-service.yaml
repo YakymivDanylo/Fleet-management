@@ -1,0 +1,14 @@
+{{- $ctx := dict "root" . "component" "postgres" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fleet.postgresHost" . }}
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "fleet.selectorLabels" $ctx | nindent 4 }}
+  ports:
+    - port: 5432
+      targetPort: 5432

@@ -1,0 +1,18 @@
+{{- $ctx := dict "root" . "component" "rabbitmq" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fleet.rabbitmqHost" . }}
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "fleet.selectorLabels" $ctx | nindent 4 }}
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+    - name: management
+      port: 15672
+      targetPort: 15672

@@ -1,0 +1,51 @@
+$ helm upgrade fleet chart/fleet-management -n fleet-management -f values-prod.yaml --wait
+Release "fleet" has been upgraded. Happy Helming!
+NAME: fleet
+LAST DEPLOYED: Tue Oct 13 21:22:25 2026
+NAMESPACE: fleet-management
+STATUS: deployed
+REVISION: 3
+NOTES:
+
+$ helm get values fleet (user-supplied)
+USER-SUPPLIED VALUES:
+config:
+  appName: Fleet Management (prod)
+image:
+  tag: 1.1.0
+ingress:
+  enabled: true
+  host: fleet.local
+replicaCount: 3
+resources:
+  limits:
+    cpu: 750m
+    memory: 384Mi
+  requests:
+    cpu: 200m
+    memory: 192Mi
+
+$ kubectl get deploy,ingress
+NAME                                              READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/fleet-fleet-management-api        3/3     3            3           90s
+deployment.apps/fleet-fleet-management-postgres   1/1     1            1           90s
+deployment.apps/fleet-fleet-management-rabbitmq   1/1     1            1           90s
+deployment.apps/fleet-fleet-management-redis      1/1     1            1           90s
+deployment.apps/fleet-fleet-management-worker     1/1     1            1           90s
+
+NAME                                                   CLASS   HOSTS         ADDRESS   PORTS   AGE
+ingress.networking.k8s.io/fleet-fleet-management-api   nginx   fleet.local             80      16s
+
+$ kubectl get pods -l component=api
+NAME                                          READY   STATUS        RESTARTS   AGE
+fleet-fleet-management-api-565665b4f5-mjgb4   1/1     Running       0          10s
+fleet-fleet-management-api-565665b4f5-qq64w   1/1     Running       0          16s
+fleet-fleet-management-api-565665b4f5-wrptj   1/1     Running       0          5s
+fleet-fleet-management-api-75c79b9cbc-dpn9q   1/1     Terminating   0          40s
+fleet-fleet-management-api-75c79b9cbc-sd9p6   1/1     Terminating   0          34s
+
+$ kubectl exec ... GET /info
+{"app":"Fleet Management (prod)","version":"1.1.0","pod":"fleet-fleet-management-api-565665b4f5-qq64w"}
+
+$ helm test fleet
+Phase:          Succeeded

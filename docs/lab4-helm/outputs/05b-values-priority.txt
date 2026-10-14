@@ -1,0 +1,17 @@
+# Priority: values.yaml  <  -f file(s) (later file wins)  <  --set (highest)
+
+$ helm template ... (values.yaml only)            -> replicaCount=2, tag=1.0.0
+  replicas: 2
+          image: fleet-management-api:1.0.0
+
+$ helm template ... -f values-prod.yaml           -> file overrides defaults
+  replicas: 3
+          image: fleet-management-api:1.1.0
+
+$ helm template ... -f values-prod.yaml --set replicaCount=5,image.tag=1.0.0   -> --set overrides the file
+  replicas: 5
+          image: fleet-management-api:1.0.0
+
+$ helm template ... -f values-prod.yaml -f values-dev.yaml   -> the last -f wins
+  replicas: 1
+          image: fleet-management-api:1.0.0

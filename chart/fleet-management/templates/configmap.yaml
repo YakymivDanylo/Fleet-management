@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fleet.configName" . }}
+  labels:
+    {{- include "fleet.labels" (dict "root" . "component" "config") | nindent 4 }}
+data:
+  APP_NAME: {{ .Values.config.appName | quote }}
+  REDIS_URL: {{ printf "redis://%s:6379/0" (include "fleet.redisHost" .) | quote }}
+  TELEMETRY_QUEUE: {{ .Values.config.telemetryQueue | quote }}
+  RESILIENCE_ENABLED: {{ .Values.config.resilienceEnabled | quote }}
+  ACCESS_TOKEN_EXPIRE_MINUTES: {{ .Values.config.accessTokenExpireMinutes | quote }}
+  POSTGRES_DB: {{ .Values.config.postgresDb | quote }}
+  POSTGRES_USER: {{ .Values.config.postgresUser | quote }}
