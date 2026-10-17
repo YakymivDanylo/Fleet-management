@@ -4,9 +4,9 @@ services:
     container_name: fleet_management_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: fleet_user
-      POSTGRES_PASSWORD: fleet_password
-      POSTGRES_DB: fleet_management
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-fleet_sandbox}
     ports:
       - "5432:5432"
     volumes:

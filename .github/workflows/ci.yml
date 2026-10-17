@@ -1,3 +1,5 @@
+# CI/CD pipeline: runs on every pull request to main and on every push to main.
+# Gates: lint (ruff) + all pytest tests + quality/security scans; on main it also publishes images.
 name: CI
 
 on:
@@ -39,6 +41,9 @@ jobs:
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
+      # Tests run as sandbox; the *_test database name is only valid for APP_ENV=sandbox.
+      APP_ENV: sandbox
+      DEBUG: "false"
       TEST_DATABASE_URL: postgresql+asyncpg://fleet_user:fleet_password@localhost:5432/fleet_management_test
       TEST_REDIS_URL: redis://localhost:6379/15
 
@@ -60,14 +65,14 @@ jobs:
           pip install -r requirements-dev.txt
           pip install --no-deps -e .
 
+      # api job = every test except the worker ones, so `pytest tests` is covered in full
+      # across the two matrix legs (new config/error-handling unit tests included).
       - name: Test (api)
         if: matrix.service == 'api'
         run: >-
-          pytest tests/unit/test_rental_service.py tests/unit/test_rental_eligibility_characterization.py
-          tests/integration/test_api.py
-          tests/unit/test_resilience.py tests/unit/test_vehicle_state_service.py
-          tests/integration/test_vehicle_state_api.py tests/unit/test_security.py
-          tests/integration/test_auth_api.py -v
+          pytest tests -v
+          --ignore=tests/unit/test_telemetry_schema.py
+          --ignore=tests/integration/test_telemetry_worker.py
           --cov --cov-report=xml:coverage-api.xml
 
       - name: Test (worker)

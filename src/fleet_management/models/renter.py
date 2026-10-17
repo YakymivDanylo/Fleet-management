@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..database import Base
@@ -10,3 +10,4 @@ class Renter(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(150))
     license_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), unique=True, nullable=True)
