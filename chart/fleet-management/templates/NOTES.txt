@@ -1,0 +1,20 @@
+Fleet Management "{{ .Release.Name }}" installed in namespace "{{ .Release.Namespace }}" (chart {{ .Chart.Version }}, API image {{ include "fleet.image" (dict "image" .Values.image "root" .) }}).
+
+Wait until the API is ready:
+  kubectl rollout status deployment/{{ include "fleet.componentName" (dict "root" . "component" "api") }} -n {{ .Release.Namespace }}
+
+Open the application:
+{{- if .Values.ingress.enabled }}
+  1. Run "minikube tunnel" in a separate admin terminal.
+  2. Add "127.0.0.1 {{ .Values.ingress.host }}" to C:\Windows\System32\drivers\etc\hosts (or /etc/hosts).
+  3. Open http://{{ .Values.ingress.host }}{{ .Values.ingress.path }}docs
+{{- else if eq .Values.service.type "NodePort" }}
+  minikube service {{ include "fleet.componentName" (dict "root" . "component" "api") }} -n {{ .Release.Namespace }} --url
+{{- else }}
+  kubectl port-forward svc/{{ include "fleet.componentName" (dict "root" . "component" "api") }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  then open http://localhost:8080/docs
+{{- end }}
+
+Check the release:
+  helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

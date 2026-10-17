@@ -1,0 +1,16 @@
+{{- if .Values.postgres.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "fleet.componentName" (dict "root" . "component" "postgres") }}-data
+  labels:
+    {{- include "fleet.labels" (dict "root" . "component" "postgres") | nindent 4 }}
+spec:
+  accessModes: [{{ .Values.postgres.persistence.accessMode | quote }}]
+  {{- with .Values.postgres.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.persistence.size }}
+{{- end }}

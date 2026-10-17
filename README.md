@@ -381,6 +381,25 @@ kubectl rollout status deployment/api -n fleet-management
 | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` | Облікові дані брокера; з них складається `RABBITMQ_URL` |
 | `JWT_SECRET_KEY` | Ключ підпису access-токенів |
 
+## Розгортання через Helm (лабораторна №4)
+
+Ті самі об'єкти, що й у `k8s/`, запаковані в чарт [`chart/fleet-management`](chart/fleet-management/README.md): шаблони з іменами від імені релізу, значення в `values.yaml`, окремі `values-dev.yaml` та `values-prod.yaml`, `pre-upgrade` хук і `helm test`. Namespace створює Helm (`--create-namespace`), тому окремого маніфесту Namespace немає.
+
+```powershell
+# dev
+helm install fleet chart/fleet-management -n fleet-management --create-namespace -f chart/fleet-management/values-dev.yaml
+# prod (3 репліки, образ 1.1.0, Ingress)
+helm install fleet chart/fleet-management -n fleet-management --create-namespace -f chart/fleet-management/values-prod.yaml
+
+helm upgrade fleet chart/fleet-management -n fleet-management --set image.tag=1.1.0
+helm history fleet -n fleet-management
+helm rollback fleet 1 -n fleet-management
+helm test fleet -n fleet-management
+helm uninstall fleet -n fleet-management
+```
+
+Паролі у файлах значень не зберігаються: порожні `secret.*` означають «взяти наявне значення з кластера або згенерувати випадкове». Таблиця всіх параметрів — у [README чарта](chart/fleet-management/README.md#параметри-valuesyaml), звіт з виводом команд — у [`docs/lab4-helm/REPORT.md`](docs/lab4-helm/REPORT.md).
+
 
 ## Privacy Engineering / GDPR (Лабораторна робота №4)
 

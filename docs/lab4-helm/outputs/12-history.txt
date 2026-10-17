@@ -1,0 +1,72 @@
+$ helm history fleet -n fleet-management
+REVISION	UPDATED                 	STATUS    	CHART                 	APP VERSION	DESCRIPTION     
+1       	Tue Oct 13 21:21:15 2026	superseded	fleet-management-0.1.0	1.0.0      	Install complete
+2       	Tue Oct 13 21:22:01 2026	superseded	fleet-management-0.1.0	1.0.0      	Upgrade complete
+3       	Tue Oct 13 21:22:25 2026	deployed  	fleet-management-0.1.0	1.0.0      	Upgrade complete
+
+--- revision 1: helm get values --revision 1
+null
+--- revision 2: helm get values --revision 2
+image:
+  tag: 1.1.0
+--- revision 3: helm get values --revision 3
+config:
+  appName: Fleet Management (prod)
+image:
+  tag: 1.1.0
+ingress:
+  enabled: true
+  host: fleet.local
+replicaCount: 3
+resources:
+  limits:
+    cpu: 750m
+    memory: 384Mi
+  requests:
+    cpu: 200m
+    memory: 192Mi
+
+$ diff <(helm get manifest --revision 1) <(... --revision 2)   # what rev 2 changed
+<           image: fleet-management-api:1.0.0
+>           image: fleet-management-api:1.1.0
+
+$ diff rev 2 vs rev 3 (kinds/lines changed)
+<   APP_NAME: "Fleet Management (dev)"
+>   APP_NAME: "Fleet Management (prod)"
+<   replicas: 2
+>   replicas: 3
+<               cpu: 500m
+<               memory: 256Mi
+>               cpu: 750m
+>               memory: 384Mi
+<               cpu: 100m
+<               memory: 128Mi
+>               cpu: 200m
+>               memory: 192Mi
+> ---
+> # Source: fleet-management/templates/api-ingress.yaml
+> apiVersion: networking.k8s.io/v1
+> kind: Ingress
+> metadata:
+>   name: fleet-fleet-management-api
+>   labels:
+>     helm.sh/chart: fleet-management-0.1.0
+>     app.kubernetes.io/name: fleet-management
+>     app.kubernetes.io/instance: fleet
+>     app.kubernetes.io/component: api
+>     app.kubernetes.io/version: "1.0.0"
+>     app.kubernetes.io/part-of: fleet-management
+>     app.kubernetes.io/managed-by: Helm
+> spec:
+>   ingressClassName: nginx
+>   rules:
+>     - host: "fleet.local"
+>       http:
+>         paths:
+>           - path: /
+>             pathType: Prefix
+>             backend:
+>               service:
+>                 name: fleet-fleet-management-api
+>                 port:
+>                   name: http

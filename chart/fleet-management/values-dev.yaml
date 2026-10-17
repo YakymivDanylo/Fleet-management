@@ -1,0 +1,16 @@
+# Development environment: minimal footprint, no Ingress, image 1.0.0.
+# helm install fleet chart/fleet-management -f chart/fleet-management/values-dev.yaml
+replicaCount: 1
+
+image:
+  tag: "1.0.0"
+
+ingress:
+  enabled: false
+
+resources:
+  requests: { cpu: 50m,  memory: 96Mi }
+  limits:   { cpu: 250m, memory: 192Mi }
+
+config:
+  appName: "Fleet Management (dev)"

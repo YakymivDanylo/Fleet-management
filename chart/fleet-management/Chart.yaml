@@ -1,0 +1,11 @@
+apiVersion: v2
+name: fleet-management
+description: Helm chart for the Fleet Management (car sharing) stack - FastAPI API, telemetry worker, PostgreSQL, Redis and RabbitMQ
+type: application
+# version - version of the chart itself (templates + values); bump on every chart change
+version: 0.1.0
+# appVersion - version of the packaged application (default tag of the API/worker images)
+appVersion: "1.0.0"
+keywords:
+  - fleet-management
+  - fastapi

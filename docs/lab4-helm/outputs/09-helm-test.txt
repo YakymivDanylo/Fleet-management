@@ -1,0 +1,22 @@
+$ helm test fleet -n fleet-management
+NAME: fleet
+LAST DEPLOYED: Tue Oct 13 21:21:15 2026
+NAMESPACE: fleet-management
+STATUS: deployed
+REVISION: 1
+TEST SUITE:     fleet-fleet-management-test
+Last Started:   Tue Oct 13 21:21:48 2026
+Last Completed: Tue Oct 13 21:21:50 2026
+Phase:          Succeeded
+NOTES:
+Fleet Management "fleet" installed in namespace "fleet-management" (chart 0.1.0, API image fleet-management-api:1.0.0).
+
+Wait until the API is ready:
+  kubectl rollout status deployment/fleet-fleet-management-api -n fleet-management
+
+Open the application:
+  minikube service fleet-fleet-management-api -n fleet-management --url
+
+Check the release:
+  helm status fleet -n fleet-management
+  helm test fleet -n fleet-management
