@@ -1,3 +1,8 @@
+"""Seed load-test vehicles (LT-xxxx) and push one telemetry reading each, so Redis has state.
+
+python scripts/seed_loadtest.py --vehicles 50
+"""
+
 import argparse
 import base64
 import json

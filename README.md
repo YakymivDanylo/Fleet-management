@@ -405,3 +405,27 @@ helm uninstall fleet -n fleet-management
 
 Безпечне логування, експорт персональних даних, анонімізація та керування згодами — інструкція запуску,
 демо-сценарій, PII inventory, політика erasure та висновок: [`docs/lab4-privacy-gdpr.md`](docs/lab4-privacy-gdpr.md).
+
+## Контейнеризація: запуск однією командою (лабораторна №5)
+
+```powershell
+Copy-Item .env.example .env     # розкоментуйте блок "one-command start" і заповніть паролі та JWT_SECRET_KEY
+docker compose up --build       # db, redis, rabbitmq → api (міграції) → worker
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # режим розробки з hot-reload
+```
+
+БД, Redis і worker працюють лише у внутрішній мережі `backend` (`internal: true`), назовні опубліковано тільки api та UI RabbitMQ. Дані PostgreSQL і RabbitMQ зберігаються в іменованих томах. Звіт з виводом команд: [`docs/lab5-docker/REPORT.md`](docs/lab5-docker/REPORT.md).
+
+## Навантажувальне тестування (лабораторна №4, Web)
+
+Інструмент — k6. Сценарій [`loadtest/user_journey.js`](loadtest/user_journey.js): логін → профіль → станції → авто → стан авто, ступінчасте навантаження 10 → 25 → 50 → 100 VUs.
+
+```powershell
+python scripts/seed_loadtest.py --vehicles 50              # потрібні RABBITMQ_DEFAULT_USER/PASS з .env
+docker compose run --rm --no-deps -e PROFILE=smoke k6 run /scripts/user_journey.js   # контрольний запуск
+python scripts/docker_stats.py --out loadtest/results/lab4/resources.csv --duration 440   # паралельно з тестом
+docker compose run --rm --no-deps k6 run --out csv=/scripts/results/lab4/k6.csv /scripts/user_journey.js
+python loadtest/report.py --k6 loadtest/results/lab4/k6.csv --resources loadtest/results/lab4/resources.csv --out loadtest/results/lab4
+```
+
+Метрики, графіки й виявлені вузькі місця: [`docs/lab4-loadtest/REPORT.md`](docs/lab4-loadtest/REPORT.md).
