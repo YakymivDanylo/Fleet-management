@@ -1,0 +1,23 @@
+# final multi-stage image vs. builder stage vs. naive single-stage build
+$ docker build --target builder -t fleet-api:builder-stage .
+$ docker build -f docs/lab5-docker/Dockerfile.single-stage -t fleet-api:single-stage .
+$ docker image ls
+REPOSITORY:TAG                              SIZE
+fleet-api:single-stage                      1.81GB
+fleet_lab5-worker:latest                    311MB
+fleet_lab5-api:latest                       312MB
+fleet-api:builder-stage                     325MB
+
+# runtime image: non-root user, no pip, no compiler
+$ docker compose exec api sh -c "whoami; python -m pip --version; which gcc"
+appuser
+/opt/venv/bin/python: No module named pip
+gcc: not found
+$ docker run --rm fleet-api:single-stage sh -c "whoami; which gcc"
+root
+/usr/bin/gcc
+
+# .dockerignore: nothing but code, migrations and the venv in the image
+$ docker compose exec api ls -A /app
+alembic
+alembic.ini
