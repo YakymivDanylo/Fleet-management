@@ -121,12 +121,30 @@ jobs:
           python-version: "3.13"
       - name: Install analyzers
         run: pip install radon==6.0.1 xenon==0.9.3 complexipy==8.0.1
+      # xenon exits 0 on files radon cannot parse (BOM, non-UTF-8) - fail closed instead.
+      - name: Every source file is analyzable
+        run: python scripts/check_analyzable.py src
       - name: Cyclomatic Complexity report (radon)
         run: radon cc src -s -a
       - name: Cyclomatic Complexity <= 10 per block (xenon rank B)
         run: xenon --max-absolute B src
       - name: Cognitive Complexity <= 15 per function (complexipy)
         run: complexipy src --max-complexity-allowed 15
+  quality-gate:
+    name: Balanced Quality Gate (coverage AND mutation score)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build pinned metrics runner
+        run: docker build -f Dockerfile.metrics -t fleet-metrics:ci .
+      # Fixed CPU/RAM quota for the runner container, so mutmut timeouts do not depend on
+      # how loaded the shared GitHub runner happens to be.
+      - name: Line Coverage >= 90 % AND Mutation Score >= 75 %
+        run: >-
+          docker run --rm --cpus=2 --memory=2g
+          --user "$(id -u):$(id -g)" -e HOME=/tmp
+          -v "$PWD:/work" fleet-metrics:ci sh scripts/run_quality_gate.sh
   sca:
     name: SCA (pip-audit)
     runs-on: ubuntu-latest
@@ -174,7 +192,7 @@ jobs:
   build:
     name: Build Image (${{matrix.service}})
     runs-on: ubuntu-latest
-    needs: [test, lint, sonarcloud, complexity, sca, secrets]
+    needs: [test, lint, sonarcloud, complexity, quality-gate, sca, secrets]
     strategy:
       fail-fast: false
       matrix:
