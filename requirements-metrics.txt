@@ -1,0 +1,10 @@
+# Exact versions of every measuring tool (Lab 5): a version bump is a deliberate,
+# reviewed change, never a silent drift of the numbers on the quality dashboard.
+pytest==9.1.1
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
+httpx==0.28.1
+radon==6.0.1
+lizard==1.24.1
+complexipy==8.0.1
+mutmut==3.8.0

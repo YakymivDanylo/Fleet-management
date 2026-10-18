@@ -9,3 +9,8 @@ venv/
 .idea/
 .env.sandbox
 .env.production
+
+# mutation testing workspace (mutmut)
+mutants/
+coverage.json
+.coverage

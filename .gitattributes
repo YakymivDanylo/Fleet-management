@@ -1,0 +1,5 @@
+# Lab 5: one canonical byte form for every text file, whatever core.autocrlf a developer
+# has, so the analyzers in CI and on any laptop always measure the same bytes.
+* text=auto eol=lf
+*.png binary
+*.svg text eol=lf
