@@ -1,3 +1,5 @@
+"""Seed LT-* load-test vehicles and their telemetry so /vehicles/{id}/state is served from Redis."""
+
 import argparse
 import base64
 import json
