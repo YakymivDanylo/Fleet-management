@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -10,6 +11,16 @@ from ..schemas import RentalEnd, RentalRead, RentalStart
 from ..services import rental_service
 
 router = APIRouter(prefix="/rentals", tags=["rentals"])
+
+
+def rental_with_cost(rental: Rental) -> RentalRead:
+    # Active rentals get the cost accrued so far, completed ones the final cost.
+    cost = None
+    if rental.status != RentalStatus.CANCELLED:
+        cost = rental_service.calculate_cost(
+            rental.started_at, rental.ended_at or datetime.utcnow()
+        )
+    return RentalRead.model_validate(rental).model_copy(update={"cost": cost})
 
 
 @router.post("/start", response_model=RentalRead, status_code=201)
@@ -27,8 +38,8 @@ async def end_rental(rental_id: int, payload: RentalEnd, db: AsyncSession = Depe
 
 @router.get("", response_model=list[RentalRead])
 async def list_rentals(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Rental))
-    return result.scalars().all()
+    result = await db.execute(select(Rental).order_by(Rental.started_at.desc()))
+    return [rental_with_cost(rental) for rental in result.scalars().all()]
 
 
 def _completed_rental_revenue(rental: Rental) -> float:
