@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fleet — каршеринг</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M8 19l2-6h12l2 6v4h-3v-2H11v2H8z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar" id="topbar" hidden>
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 15l1.6-5h12.8L20 15v4h-2.5v-1.6h-11V19H4z" fill="currentColor"/></svg>
+      </span>
+      <span>Fleet</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Головна навігація"></nav>
+    <div class="account">
+      <span class="account-name" id="account-name"></span>
+      <button class="btn btn-ghost btn-sm" id="logout-btn" type="button">Вийти</button>
+    </div>
+  </header>
+  <main class="page" id="app" tabindex="-1"></main>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

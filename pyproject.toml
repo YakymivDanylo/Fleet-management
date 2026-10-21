@@ -26,6 +26,7 @@ dependencies = [
 [project.scripts]
 telemetry-worker = 'fleet_management.telemetry.worker:main'
 create-admin = 'fleet_management.cli:main'
+telemetry-simulator = 'fleet_management.telemetry.simulator:main'
 
 [project.optional-dependencies]
 dev = [
@@ -35,6 +36,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+fleet_management = ["web/static/**/*"]
 
 [tool.ruff]
 line-length = 100

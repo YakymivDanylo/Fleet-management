@@ -10,9 +10,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..exceptions import DependencyUnavailableError, NotFoundError
-from ..models import TelemetryReading
+from ..models import TelemetryReading, Vehicle
 from ..resilience import RetryExhaustedError, RetryPolicy, call_with_retry
-from ..schemas import VehicleStateRead
+from ..schemas import FleetPositionsRead, VehiclePositionRead, VehicleStateRead
 from ..telemetry.processor import vehicle_state_key
 
 logger = logging.getLogger("fleet_management.vehicle_state")
@@ -107,3 +107,72 @@ async def get_vehicle_state(
     if reading is None:
         raise NotFoundError(f"No telemetry for vehicle {vehicle_id}")
     return _from_reading(reading, degraded=False)
+
+
+async def _latest_readings(db: AsyncSession, vehicle_ids: list[int]) -> dict[int, TelemetryReading]:
+    if not vehicle_ids:
+        return {}
+    # DISTINCT ON keeps the newest reading per vehicle in a single query.
+    result = await db.execute(
+        select(TelemetryReading)
+        .where(TelemetryReading.vehicle_id.in_(vehicle_ids))
+        .order_by(TelemetryReading.vehicle_id, TelemetryReading.recorded_at.desc())
+        .distinct(TelemetryReading.vehicle_id)
+    )
+    return {reading.vehicle_id: reading for reading in result.scalars().all()}
+
+
+async def _cached_states(redis: Redis, vehicle_ids: list[int]) -> dict[int, dict[str, str]]:
+    pipe = redis.pipeline(transaction=False)
+    for vehicle_id in vehicle_ids:
+        pipe.hgetall(vehicle_state_key(vehicle_id))
+    results = await pipe.execute()
+    return {vid: cached for vid, cached in zip(vehicle_ids, results, strict=True) if cached}
+
+
+def _position(vehicle: Vehicle, state: VehicleStateRead) -> VehiclePositionRead:
+    return VehiclePositionRead(
+        vehicle_id=vehicle.id,
+        license_plate=vehicle.license_plate,
+        model=vehicle.model,
+        status=vehicle.status,
+        station_id=vehicle.station_id,
+        recorded_at=state.recorded_at,
+        latitude=state.latitude,
+        longitude=state.longitude,
+        fuel_level=state.fuel_level,
+        is_locked=state.is_locked,
+        source=state.source,
+    )
+
+
+async def get_fleet_positions(db: AsyncSession, redis: Redis) -> FleetPositionsRead:
+    """Latest known position of every vehicle for the live map.
+
+    One Redis pipeline round trip for the hot state; vehicles missing from the cache
+    (or all of them, if Redis is down) are filled from Postgres in one query.
+    """
+    vehicles = (await db.execute(select(Vehicle).order_by(Vehicle.id))).scalars().all()
+    ids = [vehicle.id for vehicle in vehicles]
+
+    degraded = False
+    try:
+        cached = await _cached_states(redis, ids) if ids else {}
+    except REDIS_TRANSIENT_ERRORS as exc:
+        logger.error("Redis unavailable for fleet positions (%r); serving from Postgres", exc)
+        cached, degraded = {}, True
+
+    readings = await _latest_readings(db, [vid for vid in ids if vid not in cached])
+
+    positions, without_telemetry = [], []
+    for vehicle in vehicles:
+        if vehicle.id in cached:
+            positions.append(_position(vehicle, _from_cache(vehicle.id, cached[vehicle.id])))
+        elif vehicle.id in readings:
+            state = _from_reading(readings[vehicle.id], degraded=degraded)
+            positions.append(_position(vehicle, state))
+        else:
+            without_telemetry.append(vehicle.id)
+    return FleetPositionsRead(
+        positions=positions, without_telemetry=without_telemetry, degraded=degraded
+    )
