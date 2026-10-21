@@ -1,0 +1,10 @@
+# state: baseline (2026-10-17 13:43 UTC)
+$ docker run --rm --cpus=2 --memory=2g -v "$PWD:/work" fleet-metrics:1 sh scripts/run_quality_gate.sh
+
+1262 passed in 8.12s
+Scope: src/fleet_management/services/rental_service.py, src/fleet_management/privacy/sanitizer.py
+Mutants: total=268 killed=186 survived=35 no_tests=47 timeout=0
+Line Coverage   82.17 %  (>= 90)  FAIL
+Mutation Score  84.16 %  (>= 75)  PASS
+Balanced Quality Gate: FAIL
+exit=1

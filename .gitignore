@@ -9,5 +9,11 @@ venv/
 .idea/
 .env.sandbox
 .env.production
+
+# mutation testing workspace (mutmut)
+mutants/
+coverage.json
+.coverage
+
 # raw k6 samples (tens of MB); summary.md and charts are committed instead
 loadtest/results/lab4/k6*.csv

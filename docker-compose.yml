@@ -74,6 +74,13 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     networks: [backend, edge]
+    # Fixed resource quota (Lab 5): latency numbers are only comparable between runs when
+    # the measured container always gets the same CPU/RAM, not whatever the host has free.
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
     depends_on:
       db:
         condition: service_healthy
@@ -111,6 +118,11 @@ services:
   k6:
     image: grafana/k6:1.3.0
     profiles: ["loadtest"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
     environment:
       BASE_URL: http://api:8000
     volumes:

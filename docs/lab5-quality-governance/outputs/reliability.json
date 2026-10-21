@@ -1,0 +1,509 @@
+{
+  "file": "src/fleet_management/privacy/logging_setup.py",
+  "environments": {
+    "py3.9 + pinned tools": {
+      "image": "python:3.9-slim",
+      "variants": {
+        "utf8-lf": {
+          "python": "3.9.25",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-crlf": {
+          "python": "3.9.25",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-cr": {
+          "python": "3.9.25",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-bom-lf": {
+          "python": "3.9.25",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "SyntaxError at line: 1"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "cp1251-lf": {
+          "python": "3.9.25",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "'utf-8' codec can't decode byte 0x97 in position 248: invalid start byte"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "error: Failed to process /work/cp1251-lf.py - Please check file/folder exists or check syntax"
+          }
+        }
+      }
+    },
+    "py3.13 + pinned tools": {
+      "image": "python:3.13.16-slim",
+      "variants": {
+        "utf8-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-crlf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-cr": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-bom-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "invalid non-printable character U+FEFF (<unknown>, line 1)"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "cp1251-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "'utf-8' codec can't decode byte 0x97 in position 248: invalid start byte"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "error: Failed to process /work/cp1251-lf.py - Please check file/folder exists or check syntax"
+          }
+        }
+      }
+    },
+    "py3.14 + pinned tools": {
+      "image": "python:3.14-slim",
+      "variants": {
+        "utf8-lf": {
+          "python": "3.14.8",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-crlf": {
+          "python": "3.14.8",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-cr": {
+          "python": "3.14.8",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "utf8-bom-lf": {
+          "python": "3.14.8",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "invalid non-printable character U+FEFF (<unknown>, line 1)"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "cognitive_sum": 22
+          }
+        },
+        "cp1251-lf": {
+          "python": "3.14.8",
+          "tools": {
+            "radon": "6.0.1",
+            "lizard": "1.24.1",
+            "complexipy": "8.0.1"
+          },
+          "radon": {
+            "error": "'utf-8' codec can't decode byte 0x97 in position 248: invalid start byte"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 73,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "error: Failed to process /work/cp1251-lf.py - Please check file/folder exists or check syntax"
+          }
+        }
+      }
+    },
+    "py3.13 + old tools": {
+      "image": "python:3.13.16-slim",
+      "variants": {
+        "utf8-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "5.1.0",
+            "lizard": "1.17.10",
+            "complexipy": "-"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 75,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "complexipy not installed"
+          }
+        },
+        "utf8-crlf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "5.1.0",
+            "lizard": "1.17.10",
+            "complexipy": "-"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 75,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "complexipy not installed"
+          }
+        },
+        "utf8-cr": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "5.1.0",
+            "lizard": "1.17.10",
+            "complexipy": "-"
+          },
+          "radon": {
+            "loc": 124,
+            "sloc": 88,
+            "lloc": 83,
+            "comments": 2,
+            "blank": 27,
+            "cc_max": 10,
+            "cc_sum": 41,
+            "mi": 56.7
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 75,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "complexipy not installed"
+          }
+        },
+        "utf8-bom-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "5.1.0",
+            "lizard": "1.17.10",
+            "complexipy": "-"
+          },
+          "radon": {
+            "error": "invalid non-printable character U+FEFF (<unknown>, line 1)"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 75,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "complexipy not installed"
+          }
+        },
+        "cp1251-lf": {
+          "python": "3.13.16",
+          "tools": {
+            "radon": "5.1.0",
+            "lizard": "1.17.10",
+            "complexipy": "-"
+          },
+          "radon": {
+            "error": "'utf-8' codec can't decode byte 0x97 in position 248: invalid start byte"
+          },
+          "lizard": {
+            "functions": 11,
+            "nloc": 75,
+            "ccn_sum": 33,
+            "tokens": 642
+          },
+          "complexipy": {
+            "error": "complexipy not installed"
+          }
+        }
+      }
+    }
+  }
+}

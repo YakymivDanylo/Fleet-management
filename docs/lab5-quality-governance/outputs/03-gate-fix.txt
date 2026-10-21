@@ -1,0 +1,16 @@
+# state: fix (2026-10-17 13:47 UTC)
+$ docker run --rm --cpus=2 --memory=2g -v "$PWD:/work" fleet-metrics:1 sh scripts/run_quality_gate.sh
+=============================== warnings summary ===============================
+tests/unit/test_goodhart_rentals.py::test_end_rental_returns_vehicle_to_station
+  /work/src/fleet_management/services/rental_service.py:58: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    rental.ended_at = datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+1269 passed, 1 warning in 12.62s
+Scope: src/fleet_management/services/rental_service.py, src/fleet_management/privacy/sanitizer.py
+Mutants: total=268 killed=233 survived=35 no_tests=0 timeout=0
+Line Coverage   99.36 %  (>= 90)  PASS
+Mutation Score  86.94 %  (>= 75)  PASS
+Balanced Quality Gate: PASS
+exit=0

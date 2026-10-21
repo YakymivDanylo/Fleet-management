@@ -1,0 +1,21 @@
+# Pinned, isolated runner for quality metrics (Lab 5, Task 3 "engineering protection").
+# The interpreter, the analyzers and the test deps are frozen, so the same commit always
+# yields the same numbers on any developer machine and on any CI runner. The source tree is
+# mounted at run time (it is not baked in), e.g.:
+#   docker build -f Dockerfile.metrics -t fleet-metrics:1 .
+#   docker run --rm --cpus=2 --memory=2g -v "$PWD:/work" fleet-metrics:1 radon cc src -s
+FROM python:3.13.16-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /work
+
+COPY requirements.txt requirements-metrics.txt /tmp/
+RUN pip install -r /tmp/requirements.txt -r /tmp/requirements-metrics.txt
+
+# Run as an unprivileged user so the mounted tree is not filled with root-owned files.
+RUN useradd --create-home --uid 1000 metrics
+USER metrics
