@@ -1,0 +1,35 @@
+$ docker compose logs api | grep -i alembic
+api-1  | INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+api-1  | INFO  [alembic.runtime.migration] Will assume transactional DDL.
+api-1  | INFO  [alembic.runtime.migration] Running upgrade  -> 945d8fb7f540, initial schema
+api-1  | INFO  [alembic.runtime.migration] Running upgrade 945d8fb7f540 -> d9c208b5f3b7, add telemetry readings
+api-1  | INFO  [alembic.runtime.migration] Running upgrade d9c208b5f3b7 -> b7e4a1c2d3f5, add users
+api-1  | INFO  [alembic.runtime.migration] Running upgrade b7e4a1c2d3f5 -> c3a91f0b7d21, add privacy engineering tables (consent, activity, audit, marketing, analytics)
+api-1  | INFO:     Waiting for application startup.
+api-1  | INFO:     Application startup complete.
+api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+
+$ docker compose exec db psql -U $POSTGRES_USER -d $POSTGRES_DB -c "\dt"
+                   List of relations
+ Schema |        Name        | Type  |      Owner      
+--------+--------------------+-------+-----------------
+ public | alembic_version    | table | fleet_lab5_user
+ public | analytics_events   | table | fleet_lab5_user
+ public | audit_events       | table | fleet_lab5_user
+ public | consent_history    | table | fleet_lab5_user
+ public | marketing_messages | table | fleet_lab5_user
+ public | rentals            | table | fleet_lab5_user
+ public | renters            | table | fleet_lab5_user
+ public | stations           | table | fleet_lab5_user
+ public | telemetry_readings | table | fleet_lab5_user
+ public | user_activity      | table | fleet_lab5_user
+ public | user_consents      | table | fleet_lab5_user
+ public | users              | table | fleet_lab5_user
+ public | vehicles           | table | fleet_lab5_user
+(13 rows)
+
+ version_num  
+--------------
+ c3a91f0b7d21
+(1 row)
+

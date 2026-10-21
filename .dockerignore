@@ -14,3 +14,13 @@ venv
 tests
 docs
 config
+*.log
+logs
+.github
+chart
+k8s
+loadtest
+scripts
+lab*.md
+.complexipy_cache
+docker-compose*.yml

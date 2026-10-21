@@ -1,0 +1,21 @@
+$ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+$ docker compose exec api cat /proc/1/cmdline
+/opt/venv/bin/python /opt/venv/bin/uvicorn fleet_management.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src 
+
+$ curl -s localhost:8000/info   # before the edit
+{"app":"Fleet Management","version":"dev","pod":"1eccd81afbb9"}
+
+# edit src/fleet_management/main.py on the host (add "hot_reload" to /info), no rebuild
+$ curl -s localhost:8000/info   # a few seconds later
+{"app":"Fleet Management","version":"dev","pod":"1eccd81afbb9","hot_reload":"edited on the host"}
+
+$ docker compose logs api | grep -iE "watchfiles|reload|startup"
+api-1  | INFO:     Started reloader process [1] using WatchFiles
+api-1  | INFO:     Application startup complete.
+api-1  | WARNING:  WatchFiles detected changes in 'src/fleet_management/main.py'. Reloading...
+api-1  | INFO:     Application startup complete.
+api-1  | WARNING:  WatchFiles detected changes in 'src/fleet_management/main.py'. Reloading...
+api-1  | INFO:     Application startup complete.
+
+$ docker compose ps api   # same container, never recreated
+fleet_lab5-api-1 Up 21 seconds (healthy)

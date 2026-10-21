@@ -1,0 +1,20 @@
+# Development override with hot reload (Lab 5, additional task 2). Layered on top of the
+# main file, so every other setting (env, networks, healthchecks) stays the same:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# Edit any file under src/ and uvicorn restarts inside the container; no image rebuild.
+services:
+  api:
+    environment:
+      # The image has the package installed into /opt/venv site-packages. PYTHONPATH is
+      # searched first, so the bind-mounted /app/src shadows the installed copy.
+      PYTHONPATH: /app/src
+      # Docker Desktop on Windows does not forward inotify events from the host into
+      # bind mounts, so the reloader polls for changes instead.
+      WATCHFILES_FORCE_POLLING: "true"
+    volumes:
+      - ./src:/app/src
+      - ./alembic:/app/alembic
+    command:
+      - sh
+      - -c
+      - alembic upgrade head && exec uvicorn fleet_management.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
