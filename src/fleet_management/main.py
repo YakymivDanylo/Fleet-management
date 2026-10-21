@@ -22,6 +22,7 @@ from .exceptions import (
 )
 from .privacy import configure_logging
 from .privacy.middleware import CorrelationIdMiddleware
+from .web import mount_ui
 
 DEPENDENCY_RETRY_AFTER_SECONDS = 5
 
@@ -126,6 +127,7 @@ def create_app(cfg: Settings = settings) -> FastAPI:
     app.include_router(api_router)
     _register_error_handlers(app)
     _register_service_routes(app)
+    mount_ui(app)
     return app
 
 
