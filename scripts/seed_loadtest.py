@@ -18,9 +18,21 @@ RABBITMQ_API_URL = f"{RABBITMQ_MGMT_URL}/api/exchanges/%2F/amq.default/publish"
 PLATE_PREFIX = "LT-"
 
 
+def env_value(name: str) -> str:
+    # Same variables docker compose reads, so the script never carries credentials itself:
+    # the real environment first, then the .env file next to docker-compose.yml.
+    if name in os.environ:
+        return os.environ[name]
+    with open(".env", encoding="utf-8") as file:
+        for line in file:
+            key, sep, value = line.strip().partition("=")
+            if sep and key == name:
+                return value
+    raise KeyError(f"{name} is neither set in the environment nor in .env")
+
+
 def rabbitmq_auth() -> str:
-    # Same variables as in .env.sandbox, so the script never carries credentials itself.
-    credentials = f"{os.environ['RABBITMQ_DEFAULT_USER']}:{os.environ['RABBITMQ_DEFAULT_PASS']}"
+    credentials = f"{env_value('RABBITMQ_DEFAULT_USER')}:{env_value('RABBITMQ_DEFAULT_PASS')}"
     return base64.b64encode(credentials.encode()).decode()
 
 
