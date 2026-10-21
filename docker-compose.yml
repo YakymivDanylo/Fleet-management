@@ -13,6 +13,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in the env file}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [backend]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -28,6 +29,8 @@ services:
       - "${RABBITMQ_MGMT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    # The management UI port is published, so rabbitmq also sits on the edge network.
+    networks: [backend, edge]
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -36,6 +39,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    networks: [backend]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -51,6 +55,7 @@ services:
       - ./loadtest/toxiproxy.json:/config/toxiproxy.json:ro
     ports:
       - "${TOXIPROXY_PORT:-8474}:8474"
+    networks: [backend, edge]
     depends_on:
       redis:
         condition: service_healthy
@@ -68,6 +73,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in the env file}
     ports:
       - "${API_PORT:-8000}:8000"
+    networks: [backend, edge]
     # Fixed resource quota (Lab 5): latency numbers are only comparable between runs when
     # the measured container always gets the same CPU/RAM, not whatever the host has free.
     deploy:
@@ -77,6 +83,8 @@ services:
           memory: 512M
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       toxiproxy:
         condition: service_started
@@ -97,6 +105,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/
       REDIS_URL: redis://redis:6379/0
+    networks: [backend]
     depends_on:
       api:
         condition: service_healthy
@@ -118,9 +127,18 @@ services:
       BASE_URL: http://api:8000
     volumes:
       - ./loadtest:/scripts
+    networks: [edge]
     depends_on:
       api:
         condition: service_healthy
+
+networks:
+  # Internal: no route to the outside world and no published ports, so db/redis/worker are
+  # reachable only by the other services on this network.
+  backend:
+    internal: true
+  # Edge: the services whose ports are published to the host (api, management UIs, k6).
+  edge:
 
 volumes:
   pgdata:

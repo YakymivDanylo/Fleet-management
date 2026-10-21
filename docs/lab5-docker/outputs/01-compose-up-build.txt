@@ -1,0 +1,424 @@
+ Image fleet_lab5-worker Building 
+ Image fleet_lab5-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 958B 0.0s done
+#1 DONE 0.0s
+
+#2 [api internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.04kB 0.0s done
+#2 DONE 0.1s
+
+#3 [worker internal] load build definition from Dockerfile.worker
+#3 transferring dockerfile: 848B done
+#3 DONE 0.1s
+
+#4 [worker internal] load metadata for docker.io/library/python:3.13-slim
+#4 ...
+
+#5 [auth] library/python:pull token for registry-1.docker.io
+#5 DONE 0.0s
+
+#4 [worker internal] load metadata for docker.io/library/python:3.13-slim
+#4 DONE 1.4s
+
+#6 [worker internal] load .dockerignore
+#6 transferring context: 290B done
+#6 DONE 0.1s
+
+#7 [worker internal] load build context
+#7 DONE 0.0s
+
+#8 [api internal] load build context
+#8 DONE 0.0s
+
+#9 [api builder 1/8] FROM docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f
+#9 resolve docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f 0.0s done
+#9 resolve docker.io/library/python:3.13-slim@sha256:70729b46c69b4f1e97c4822c1af3df53a1476cf5ddc6c087c0c10bc3a5678c2f 0.0s done
+#9 DONE 0.0s
+
+#7 [worker internal] load build context
+#7 transferring context: 105.34kB 0.0s done
+#7 DONE 0.1s
+
+#8 [api internal] load build context
+#8 transferring context: 126.67kB 0.0s done
+#8 DONE 0.1s
+
+#10 [api builder 2/8] RUN python -m venv --without-pip /opt/venv
+#10 CACHED
+
+#11 [api builder 3/8] WORKDIR /app
+#11 CACHED
+
+#12 [api builder 4/8] COPY requirements.txt .
+#12 CACHED
+
+#13 [api builder 5/8] RUN pip --python /opt/venv/bin/python install -r requirements.txt
+#13 2.048 Collecting fastapi==0.141.1 (from -r requirements.txt (line 1))
+#13 2.190   Downloading fastapi-0.141.1-py3-none-any.whl.metadata (27 kB)
+#13 2.267 Collecting uvicorn==0.52.4 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 2.317   Downloading uvicorn-0.52.4-py3-none-any.whl.metadata (6.6 kB)
+#13 2.686 Collecting sqlalchemy==2.0.52 (from -r requirements.txt (line 3))
+#13 2.728   Downloading sqlalchemy-2.0.52-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.6 kB)
+#13 2.807 Collecting asyncpg==0.31.0 (from -r requirements.txt (line 4))
+#13 2.849   Downloading asyncpg-0.31.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.4 kB)
+#13 2.893 Collecting pydantic-settings==2.15.0 (from -r requirements.txt (line 5))
+#13 2.932   Downloading pydantic_settings-2.15.0-py3-none-any.whl.metadata (3.9 kB)
+#13 2.978 Collecting python-dotenv==1.2.3 (from -r requirements.txt (line 6))
+#13 3.016   Downloading python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+#13 3.078 Collecting alembic==1.20.0 (from -r requirements.txt (line 7))
+#13 3.120   Downloading alembic-1.20.0-py3-none-any.whl.metadata (7.3 kB)
+#13 3.181 Collecting aio-pika==10.0.1 (from -r requirements.txt (line 8))
+#13 3.219   Downloading aio_pika-10.0.1-py3-none-any.whl.metadata (15 kB)
+#13 3.274 Collecting redis==8.1.0 (from -r requirements.txt (line 9))
+#13 3.313   Downloading redis-8.1.0-py3-none-any.whl.metadata (16 kB)
+#13 3.362 Collecting pyjwt==2.15.0 (from -r requirements.txt (line 10))
+#13 3.403   Downloading pyjwt-2.15.0-py3-none-any.whl.metadata (3.5 kB)
+#13 3.440 Collecting pwdlib==0.3.1 (from pwdlib[argon2]==0.3.1->-r requirements.txt (line 11))
+#13 3.501   Downloading pwdlib-0.3.1-py3-none-any.whl.metadata (5.6 kB)
+#13 3.542 Collecting python-multipart==0.0.32 (from -r requirements.txt (line 12))
+#13 3.580   Downloading python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+#13 3.621 Collecting email-validator==2.3.0 (from -r requirements.txt (line 13))
+#13 3.740   Downloading email_validator-2.3.0-py3-none-any.whl.metadata (26 kB)
+#13 3.811 Collecting starlette>=0.46.0 (from fastapi==0.141.1->-r requirements.txt (line 1))
+#13 3.950   Downloading starlette-1.8.0-py3-none-any.whl.metadata (6.6 kB)
+#13 4.070 Collecting pydantic>=2.9.0 (from fastapi==0.141.1->-r requirements.txt (line 1))
+#13 4.107   Downloading pydantic-2.14.1-py3-none-any.whl.metadata (133 kB)
+#13 4.210 Collecting typing-extensions>=4.8.0 (from fastapi==0.141.1->-r requirements.txt (line 1))
+#13 4.248   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#13 4.289 Collecting typing-inspection>=0.4.2 (from fastapi==0.141.1->-r requirements.txt (line 1))
+#13 4.326   Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+#13 4.364 Collecting annotated-doc>=0.0.2 (from fastapi==0.141.1->-r requirements.txt (line 1))
+#13 4.409   Downloading annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+#13 4.460 Collecting click>=7.0 (from uvicorn==0.52.4->uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 4.505   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#13 4.545 Collecting h11>=0.8 (from uvicorn==0.52.4->uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 4.582   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#13 4.729 Collecting greenlet>=1 (from sqlalchemy==2.0.52->-r requirements.txt (line 3))
+#13 4.768   Downloading greenlet-3.5.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#13 4.820 Collecting Mako (from alembic==1.20.0->-r requirements.txt (line 7))
+#13 4.862   Downloading mako-1.4.3-py3-none-any.whl.metadata (2.9 kB)
+#13 4.924 Collecting aiormq<8,>=7 (from aio-pika==10.0.1->-r requirements.txt (line 8))
+#13 5.044   Downloading aiormq-7.2.2-py3-none-any.whl.metadata (26 kB)
+#13 5.306 Collecting yarl (from aio-pika==10.0.1->-r requirements.txt (line 8))
+#13 5.345   Downloading yarl-1.25.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+#13 5.410 Collecting dnspython>=2.0.0 (from email-validator==2.3.0->-r requirements.txt (line 13))
+#13 5.471   Downloading dnspython-2.9.0-py3-none-any.whl.metadata (5.7 kB)
+#13 5.530 Collecting idna>=2.0.0 (from email-validator==2.3.0->-r requirements.txt (line 13))
+#13 5.581   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#13 5.647 Collecting argon2-cffi>=23.1.0 (from pwdlib[argon2]==0.3.1->-r requirements.txt (line 11))
+#13 5.688   Downloading argon2_cffi-25.1.0-py3-none-any.whl.metadata (4.1 kB)
+#13 5.756 Collecting httptools>=0.8.0 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 5.796   Downloading httptools-0.9.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+#13 5.871 Collecting pyyaml>=5.1 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 5.909   Downloading pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+#13 6.029 Collecting uvloop>=0.15.1 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 6.080   Downloading uvloop-0.23.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.1 kB)
+#13 6.202 Collecting watchfiles>=0.20 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 6.241   Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+#13 6.461 Collecting websockets>=13.0 (from uvicorn[standard]==0.52.4->-r requirements.txt (line 2))
+#13 6.508   Downloading websockets-17.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.3 kB)
+#13 6.557 Collecting pamqp<5,>=4 (from aiormq<8,>=7->aio-pika==10.0.1->-r requirements.txt (line 8))
+#13 6.610   Downloading pamqp-4.0.1-py3-none-any.whl.metadata (3.0 kB)
+#13 6.661 Collecting argon2-cffi-bindings (from argon2-cffi>=23.1.0->pwdlib[argon2]==0.3.1->-r requirements.txt (line 11))
+#13 6.698   Downloading argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl.metadata (7.5 kB)
+#13 6.751 Collecting annotated-types>=0.6.0 (from pydantic>=2.9.0->fastapi==0.141.1->-r requirements.txt (line 1))
+#13 6.788   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+#13 7.581 Collecting pydantic-core==2.50.1 (from pydantic>=2.9.0->fastapi==0.141.1->-r requirements.txt (line 1))
+#13 7.620   Downloading pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+#13 7.674 Collecting anyio<5,>=4.0.0 (from starlette>=0.46.0->fastapi==0.141.1->-r requirements.txt (line 1))
+#13 7.711   Downloading anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#13 7.848 Collecting cffi>=1.0.1 (from argon2-cffi-bindings->argon2-cffi>=23.1.0->pwdlib[argon2]==0.3.1->-r requirements.txt (line 11))
+#13 7.885   Downloading cffi-2.1.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+#13 7.925 Collecting pycparser (from cffi>=1.0.1->argon2-cffi-bindings->argon2-cffi>=23.1.0->pwdlib[argon2]==0.3.1->-r requirements.txt (line 11))
+#13 7.965   Downloading pycparser-3.11-py3-none-any.whl.metadata (8.2 kB)
+#13 8.055 Collecting MarkupSafe>=2.0 (from Mako->alembic==1.20.0->-r requirements.txt (line 7))
+#13 8.095   Downloading markupsafe-3.0.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#13 8.363 Collecting multidict>=4.0 (from yarl->aio-pika==10.0.1->-r requirements.txt (line 8))
+#13 8.400   Downloading multidict-7.1.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (6.2 kB)
+#13 8.495 Collecting propcache>=0.2.1 (from yarl->aio-pika==10.0.1->-r requirements.txt (line 8))
+#13 8.533   Downloading propcache-0.5.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+#13 8.579 Downloading fastapi-0.141.1-py3-none-any.whl (131 kB)
+#13 8.627 Downloading uvicorn-0.52.4-py3-none-any.whl (79 kB)
+#13 8.673 Downloading sqlalchemy-2.0.52-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.3 MB)
+#13 8.912    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 15.2 MB/s  0:00:00
+#13 8.947 Downloading asyncpg-0.31.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.5 MB)
+#13 9.192    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.5/3.5 MB 14.9 MB/s  0:00:00
+#13 9.229 Downloading pydantic_settings-2.15.0-py3-none-any.whl (69 kB)
+#13 9.270 Downloading python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+#13 9.309 Downloading alembic-1.20.0-py3-none-any.whl (268 kB)
+#13 9.373 Downloading aio_pika-10.0.1-py3-none-any.whl (56 kB)
+#13 9.411 Downloading redis-8.1.0-py3-none-any.whl (560 kB)
+#13 9.454    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 560.6/560.6 kB 18.8 MB/s  0:00:00
+#13 9.495 Downloading pyjwt-2.15.0-py3-none-any.whl (33 kB)
+#13 9.539 Downloading pwdlib-0.3.1-py3-none-any.whl (9.3 kB)
+#13 9.579 Downloading python_multipart-0.0.32-py3-none-any.whl (30 kB)
+#13 9.621 Downloading email_validator-2.3.0-py3-none-any.whl (35 kB)
+#13 9.663 Downloading aiormq-7.2.2-py3-none-any.whl (39 kB)
+#13 9.715 Downloading pamqp-4.0.1-py3-none-any.whl (32 kB)
+#13 9.754 Downloading annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+#13 9.793 Downloading argon2_cffi-25.1.0-py3-none-any.whl (14 kB)
+#13 9.837 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#13 9.890 Downloading dnspython-2.9.0-py3-none-any.whl (354 kB)
+#13 9.952 Downloading greenlet-3.5.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (623 kB)
+#13 9.995    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 623.8/623.8 kB 14.6 MB/s  0:00:00
+#13 10.03 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#13 10.07 Downloading httptools-0.9.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (520 kB)
+#13 10.17 Downloading idna-3.20-py3-none-any.whl (69 kB)
+#13 10.21 Downloading pydantic-2.14.1-py3-none-any.whl (488 kB)
+#13 10.29 Downloading pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+#13 10.40    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 20.0 MB/s  0:00:00
+#13 10.52 Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+#13 10.56 Downloading pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+#13 10.60    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.6/801.6 kB 26.7 MB/s  0:00:00
+#13 10.64 Downloading starlette-1.8.0-py3-none-any.whl (79 kB)
+#13 10.69 Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+#13 10.75 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#13 10.79 Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+#13 10.84 Downloading uvloop-0.23.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.5 MB)
+#13 11.13    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 16.0 MB/s  0:00:00
+#13 11.17 Downloading watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (458 kB)
+#13 11.24 Downloading websockets-17.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (225 kB)
+#13 11.30 Downloading argon2_cffi_bindings-26.1.0-cp310-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (26 kB)
+#13 11.34 Downloading cffi-2.1.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+#13 11.39 Downloading mako-1.4.3-py3-none-any.whl (80 kB)
+#13 11.43 Downloading markupsafe-3.0.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (23 kB)
+#13 11.47 Downloading pycparser-3.11-py3-none-any.whl (51 kB)
+#13 11.51 Downloading yarl-1.25.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (117 kB)
+#13 11.57 Downloading multidict-7.1.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (481 kB)
+#13 11.64 Downloading propcache-0.5.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (234 kB)
+#13 11.92 Installing collected packages: websockets, uvloop, typing-extensions, redis, pyyaml, python-multipart, python-dotenv, pyjwt, pycparser, pwdlib, propcache, pamqp, multidict, MarkupSafe, idna, httptools, h11, greenlet, dnspython, click, asyncpg, annotated-types, annotated-doc, yarl, uvicorn, typing-inspection, sqlalchemy, pydantic-core, Mako, email-validator, cffi, anyio, watchfiles, starlette, pydantic, argon2-cffi-bindings, alembic, aiormq, pydantic-settings, fastapi, argon2-cffi, aio-pika
+#13 15.70 
+#13 15.70 Successfully installed Mako-1.4.3 MarkupSafe-3.0.4 aio-pika-10.0.1 aiormq-7.2.2 alembic-1.20.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 argon2-cffi-25.1.0 argon2-cffi-bindings-26.1.0 asyncpg-0.31.0 cffi-2.1.1 click-8.5.0 dnspython-2.9.0 email-validator-2.3.0 fastapi-0.141.1 greenlet-3.5.6 h11-0.16.0 httptools-0.9.0 idna-3.20 multidict-7.1.0 pamqp-4.0.1 propcache-0.5.4 pwdlib-0.3.1 pycparser-3.11 pydantic-2.14.1 pydantic-core-2.50.1 pydantic-settings-2.15.0 pyjwt-2.15.0 python-dotenv-1.2.3 python-multipart-0.0.32 pyyaml-6.0.3 redis-8.1.0 sqlalchemy-2.0.52 starlette-1.8.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.52.4 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.2 yarl-1.25.1
+#13 DONE 16.3s
+
+#14 [worker builder 6/8] COPY pyproject.toml .
+#14 DONE 0.1s
+
+#15 [api builder 7/8] COPY src ./src
+#15 DONE 0.1s
+
+#16 [worker builder 8/8] RUN pip --python /opt/venv/bin/python install --no-deps .
+#16 0.528 Processing ./.
+#16 0.531   Installing build dependencies: started
+#16 1.588   Installing build dependencies: finished with status 'done'
+#16 1.590   Getting requirements to build wheel: started
+#16 2.101   Getting requirements to build wheel: finished with status 'done'
+#16 2.103   Preparing metadata (pyproject.toml): started
+#16 2.298   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 2.302 Building wheels for collected packages: fleet-management
+#16 2.304   Building wheel for fleet-management (pyproject.toml): started
+#16 2.552   Building wheel for fleet-management (pyproject.toml): finished with status 'done'
+#16 2.553   Created wheel for fleet-management: filename=fleet_management-0.1.0-py3-none-any.whl size=45699 sha256=9bb4148e46a178413dca5ed1784ee89a0f701672652adc92881d5f9c9deff1fe
+#16 2.553   Stored in directory: /tmp/pip-ephem-wheel-cache-wb005g1f/wheels/19/62/e5/caf0138816cbbc0c92b8fb19626cf9ac282f22194a65231821
+#16 2.556 Successfully built fleet-management
+#16 2.570 Installing collected packages: fleet-management
+#16 2.628 Successfully installed fleet-management-0.1.0
+#16 DONE 2.8s
+
+#17 [api stage-1 2/4] WORKDIR /app
+#17 CACHED
+
+#18 [api builder 4/8] COPY requirements.txt .
+#18 CACHED
+
+#19 [api builder 5/8] RUN pip --python /opt/venv/bin/python install -r requirements.txt
+#19 CACHED
+
+#20 [api builder 6/8] COPY pyproject.toml .
+#20 CACHED
+
+#21 [api builder 7/8] COPY src ./src
+#21 CACHED
+
+#22 [api builder 8/8] RUN pip --python /opt/venv/bin/python install --no-deps .
+#22 CACHED
+
+#23 [api stage-1 3/6] COPY --from=builder /opt/venv /opt/venv
+#23 CANCELED
+
+#17 [worker stage-1 2/4] WORKDIR /app
+#17 CACHED
+
+#24 [worker stage-1 3/4] COPY --from=builder /opt/venv /opt/venv
+#24 ...
+
+#17 [api stage-1 2/4] WORKDIR /app
+#17 CACHED
+
+#24 [api stage-1 3/4] COPY --from=builder /opt/venv /opt/venv
+#24 DONE 0.7s
+
+#25 [api stage-1 4/6] COPY alembic.ini .
+#25 DONE 0.1s
+
+#26 [worker stage-1 4/4] RUN apt-get update     && apt-get upgrade -y --no-install-recommends     && rm -rf /var/lib/apt/lists/*     && /usr/local/bin/python -m pip uninstall -y pip setuptools wheel     && useradd --create-home appuser
+#26 ...
+
+#27 [api stage-1 5/6] COPY alembic ./alembic
+#27 DONE 0.1s
+
+#28 [api stage-1 6/6] RUN apt-get update     && apt-get upgrade -y --no-install-recommends     && rm -rf /var/lib/apt/lists/*     && /usr/local/bin/python -m pip uninstall -y pip setuptools wheel     && useradd --create-home appuser
+#28 0.346 Hit:1 http://deb.debian.org/debian trixie InRelease
+#28 0.368 Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+#28 0.440 Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+#28 0.491 Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9678 kB]
+#28 1.640 Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [4412 B]
+#28 1.677 Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [269 kB]
+#28 2.288 Fetched 10.0 MB in 2s (4955 kB/s)
+#28 2.288 Reading package lists...
+#28 2.989 Reading package lists...
+#28 3.623 Building dependency tree...
+#28 3.843 Reading state information...
+#28 3.916 Calculating upgrade...
+#28 4.161 The following packages will be upgraded:
+#28 4.163   liblzma5
+#28 4.257 1 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+#28 4.257 Need to get 310 kB of archives.
+#28 4.257 After this operation, 0 B of additional disk space will be used.
+#28 4.257 Get:1 http://deb.debian.org/debian-security trixie-security/main amd64 liblzma5 amd64 5.8.1-1+deb13u2 [310 kB]
+#28 4.492 debconf: unable to initialize frontend: Dialog
+#28 4.492 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#28 4.492 debconf: falling back to frontend: Readline
+#28 4.492 debconf: unable to initialize frontend: Readline
+#28 4.492 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 1.)
+#28 4.492 debconf: falling back to frontend: Teletype
+#28 4.497 debconf: unable to initialize frontend: Teletype
+#28 4.497 debconf: (This frontend requires a controlling tty.)
+#28 4.497 debconf: falling back to frontend: Noninteractive
+#28 5.151 Fetched 310 kB in 0s (1675 kB/s)
+#28 5.183 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5660 files and directories currently installed.)
+#28 5.187 Preparing to unpack .../liblzma5_5.8.1-1+deb13u2_amd64.deb ...
+#28 5.211 Unpacking liblzma5:amd64 (5.8.1-1+deb13u2) over (5.8.1-1+deb13u1) ...
+#28 5.266 Setting up liblzma5:amd64 (5.8.1-1+deb13u2) ...
+#28 5.291 Processing triggers for libc-bin (2.41-12+deb13u4) ...
+#28 6.295 Found existing installation: pip 26.2.1
+#28 6.322 Uninstalling pip-26.2.1:
+#28 6.446   Successfully uninstalled pip-26.2.1
+#28 6.457 WARNING: Skipping setuptools as it is not installed.
+#28 6.460 WARNING: Skipping wheel as it is not installed.
+#28 6.460 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#28 DONE 6.7s
+
+#26 [worker stage-1 4/4] RUN apt-get update     && apt-get upgrade -y --no-install-recommends     && rm -rf /var/lib/apt/lists/*     && /usr/local/bin/python -m pip uninstall -y pip setuptools wheel     && useradd --create-home appuser
+#26 0.535 Hit:1 http://deb.debian.org/debian trixie InRelease
+#26 0.557 Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+#26 0.627 Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+#26 0.671 Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9678 kB]
+#26 1.531 Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [4412 B]
+#26 1.566 Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [269 kB]
+#26 2.242 Fetched 10.0 MB in 2s (5255 kB/s)
+#26 2.242 Reading package lists...
+#26 2.961 Reading package lists...
+#26 3.558 Building dependency tree...
+#26 3.759 Reading state information...
+#26 3.823 Calculating upgrade...
+#26 4.131 The following packages will be upgraded:
+#26 4.132   liblzma5
+#26 4.226 1 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+#26 4.226 Need to get 310 kB of archives.
+#26 4.226 After this operation, 0 B of additional disk space will be used.
+#26 4.226 Get:1 http://deb.debian.org/debian-security trixie-security/main amd64 liblzma5 amd64 5.8.1-1+deb13u2 [310 kB]
+#26 4.513 debconf: unable to initialize frontend: Dialog
+#26 4.513 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#26 4.513 debconf: falling back to frontend: Readline
+#26 4.514 debconf: unable to initialize frontend: Readline
+#26 4.514 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 1.)
+#26 4.514 debconf: falling back to frontend: Teletype
+#26 4.519 debconf: unable to initialize frontend: Teletype
+#26 4.519 debconf: (This frontend requires a controlling tty.)
+#26 4.519 debconf: falling back to frontend: Noninteractive
+#26 5.175 Fetched 310 kB in 0s (1700 kB/s)
+#26 5.207 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5660 files and directories currently installed.)
+#26 5.232 Preparing to unpack .../liblzma5_5.8.1-1+deb13u2_amd64.deb ...
+#26 5.250 Unpacking liblzma5:amd64 (5.8.1-1+deb13u2) over (5.8.1-1+deb13u1) ...
+#26 5.302 Setting up liblzma5:amd64 (5.8.1-1+deb13u2) ...
+#26 5.329 Processing triggers for libc-bin (2.41-12+deb13u4) ...
+#26 6.448 Found existing installation: pip 26.2.1
+#26 6.488 Uninstalling pip-26.2.1:
+#26 6.652   Successfully uninstalled pip-26.2.1
+#26 6.665 WARNING: Skipping setuptools as it is not installed.
+#26 6.667 WARNING: Skipping wheel as it is not installed.
+#26 6.670 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#26 DONE 6.9s
+
+#29 [worker] exporting to image
+#29 exporting layers
+#29 exporting layers 3.2s done
+#29 exporting manifest sha256:197cbafecfd0a8c6a453a88f3d064422bf424087ff6d8562989a6a75a09164dd 0.0s done
+#29 exporting config sha256:af3dc5a827c19de1809dc56acec2428404d2b17ab06a51ac8437ea4d00fe8520 0.0s done
+#29 exporting attestation manifest sha256:a6def1cb172bda23339cedd892aab4e5ec302fa51931652660345ae07b34717f 0.0s done
+#29 exporting manifest list sha256:95cb57f37d50a945d99f26acb7a50d3d27d89ae19b8f3305940602de0a1245b6
+#29 exporting manifest list sha256:95cb57f37d50a945d99f26acb7a50d3d27d89ae19b8f3305940602de0a1245b6 0.0s done
+#29 naming to docker.io/library/fleet_lab5-worker:latest done
+#29 unpacking to docker.io/library/fleet_lab5-worker:latest
+#29 unpacking to docker.io/library/fleet_lab5-worker:latest 0.7s done
+#29 DONE 4.1s
+
+#30 [api] exporting to image
+#30 exporting layers 3.3s done
+#30 exporting manifest sha256:5c3a98db08430f83b9f41b61c0ecc073349eb6a7b9fd1c2407e8645ea6f28be8 0.0s done
+#30 exporting config sha256:8d9b374449d89b6345f9b2cef512ce9a5f8d8fd1ce40179e8ee1c5e4b5f6e020 0.0s done
+#30 exporting attestation manifest sha256:dce02bd134bfa22381fb51fe30bdee4ffc532584d8971d1e61f986735dc92156 0.0s done
+#30 exporting manifest list sha256:89eb427c993e20e9ec8e9af576be92ab67cc097db5fc1b3264a342cb3821d9ab 0.0s done
+#30 naming to docker.io/library/fleet_lab5-api:latest done
+#30 unpacking to docker.io/library/fleet_lab5-api:latest 0.8s done
+#30 DONE 4.2s
+
+#31 [worker] resolving provenance for metadata file
+#31 DONE 0.0s
+
+#32 [api] resolving provenance for metadata file
+#32 DONE 0.0s
+ Image fleet_lab5-api Built 
+ Image fleet_lab5-worker Built 
+ Network fleet_lab5_edge Creating 
+ Volume fleet_lab5_pgdata Creating 
+ Volume fleet_lab5_rabbitmq_data Creating 
+ Volume fleet_lab5_pgdata Creating 
+ Network fleet_lab5_backend Creating 
+ Volume fleet_lab5_rabbitmq_data Creating 
+ Network fleet_lab5_backend Creating 
+ Network fleet_lab5_edge Creating 
+ Volume fleet_lab5_rabbitmq_data Created 
+ Volume fleet_lab5_rabbitmq_data Created 
+ Volume fleet_lab5_pgdata Created 
+ Volume fleet_lab5_pgdata Created 
+ Network fleet_lab5_backend Created 
+ Network fleet_lab5_backend Created 
+ Container fleet_lab5-db-1 Creating 
+ Container fleet_lab5-redis-1 Creating 
+ Network fleet_lab5_edge Created 
+ Network fleet_lab5_edge Created 
+ Container fleet_lab5-rabbitmq-1 Creating 
+ Container fleet_lab5-rabbitmq-1 Created 
+ Container fleet_lab5-redis-1 Created 
+ Container fleet_lab5-db-1 Created 
+ Container fleet_lab5-api-1 Creating 
+ Container fleet_lab5-api-1 Created 
+ Container fleet_lab5-worker-1 Creating 
+ Container fleet_lab5-worker-1 Created 
+ Container fleet_lab5-rabbitmq-1 Starting 
+ Container fleet_lab5-db-1 Starting 
+ Container fleet_lab5-redis-1 Starting 
+ Container fleet_lab5-rabbitmq-1 Started 
+ Container fleet_lab5-db-1 Started 
+ Container fleet_lab5-redis-1 Started 
+ Container fleet_lab5-redis-1 Waiting 
+ Container fleet_lab5-db-1 Waiting 
+ Container fleet_lab5-db-1 Healthy 
+ Container fleet_lab5-redis-1 Healthy 
+ Container fleet_lab5-api-1 Starting 
+ Container fleet_lab5-api-1 Started 
+ Container fleet_lab5-rabbitmq-1 Waiting 
+ Container fleet_lab5-redis-1 Waiting 
+ Container fleet_lab5-api-1 Waiting 
+ Container fleet_lab5-redis-1 Healthy 
+ Container fleet_lab5-rabbitmq-1 Healthy 
+ Container fleet_lab5-api-1 Healthy 
+ Container fleet_lab5-worker-1 Starting 
+ Container fleet_lab5-worker-1 Started 
+
+real	0m47.072s
+user	0m0.045s
+sys	0m0.061s
