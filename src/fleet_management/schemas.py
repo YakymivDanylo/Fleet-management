@@ -84,6 +84,26 @@ class VehicleStateRead(BaseModel):
     degraded: bool = False
 
 
+class VehiclePositionRead(BaseModel):
+    vehicle_id: int
+    license_plate: str
+    model: str
+    status: VehicleStatus
+    station_id: int
+    recorded_at: datetime
+    latitude: float
+    longitude: float
+    fuel_level: float
+    is_locked: bool
+    source: Literal["cache", "database"]
+
+
+class FleetPositionsRead(BaseModel):
+    positions: list[VehiclePositionRead]
+    without_telemetry: list[int]
+    degraded: bool = False
+
+
 class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)

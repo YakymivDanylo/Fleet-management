@@ -3,11 +3,12 @@ from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..auth import require_admin
 from ..cache import get_redis, get_retry_policy
 from ..database import get_db
 from ..models import Vehicle
 from ..resilience import RetryPolicy
-from ..schemas import VehicleCreate, VehicleRead, VehicleStateRead
+from ..schemas import FleetPositionsRead, VehicleCreate, VehicleRead, VehicleStateRead
 from ..services import station_service, vehicle_state_service
 
 router = APIRouter(prefix="/vehicles", tags=["vehicles"])
@@ -32,6 +33,13 @@ async def create_vehicle(payload: VehicleCreate, db: AsyncSession = Depends(get_
 async def list_vehicles(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Vehicle))
     return result.scalars().all()
+
+
+# Declared before /{vehicle_id} so "positions" is not parsed as an id.
+# Admin-only: the position of a rented vehicle is the location of its renter.
+@router.get("/positions", response_model=FleetPositionsRead, dependencies=[Depends(require_admin)])
+async def fleet_positions(db: AsyncSession = Depends(get_db), redis: Redis = Depends(get_redis)):
+    return await vehicle_state_service.get_fleet_positions(db, redis)
 
 
 @router.get("/{vehicle_id}", response_model=VehicleRead)
