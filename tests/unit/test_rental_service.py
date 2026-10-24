@@ -65,6 +65,46 @@ def test_calculate_discount(overrides, expected):
     assert _discount(**overrides) == expected
 
 
+@pytest.mark.parametrize(
+    ("overrides", "expected"),
+    [
+        # corporate: corporate account, more than 5 rentals, non-premium vehicle
+        ({"is_corporate": True, "rental_count": 6}, 3 + 1),
+        ({"is_corporate": True, "rental_count": 5}, 0),
+        ({"is_corporate": True, "rental_count": 6, "vehicle_type": "premium"}, 1),
+        ({"rental_count": 6}, 1),
+        # night: night trip of 3+ hours without a coupon
+        ({"is_night": True, "trip_hours": 3}, 4),
+        ({"is_night": True, "trip_hours": 2.9}, 0),
+        ({"is_night": True, "trip_hours": 3, "has_coupon": True}, 0),
+        # birthday: VIP or more than 3 rentals
+        ({"is_birthday": True, "is_vip": True, "rental_count": 0}, 5 + 6),
+        ({"is_birthday": True, "rental_count": 4}, 0 + 6),
+        ({"is_birthday": True, "rental_count": 3}, 0),
+        # electric vehicle returned charged after more than an hour
+        ({"returned_charged": True, "vehicle_type": "electric", "trip_hours": 1.5}, 2),
+        ({"returned_charged": True, "vehicle_type": "electric", "trip_hours": 1}, 0),
+        ({"returned_charged": True, "vehicle_type": "standard", "trip_hours": 2}, 0),
+        # rules stack with the base and weekend/holiday discounts
+        (
+            {
+                "is_corporate": True,
+                "rental_count": 8,
+                "is_night": True,
+                "trip_hours": 4,
+                "is_birthday": True,
+                "returned_charged": True,
+                "vehicle_type": "electric",
+                "is_holiday": True,
+            },
+            1 + 1 + 3 + 4 + 6 + 2,
+        ),
+    ],
+)
+def test_calculate_discount_extended_rules(overrides, expected):
+    assert _discount(**overrides) == expected
+
+
 def _eligibility(**overrides) -> tuple[bool, str]:
     params = {
         "renter_is_blacklisted": False,

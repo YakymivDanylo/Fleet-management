@@ -1,0 +1,4 @@
+# 2026-10-24 14:45 UTC
+$ .venv/Scripts/xenon.exe --max-absolute B src/fleet_management/services/rental_service.py
+ERROR:xenon:block "src/fleet_management/services/rental_service.py:94 calculate_discount" has a rank of C
+[exit code: 1]

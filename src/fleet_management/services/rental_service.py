@@ -99,6 +99,12 @@ def calculate_discount(
     has_coupon: bool,
     is_weekend: bool,
     is_holiday: bool,
+    *,
+    is_corporate: bool = False,
+    is_night: bool = False,
+    trip_hours: float = 0.0,
+    is_birthday: bool = False,
+    returned_charged: bool = False,
 ) -> float:
     discount = (
         _vip_discount(rental_count, vehicle_type)
@@ -110,6 +116,15 @@ def calculate_discount(
         discount += _weekend_zone_discount(station_zones)
     if is_holiday:
         discount += _holiday_discount(has_coupon)
+
+    if is_corporate and rental_count > 5 and vehicle_type != "premium":
+        discount += 3
+    if is_night and trip_hours >= 3 and not has_coupon:
+        discount += 4
+    if is_birthday and (is_vip or rental_count > 3):
+        discount += 6
+    if returned_charged and vehicle_type == "electric" and trip_hours > 1:
+        discount += 2
 
     return discount
 
