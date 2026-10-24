@@ -18,3 +18,13 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: check-ast
+  # Lab 6: block commits that stage a function with cyclomatic complexity > 10
+  # (scripts/complexity_gate.py runs the radon CLI on the staged files only).
+  - repo: local
+    hooks:
+      - id: complexity-gate
+        name: complexity gate (radon, CC <= 10)
+        entry: python scripts/complexity_gate.py
+        language: python
+        additional_dependencies: [radon==6.0.1]
+        files: ^(src|scripts)/.*\.py$
