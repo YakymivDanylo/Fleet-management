@@ -1,0 +1,4 @@
+# 2026-10-24 14:52 UTC
+$ python scripts/cfg_cc.py docs/lab6-complexity-audit/REPORT.md
+baseline: E=10 V=8 CC=E-V+2=4
+extended: E=38 V=24 CC=E-V+2=16
