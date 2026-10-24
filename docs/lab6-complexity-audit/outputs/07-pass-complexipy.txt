@@ -1,0 +1,23 @@
+# 2026-10-24 14:46 UTC
+$ .venv/Scripts/complexipy.exe src/fleet_management/services/rental_service.py
+────────────────────────────────── complexipy ──────────────────────────────────
+src\fleet_management\services\rental_service.py
+    RentalEligibilityContext::station_closed 0  ✅  PASSED  
+    RentalEligibilityContext::vehicle_unavailable 0  ✅  PASSED  
+    _flat 0  ✅  PASSED  
+    _holiday_discount 0  ✅  PASSED  
+    _regular_discount 0  ✅  PASSED  
+    _vip_discount 0  ✅  PASSED  
+    calculate_cost 0  ✅  PASSED  
+    calculate_discount 0  ✅  PASSED  
+    RentalEligibilityContext::deposit_missing 1  ✅  PASSED  
+    RentalEligibilityContext::unpaid_fees_with_active_rental 1  ✅  PASSED  
+    RentalEligibilityContext::unpaid_fees_without_deposit 1  ✅  PASSED  
+    _weekend_zone_discount 1  ✅  PASSED  
+    start_rental 2  ✅  PASSED  
+    end_rental 3  ✅  PASSED  
+    validate_rental_eligibility 3  ✅  PASSED  
+
+All functions are within the allowed complexity.
+───────────────────────────── Analysis completed! ──────────────────────────────
+[exit code: 0]

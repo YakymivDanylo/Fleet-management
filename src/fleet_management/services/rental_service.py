@@ -1,4 +1,5 @@
 import math
+from bisect import bisect_left
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -68,19 +69,31 @@ async def end_rental(db: AsyncSession, rental_id: int, end_station_id: int) -> R
 
 ZONE_DISCOUNTS = {"center": 1, "suburb": -1}
 
+# Discount policy as data: keys are the evaluated conditions, values are the discounts.
+VIP_DISCOUNT = {  # (more than 10 rentals, premium vehicle)
+    (True, True): 5,
+    (True, False): 10,
+    (False, True): 2,
+    (False, False): 5,
+}
+REGULAR_TIER_BOUNDS = (5, 20)  # bisect_left: <=5 -> tier 0, 6..20 -> tier 1, >20 -> tier 2
+REGULAR_DISCOUNT = {  # (rental-count tier, has coupon)
+    (0, False): 0,
+    (0, True): 0,
+    (1, False): 1,
+    (1, True): 4,
+    (2, False): 3,
+    (2, True): 3,
+}
+HOLIDAY_DISCOUNT = {True: 2, False: 1}  # keyed by has_coupon
+
 
 def _vip_discount(rental_count: int, vehicle_type: str) -> float:
-    if rental_count > 10:
-        return 5 if vehicle_type == "premium" else 10
-    return 2 if vehicle_type == "premium" else 5
+    return VIP_DISCOUNT[(rental_count > 10, vehicle_type == "premium")]
 
 
 def _regular_discount(rental_count: int, has_coupon: bool) -> float:
-    if rental_count > 20:
-        return 3
-    if rental_count <= 5:
-        return 0
-    return 4 if has_coupon else 1
+    return REGULAR_DISCOUNT[(bisect_left(REGULAR_TIER_BOUNDS, rental_count), has_coupon)]
 
 
 def _weekend_zone_discount(station_zones: list[str]) -> float:
@@ -88,7 +101,72 @@ def _weekend_zone_discount(station_zones: list[str]) -> float:
 
 
 def _holiday_discount(has_coupon: bool) -> float:
-    return 2 if has_coupon else 1
+    return HOLIDAY_DISCOUNT[has_coupon]
+
+
+@dataclass(frozen=True)
+class DiscountContext:
+    rental_count: int
+    is_vip: bool
+    vehicle_type: str
+    station_zones: list[str]
+    has_coupon: bool
+    is_weekend: bool
+    is_holiday: bool
+    is_corporate: bool
+    is_night: bool
+    trip_hours: float
+    is_birthday: bool
+    returned_charged: bool
+
+
+Amount = Callable[[DiscountContext], float]
+ConditionKey = Callable[[DiscountContext], tuple]
+
+
+def _flat(amount: float) -> Amount:
+    return lambda _ctx: amount
+
+
+_NO_DISCOUNT = _flat(0)
+
+BASE_DISCOUNT: dict[bool, Amount] = {  # keyed by is_vip
+    True: lambda c: _vip_discount(c.rental_count, c.vehicle_type),
+    False: lambda c: _regular_discount(c.rental_count, c.has_coupon),
+}
+
+# Each rule: a key function evaluating the rule's conditions, and a truth table that maps the
+# keys that earn a discount to its amount. Every other key falls back to _NO_DISCOUNT.
+SURCHARGE_RULES: tuple[tuple[ConditionKey, dict[tuple, Amount]], ...] = (
+    (
+        lambda c: (c.is_weekend,),
+        {(True,): lambda c: _weekend_zone_discount(c.station_zones)},
+    ),
+    (
+        lambda c: (c.is_holiday,),
+        {(True,): lambda c: _holiday_discount(c.has_coupon)},
+    ),
+    (  # corporate account, more than 5 rentals, non-premium vehicle
+        lambda c: (c.is_corporate, c.rental_count > 5, c.vehicle_type != "premium"),
+        {(True, True, True): _flat(3)},
+    ),
+    (  # night trip of 3+ hours without a coupon
+        lambda c: (c.is_night, c.trip_hours >= 3, c.has_coupon),
+        {(True, True, False): _flat(4)},
+    ),
+    (  # birthday for VIPs or renters with more than 3 rentals
+        lambda c: (c.is_birthday, c.is_vip, c.rental_count > 3),
+        {
+            (True, True, True): _flat(6),
+            (True, True, False): _flat(6),
+            (True, False, True): _flat(6),
+        },
+    ),
+    (  # electric vehicle returned charged after more than an hour
+        lambda c: (c.returned_charged, c.vehicle_type == "electric", c.trip_hours > 1),
+        {(True, True, True): _flat(2)},
+    ),
+)
 
 
 def calculate_discount(
@@ -106,27 +184,23 @@ def calculate_discount(
     is_birthday: bool = False,
     returned_charged: bool = False,
 ) -> float:
-    discount = (
-        _vip_discount(rental_count, vehicle_type)
-        if is_vip
-        else _regular_discount(rental_count, has_coupon)
+    ctx = DiscountContext(
+        rental_count,
+        is_vip,
+        vehicle_type,
+        station_zones,
+        has_coupon,
+        is_weekend,
+        is_holiday,
+        is_corporate,
+        is_night,
+        trip_hours,
+        is_birthday,
+        returned_charged,
     )
-
-    if is_weekend:
-        discount += _weekend_zone_discount(station_zones)
-    if is_holiday:
-        discount += _holiday_discount(has_coupon)
-
-    if is_corporate and rental_count > 5 and vehicle_type != "premium":
-        discount += 3
-    if is_night and trip_hours >= 3 and not has_coupon:
-        discount += 4
-    if is_birthday and (is_vip or rental_count > 3):
-        discount += 6
-    if returned_charged and vehicle_type == "electric" and trip_hours > 1:
-        discount += 2
-
-    return discount
+    return BASE_DISCOUNT[is_vip](ctx) + sum(
+        table.get(key(ctx), _NO_DISCOUNT)(ctx) for key, table in SURCHARGE_RULES
+    )
 
 
 @dataclass(frozen=True)
