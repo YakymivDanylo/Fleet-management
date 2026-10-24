@@ -1,7 +1,0 @@
-$ docker compose ps
-NAME                    SERVICE    STATUS                    PORTS
-fleet_lab5-api-1        api        Up 14 seconds (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
-fleet_lab5-db-1         db         Up 20 seconds (healthy)   5432/tcp
-fleet_lab5-rabbitmq-1   rabbitmq   Up 20 seconds (healthy)   0.0.0.0:15672->15672/tcp, [::]:15672->15672/tcp
-fleet_lab5-redis-1      redis      Up 19 seconds (healthy)   6379/tcp
-fleet_lab5-worker-1     worker     Up 8 seconds              
