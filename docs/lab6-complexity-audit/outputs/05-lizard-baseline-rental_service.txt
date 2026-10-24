@@ -1,0 +1,32 @@
+# 2026-10-24 14:44 UTC
+$ .venv/Scripts/python -m lizard src/fleet_management/services/rental_service.py
+================================================
+  NLOC    CCN   token  PARAM  length  location  
+------------------------------------------------
+       6      1     54      3       6 calculate_cost@17-22@src/fleet_management/services/rental_service.py
+      17      3    111      3      19 start_rental@25-43@src/fleet_management/services/rental_service.py
+      17      4    139      3      21 end_rental@46-66@src/fleet_management/services/rental_service.py
+       4      4     34      2       4 _vip_discount@72-75@src/fleet_management/services/rental_service.py
+       6      4     33      2       6 _regular_discount@78-83@src/fleet_management/services/rental_service.py
+       2      2     28      1       2 _weekend_zone_discount@86-87@src/fleet_management/services/rental_service.py
+       2      2     15      1       2 _holiday_discount@90-91@src/fleet_management/services/rental_service.py
+      19      4     76      7      21 calculate_discount@94-114@src/fleet_management/services/rental_service.py
+       2      3     20      1       2 deposit_missing@130-131@src/fleet_management/services/rental_service.py
+       2      2     17      1       2 unpaid_fees_with_active_rental@133-134@src/fleet_management/services/rental_service.py
+       2      2     15      1       2 unpaid_fees_without_deposit@136-137@src/fleet_management/services/rental_service.py
+       2      1     15      1       2 vehicle_unavailable@139-140@src/fleet_management/services/rental_service.py
+       2      1     12      1       2 station_closed@142-143@src/fleet_management/services/rental_service.py
+      26      3    109      9      26 validate_rental_eligibility@163-188@src/fleet_management/services/rental_service.py
+1 file analyzed.
+==============================================================
+NLOC    Avg.NLOC  AvgCCN  Avg.token  function_cnt    file
+--------------------------------------------------------------
+    146       7.8     2.6       48.4        14     src/fleet_management/services/rental_service.py
+
+===============================================================================================================
+No thresholds exceeded (cyclomatic_complexity > 15 or length > 1000 or nloc > 1000000 or parameter_count > 100)
+==========================================================================================
+Total nloc   Avg.NLOC  AvgCCN  Avg.token   Fun Cnt  Warning cnt   Fun Rt   nloc Rt
+------------------------------------------------------------------------------------------
+       146       7.8     2.6       48.4       14            0      0.00    0.00
+[exit code: 0]
