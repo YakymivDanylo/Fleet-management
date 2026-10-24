@@ -97,22 +97,26 @@ def docstring_lines(tree: ast.AST) -> set[int]:
     return lines
 
 
+def classify(tok: tokenize.TokenInfo) -> tuple[str, str] | None:
+    """Maps a token to ("operator" | "operand", text); None for tokens that are not counted."""
+    if tok.type in SKIPPED:
+        return None
+    if tok.type == tokenize.OP or (tok.type == tokenize.NAME and keyword.iskeyword(tok.string)):
+        return "operator", tok.string
+    if tok.type == tokenize.NAME or tok.type in OPERAND_TYPES:
+        return "operand", tok.string
+    return None
+
+
 def measure(source: str, first_line: int = 1, last_line: int | None = None) -> Measures:
     skip_lines = docstring_lines(ast.parse(source))
     last_line = last_line or source.count("\n") + 2
-    operators: Counter = Counter()
-    operands: Counter = Counter()
+    counters = {"operator": Counter(), "operand": Counter()}
     for tok in tokenize.generate_tokens(io.StringIO(source).readline):
-        line = tok.start[0]
-        if tok.type in SKIPPED or line in skip_lines or not first_line <= line <= last_line:
-            continue
-        if tok.type == tokenize.NAME and keyword.iskeyword(tok.string):
-            operators[tok.string] += 1
-        elif tok.type == tokenize.NAME or tok.type in OPERAND_TYPES:
-            operands[tok.string] += 1
-        elif tok.type == tokenize.OP:
-            operators[tok.string] += 1
-    return Measures(operators, operands)
+        counted = classify(tok)
+        if counted and tok.start[0] not in skip_lines and first_line <= tok.start[0] <= last_line:
+            counters[counted[0]][counted[1]] += 1
+    return Measures(counters["operator"], counters["operand"])
 
 
 def function_ranges(source: str) -> list[tuple[str, int, int]]:
