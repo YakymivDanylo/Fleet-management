@@ -1,0 +1,5 @@
+2026/10/24 08:16:14 [error] 21#21: *34 upstream timed out (110: Operation timed out) while connecting to upstream, client: 172.21.0.1, server: , request: "GET /info HTTP/1.1", upstream: "http://172.20.0.6:8000/info", host: "localh
+172.21.0.1 [24/Oct/2026:08:16:14 +0000] "GET /info HTTP/1.1" 200 upstream=172.20.0.6:8000, 172.20.0.7:8000 ustatus=504, 200 rt=1.004 urt=1.001, 0.003
+2026/10/24 08:16:17 [warn] 21#21: *41 upstream server temporarily disabled while connecting to upstream, client: 172.21.0.1, server: , request: "GET /info HTTP/1.1", upstream: "http://172.20.0.6:8000/info", host: "localhost:8000"
+2026/10/24 08:16:17 [error] 21#21: *41 upstream timed out (110: Operation timed out) while connecting to upstream, client: 172.21.0.1, server: , request: "GET /info HTTP/1.1", upstream: "http://172.20.0.6:8000/info", host: "localh
+172.21.0.1 [24/Oct/2026:08:16:17 +0000] "GET /info HTTP/1.1" 200 upstream=172.20.0.6:8000, 172.20.0.7:8000 ustatus=504, 200 rt=1.001 urt=1.001, 0.001

@@ -2,8 +2,9 @@
 # main file, so every other setting (env, networks, healthchecks) stays the same:
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 # Edit any file under src/ and uvicorn restarts inside the container; no image rebuild.
+# Lab 6: hot reload is applied to api1 only; migrations run in the separate `migrate` service.
 services:
-  api:
+  api1:
     environment:
       # The image has the package installed into /opt/venv site-packages. PYTHONPATH is
       # searched first, so the bind-mounted /app/src shadows the installed copy.
@@ -17,4 +18,4 @@ services:
     command:
       - sh
       - -c
-      - alembic upgrade head && exec uvicorn fleet_management.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
+      - exec uvicorn fleet_management.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=* --reload --reload-dir /app/src
