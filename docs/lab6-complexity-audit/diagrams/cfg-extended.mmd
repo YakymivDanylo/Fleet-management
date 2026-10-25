@@ -1,0 +1,68 @@
+flowchart TD
+    P1{"is_vip?"}
+    N1["discount = _vip_discount(...)"]
+    N2["discount = _regular_discount(...)"]
+    P2{"is_weekend?"}
+    N3["discount += _weekend_zone_discount(...)"]
+    P3{"is_holiday?"}
+    N4["discount += _holiday_discount(...)"]
+    RET(["return discount"])
+    A1{"is_corporate?"}
+    A2{"rental_count > 5?"}
+    A3{"vehicle_type != premium?"}
+    A4["discount += 3"]
+    B1{"is_night?"}
+    B2{"trip_hours >= 3?"}
+    B3{"not has_coupon?"}
+    B4["discount += 4"]
+    C1{"is_birthday?"}
+    C2{"is_vip?"}
+    C3{"rental_count > 3?"}
+    C4["discount += 6"]
+    D1{"returned_charged?"}
+    D2{"vehicle_type == electric?"}
+    D3{"trip_hours > 1?"}
+    D4["discount += 2"]
+    P1 -->|true| N1
+    P1 -->|false| N2
+    N1 --> P2
+    N2 --> P2
+    P2 -->|true| N3
+    P2 -->|false| P3
+    N3 --> P3
+    P3 -->|true| N4
+    P3 -.->|false| A1
+    N4 -.-> A1
+    A1 -.->|true| A2
+    A1 -.->|false| B1
+    A2 -.->|true| A3
+    A2 -.->|false| B1
+    A3 -.->|true| A4
+    A3 -.->|false| B1
+    A4 -.-> B1
+    B1 -.->|true| B2
+    B1 -.->|false| C1
+    B2 -.->|true| B3
+    B2 -.->|false| C1
+    B3 -.->|true| B4
+    B3 -.->|false| C1
+    B4 -.-> C1
+    C1 -.->|true| C2
+    C1 -.->|false| D1
+    C2 -.->|true| C4
+    C2 -.->|false| C3
+    C3 -.->|true| C4
+    C3 -.->|false| D1
+    C4 -.-> D1
+    D1 -.->|true| D2
+    D1 -.->|false| RET
+    D2 -.->|true| D3
+    D2 -.->|false| RET
+    D3 -.->|true| D4
+    D3 -.->|false| RET
+    D4 -.-> RET
+    classDef pred fill:#ffe9a8,stroke:#b58900;
+    classDef added fill:#ffd6d6,stroke:#c0392b,stroke-dasharray: 5 3;
+    class P1,P2,P3 pred;
+    class A1,A2,A3,B1,B2,B3,C1,C2,C3,D1,D2,D3 added;
+    class A4,B4,C4,D4 added;

@@ -5,7 +5,7 @@
 **План і команди для ручної демонстрації:** [PLAN.md](PLAN.md)
 **Сирі виводи команд:** [`outputs/`](outputs/) — кожен файл містить рядок часу, команду й код виходу; нічого не дописано вручну.
 
-> Скріншоти для здачі студент робить сам під час повтору демонстрації за [PLAN.md](PLAN.md). У репозиторії лежать дослівні текстові виводи тих самих команд.
+> Замість скріншотів консолі — дослівні виводи: зведений файл [`outputs/12-screenshots-as-text.txt`](outputs/12-screenshots-as-text.txt) (baseline/FAIL/PASS у radon, lizard, xenon, complexipy, воротарі; CFG; diff; тести; git-історія) та [`outputs/09`](outputs/09-precommit-hook-demo.txt) (реальне FAIL/PASS блокування коміту хуком). Команди для повтору наживо — у [PLAN.md](PLAN.md). Графи CFG відрендерено у PNG у [`diagrams/`](diagrams/).
 
 ## 0. Декларація інструментального стеку
 
@@ -142,6 +142,10 @@ flowchart TD
     class P1,P2,P3 pred;
 ```
 
+![CFG baseline: calculate_discount, CC=4](diagrams/cfg-baseline.png)
+
+*Рендер того самого графа (вихідник: [`diagrams/cfg-baseline.mmd`](diagrams/cfg-baseline.mmd), PNG згенеровано `mermaid-cli 11.4.2`).*
+
 Предикатні вузли (жовті): `P1`, `P2`, `P3`. **Ручний розрахунок:** вузлів V = 8, ребер E = 10 → CC = E − V + 2 = 10 − 8 + 2 = **4** — збігається з radon і lizard. Те саме обчислює `python scripts/cfg_cc.py docs/lab6-complexity-audit/REPORT.md` ([`10`](outputs/10-cfg-cc-from-mermaid.txt)).
 
 ### 2.2 Теоретичне розширення («папір»)
@@ -228,6 +232,10 @@ flowchart TD
     class A1,A2,A3,B1,B2,B3,C1,C2,C3,D1,D2,D3 added;
     class A4,B4,C4,D4 added;
 ```
+
+![CFG розширення: CC=16](diagrams/cfg-extended.png)
+
+*Рендер того самого графа (вихідник: [`diagrams/cfg-extended.mmd`](diagrams/cfg-extended.mmd), PNG згенеровано `mermaid-cli 11.4.2`).*
 
 Короткозамкнені `and`/`or` — це приховані предикати: у CFG кожна атомарна умова — окремий ромб. Кожне правило додає 4 вузли (3 предикати + тіло) і 7 ребер; два існуючі ребра `P3→RET`, `N4→RET` лише перенаправлені на `A1`. Разом ΔV = 16, ΔE = 28, V = 24, E = 38.
 **Паперовий CC = 38 − 24 + 2 = 16 = 4 + 4·3.** Перевірка скриптом: [`10`](outputs/10-cfg-cc-from-mermaid.txt).
