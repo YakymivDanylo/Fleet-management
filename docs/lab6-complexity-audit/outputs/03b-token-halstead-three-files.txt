@@ -1,8 +1,0 @@
-# 2026-10-24 14:44 UTC
-$ .venv/Scripts/python scripts/halstead_tokens.py src/fleet_management/services/rental_service.py src/fleet_management/resilience.py src/fleet_management/privacy/sanitizer.py src/fleet_management/schemas.py
-unit                                           n1   n2    N1    N2     n      N         V       D           E   LOC
-src/fleet_management/services/rental_service.py   39  133   503   393   172    896    6653.9   57.62    383401.6   188
-src/fleet_management/resilience.py             38   66   245   175   104    420    2814.2   50.38    141775.2    78
-src/fleet_management/privacy/sanitizer.py      24   93   367   274   117    641    4403.9   35.35    155699.3   101
-src/fleet_management/schemas.py                15   80   221   217    95    438    2877.6   20.34     58541.1   130
-[exit code: 0]

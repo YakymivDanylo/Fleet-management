@@ -1,6 +1,0 @@
-# 2026-10-24 14:50 UTC - run on a copy of commit bdd6416 (baseline)
-$ python -m radon hal -j src/fleet_management/{services/rental_service,resilience,privacy/sanitizer,schemas}.py   (file totals)
-src/fleet_management/services/rental_service.py: h1=12 h2=39 N1=23 N2=43 V=374.4 D=6.62 E=2476.7
-src/fleet_management/resilience.py: h1=8 h2=28 N1=16 N2=32 V=248.2 D=4.57 E=1134.4
-src/fleet_management/privacy/sanitizer.py: h1=5 h2=16 N1=9 N2=16 V=109.8 D=2.50 E=274.5
-src/fleet_management/schemas.py: h1=1 h2=5 N1=5 N2=10 V=38.8 D=1.00 E=38.8
