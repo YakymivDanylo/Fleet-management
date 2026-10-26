@@ -2,12 +2,18 @@
 // log in, look at the profile, browse stations and vehicles, open a car, check its state.
 //   docker compose run --rm --no-deps k6 run /scripts/user_journey.js            (stepped load)
 //   docker compose run --rm --no-deps -e PROFILE=smoke k6 run /scripts/user_journey.js
+// Lab 6 (one replica vs three):
+//   docker compose run --rm --no-deps -e PROFILE=compare -e THINK=0 -e VUS=60 k6 run /scripts/user_journey.js
 import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:8000';
 const PROFILE = __ENV.PROFILE || 'stepped';
 const USERS = Number(__ENV.USERS || 100);
+// Lab 6: multiplier for the pauses between steps; THINK=0 makes the users hammer the API
+// so the comparison of one replica vs three measures capacity, not the time spent "reading".
+const THINK = Number(__ENV.THINK || 1);
+const VUS = Number(__ENV.VUS || 60);
 const PASSWORD = 'LoadTest-Passw0rd';
 
 // Ramp-up in steps, so the report can show at which number of VUs latency starts to grow.
@@ -16,6 +22,13 @@ const PROFILES = {
     executor: 'constant-vus',
     vus: 2,
     duration: '30s',
+    tags: { phase: 'load' },
+  },
+  // Lab 6: constant load for the one-replica vs three-replicas comparison.
+  compare: {
+    executor: 'constant-vus',
+    vus: VUS,
+    duration: __ENV.DURATION || '60s',
     tags: { phase: 'load' },
   },
   stepped: {
@@ -38,7 +51,7 @@ const PROFILES = {
 };
 
 if (!PROFILES[PROFILE]) {
-  throw new Error(`Unknown PROFILE=${PROFILE}; use smoke or stepped`);
+  throw new Error(`Unknown PROFILE=${PROFILE}; use smoke, stepped or compare`);
 }
 
 export const options = {
@@ -84,7 +97,7 @@ export function setup() {
 
 // Pause between user actions, like a person reading the page before the next click.
 function think() {
-  sleep(1 + Math.random() * 2);
+  if (THINK > 0) sleep((1 + Math.random() * 2) * THINK);
 }
 
 export default function (data) {

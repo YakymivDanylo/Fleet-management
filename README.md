@@ -108,7 +108,7 @@ docker compose -p fleet_production --env-file .env.production up -d --build
 ### 3. Адміністратор, зупинка
 
 ```powershell
-docker compose -p fleet_sandbox --env-file .env.sandbox exec -it api create-admin --email admin@example.com
+docker compose -p fleet_sandbox --env-file .env.sandbox exec -it api1 create-admin --email admin@example.com
 docker compose -p fleet_sandbox --env-file .env.sandbox down        # додайте -v, щоб видалити дані БД
 ```
 
@@ -415,6 +415,16 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # р
 ```
 
 БД, Redis і worker працюють лише у внутрішній мережі `backend` (`internal: true`), назовні опубліковано тільки api та UI RabbitMQ. Дані PostgreSQL і RabbitMQ зберігаються в іменованих томах. Звіт з виводом команд: [`docs/lab5-docker/REPORT.md`](docs/lab5-docker/REPORT.md).
+
+## Балансування навантаження: Nginx + 3 репліки API (лабораторна №6)
+
+`docker compose up -d --build` піднімає три репліки `api1..api3` і Nginx на порту `${API_PORT:-8000}` (репліки назовні не опубліковані). Міграції виконує одноразовий сервіс `migrate`. Алгоритм балансування задається змінною `NGINX_CONF` (`nginx/round_robin.conf` за замовчуванням, також `weighted`, `ip_hash`, `least_conn`, `single`).
+
+```powershell
+python scripts/lb_check.py -n 15     # розподіл запитів по репліках (поле "pod" у GET /info)
+```
+
+Інструкції демонстрації, перевірка відмовостійкості та порівняння 1 репліки з 3: [`docs/lab6-nginx/REPORT.md`](docs/lab6-nginx/REPORT.md).
 
 ## Навантажувальне тестування (лабораторна №4, Web)
 

@@ -1,0 +1,267 @@
+ Container fleet_lab5-k6-run-0dce27ad83ff Creating 
+ Container fleet_lab5-k6-run-0dce27ad83ff Created 
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/user_journey.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 60 max VUs, 1m30s max duration (incl. graceful stop):
+              * compare: 60 looping VUs for 1m0s (gracefulStop: 30s)
+
+
+Run       [ 100% ] setup()
+compare   [   0% ]
+
+Run       [ 100% ] setup()
+compare   [   0% ]
+
+Run       [ 100% ] setup()
+compare   [   0% ]
+
+Run       [ 100% ] setup()
+compare   [   0% ]
+
+Run       [ 100% ] setup()
+compare   [   0% ]
+
+running (0m06.0s), 60/60 VUs, 0 complete and 0 interrupted iterations
+compare   [   1% ] 60 VUs  0m00.6s/1m0s
+
+running (0m07.0s), 60/60 VUs, 0 complete and 0 interrupted iterations
+compare   [   3% ] 60 VUs  0m01.6s/1m0s
+
+running (0m08.0s), 60/60 VUs, 12 complete and 0 interrupted iterations
+compare   [   4% ] 60 VUs  0m02.6s/1m0s
+
+running (0m09.0s), 60/60 VUs, 35 complete and 0 interrupted iterations
+compare   [   6% ] 60 VUs  0m03.6s/1m0s
+
+running (0m10.0s), 60/60 VUs, 59 complete and 0 interrupted iterations
+compare   [   8% ] 60 VUs  0m04.6s/1m0s
+
+running (0m11.0s), 60/60 VUs, 75 complete and 0 interrupted iterations
+compare   [   9% ] 60 VUs  0m05.6s/1m0s
+
+running (0m12.0s), 60/60 VUs, 99 complete and 0 interrupted iterations
+compare   [  11% ] 60 VUs  0m06.6s/1m0s
+
+running (0m13.0s), 60/60 VUs, 121 complete and 0 interrupted iterations
+compare   [  13% ] 60 VUs  0m07.6s/1m0s
+
+running (0m14.0s), 60/60 VUs, 139 complete and 0 interrupted iterations
+compare   [  14% ] 60 VUs  0m08.6s/1m0s
+
+running (0m15.0s), 60/60 VUs, 159 complete and 0 interrupted iterations
+compare   [  16% ] 60 VUs  0m09.6s/1m0s
+
+running (0m16.0s), 60/60 VUs, 175 complete and 0 interrupted iterations
+compare   [  18% ] 60 VUs  0m10.6s/1m0s
+
+running (0m17.0s), 60/60 VUs, 200 complete and 0 interrupted iterations
+compare   [  19% ] 60 VUs  0m11.6s/1m0s
+
+running (0m18.0s), 60/60 VUs, 217 complete and 0 interrupted iterations
+compare   [  21% ] 60 VUs  0m12.6s/1m0s
+
+running (0m19.0s), 60/60 VUs, 244 complete and 0 interrupted iterations
+compare   [  23% ] 60 VUs  0m13.6s/1m0s
+
+running (0m20.0s), 60/60 VUs, 263 complete and 0 interrupted iterations
+compare   [  24% ] 60 VUs  0m14.6s/1m0s
+
+running (0m21.0s), 60/60 VUs, 286 complete and 0 interrupted iterations
+compare   [  26% ] 60 VUs  0m15.6s/1m0s
+
+running (0m22.0s), 60/60 VUs, 308 complete and 0 interrupted iterations
+compare   [  28% ] 60 VUs  0m16.6s/1m0s
+
+running (0m23.0s), 60/60 VUs, 328 complete and 0 interrupted iterations
+compare   [  29% ] 60 VUs  0m17.6s/1m0s
+
+running (0m24.0s), 60/60 VUs, 353 complete and 0 interrupted iterations
+compare   [  31% ] 60 VUs  0m18.6s/1m0s
+
+running (0m25.0s), 60/60 VUs, 371 complete and 0 interrupted iterations
+compare   [  33% ] 60 VUs  0m19.6s/1m0s
+
+running (0m26.0s), 60/60 VUs, 390 complete and 0 interrupted iterations
+compare   [  34% ] 60 VUs  0m20.6s/1m0s
+
+running (0m27.0s), 60/60 VUs, 417 complete and 0 interrupted iterations
+compare   [  36% ] 60 VUs  0m21.6s/1m0s
+
+running (0m28.0s), 60/60 VUs, 433 complete and 0 interrupted iterations
+compare   [  38% ] 60 VUs  0m22.6s/1m0s
+
+running (0m29.0s), 60/60 VUs, 458 complete and 0 interrupted iterations
+compare   [  39% ] 60 VUs  0m23.6s/1m0s
+
+running (0m30.0s), 60/60 VUs, 483 complete and 0 interrupted iterations
+compare   [  41% ] 60 VUs  0m24.6s/1m0s
+
+running (0m31.0s), 60/60 VUs, 501 complete and 0 interrupted iterations
+compare   [  43% ] 60 VUs  0m25.6s/1m0s
+
+running (0m32.0s), 60/60 VUs, 517 complete and 0 interrupted iterations
+compare   [  44% ] 60 VUs  0m26.6s/1m0s
+
+running (0m33.0s), 60/60 VUs, 542 complete and 0 interrupted iterations
+compare   [  46% ] 60 VUs  0m27.6s/1m0s
+
+running (0m34.0s), 60/60 VUs, 559 complete and 0 interrupted iterations
+compare   [  48% ] 60 VUs  0m28.6s/1m0s
+
+running (0m35.0s), 60/60 VUs, 584 complete and 0 interrupted iterations
+compare   [  49% ] 60 VUs  0m29.6s/1m0s
+
+running (0m36.0s), 60/60 VUs, 606 complete and 0 interrupted iterations
+compare   [  51% ] 60 VUs  0m30.6s/1m0s
+
+running (0m37.0s), 60/60 VUs, 627 complete and 0 interrupted iterations
+compare   [  53% ] 60 VUs  0m31.6s/1m0s
+
+running (0m38.0s), 60/60 VUs, 646 complete and 0 interrupted iterations
+compare   [  54% ] 60 VUs  0m32.6s/1m0s
+
+running (0m39.0s), 60/60 VUs, 663 complete and 0 interrupted iterations
+compare   [  56% ] 60 VUs  0m33.6s/1m0s
+
+running (0m40.0s), 60/60 VUs, 687 complete and 0 interrupted iterations
+compare   [  58% ] 60 VUs  0m34.6s/1m0s
+
+running (0m41.0s), 60/60 VUs, 712 complete and 0 interrupted iterations
+compare   [  59% ] 60 VUs  0m35.6s/1m0s
+
+running (0m42.0s), 60/60 VUs, 726 complete and 0 interrupted iterations
+compare   [  61% ] 60 VUs  0m36.6s/1m0s
+
+running (0m43.0s), 60/60 VUs, 754 complete and 0 interrupted iterations
+compare   [  63% ] 60 VUs  0m37.6s/1m0s
+
+running (0m44.0s), 60/60 VUs, 777 complete and 0 interrupted iterations
+compare   [  64% ] 60 VUs  0m38.6s/1m0s
+
+running (0m45.0s), 60/60 VUs, 797 complete and 0 interrupted iterations
+compare   [  66% ] 60 VUs  0m39.6s/1m0s
+
+running (0m46.0s), 60/60 VUs, 813 complete and 0 interrupted iterations
+compare   [  68% ] 60 VUs  0m40.6s/1m0s
+
+running (0m47.0s), 60/60 VUs, 837 complete and 0 interrupted iterations
+compare   [  69% ] 60 VUs  0m41.6s/1m0s
+
+running (0m48.0s), 60/60 VUs, 857 complete and 0 interrupted iterations
+compare   [  71% ] 60 VUs  0m42.6s/1m0s
+
+running (0m49.0s), 60/60 VUs, 880 complete and 0 interrupted iterations
+compare   [  73% ] 60 VUs  0m43.6s/1m0s
+
+running (0m50.0s), 60/60 VUs, 896 complete and 0 interrupted iterations
+compare   [  74% ] 60 VUs  0m44.6s/1m0s
+
+running (0m51.0s), 60/60 VUs, 914 complete and 0 interrupted iterations
+compare   [  76% ] 60 VUs  0m45.6s/1m0s
+
+running (0m52.0s), 60/60 VUs, 939 complete and 0 interrupted iterations
+compare   [  78% ] 60 VUs  0m46.6s/1m0s
+
+running (0m53.0s), 60/60 VUs, 961 complete and 0 interrupted iterations
+compare   [  79% ] 60 VUs  0m47.6s/1m0s
+
+running (0m54.0s), 60/60 VUs, 987 complete and 0 interrupted iterations
+compare   [  81% ] 60 VUs  0m48.6s/1m0s
+
+running (0m55.0s), 60/60 VUs, 1005 complete and 0 interrupted iterations
+compare   [  83% ] 60 VUs  0m49.6s/1m0s
+
+running (0m56.0s), 60/60 VUs, 1024 complete and 0 interrupted iterations
+compare   [  84% ] 60 VUs  0m50.6s/1m0s
+
+running (0m57.0s), 60/60 VUs, 1045 complete and 0 interrupted iterations
+compare   [  86% ] 60 VUs  0m51.6s/1m0s
+
+running (0m58.0s), 60/60 VUs, 1070 complete and 0 interrupted iterations
+compare   [  88% ] 60 VUs  0m52.6s/1m0s
+
+running (0m59.0s), 60/60 VUs, 1090 complete and 0 interrupted iterations
+compare   [  89% ] 60 VUs  0m53.6s/1m0s
+
+running (1m00.0s), 60/60 VUs, 1110 complete and 0 interrupted iterations
+compare   [  91% ] 60 VUs  0m54.6s/1m0s
+
+running (1m01.0s), 60/60 VUs, 1128 complete and 0 interrupted iterations
+compare   [  93% ] 60 VUs  0m55.6s/1m0s
+
+running (1m02.0s), 60/60 VUs, 1146 complete and 0 interrupted iterations
+compare   [  94% ] 60 VUs  0m56.6s/1m0s
+
+running (1m03.0s), 60/60 VUs, 1174 complete and 0 interrupted iterations
+compare   [  96% ] 60 VUs  0m57.6s/1m0s
+
+running (1m04.0s), 60/60 VUs, 1189 complete and 0 interrupted iterations
+compare   [  98% ] 60 VUs  0m58.6s/1m0s
+
+running (1m05.0s), 60/60 VUs, 1204 complete and 0 interrupted iterations
+compare   [  99% ] 60 VUs  0m59.6s/1m0s
+
+running (1m06.0s), 44/60 VUs, 1233 complete and 0 interrupted iterations
+compare ↓ [ 100% ] 60 VUs  1m0s
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:POST /auth/login}
+    ✗ 'p(95)<1000' p(95)=1.25s
+
+    http_req_duration{phase:load}
+    ✗ 'p(95)<500' p(95)=1.13s
+
+    http_req_failed{phase:load}
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 7662    115.585884/s
+    checks_succeeded...: 100.00% 7662 out of 7662
+    checks_failed......: 0.00%   0 out of 7662
+
+    ✓ login 200
+    ✓ me 200
+    ✓ stations 200
+    ✓ vehicles 200
+    ✓ vehicle 200
+    ✓ state 200
+
+    HTTP
+    http_req_duration..............: avg=469.11ms min=1.82ms   med=396.41ms max=2.27s p(90)=989.9ms  p(95)=1.12s p(99)=1.38s
+      { expected_response:true }...: avg=474.53ms min=1.82ms   med=402.24ms max=2.27s p(90)=993.99ms p(95)=1.13s p(99)=1.38s
+      { name:POST /auth/login }....: avg=609.84ms min=87.94ms  med=540.37ms max=2.27s p(90)=1.1s     p(95)=1.25s p(99)=1.86s
+      { phase:load }...............: avg=474.59ms min=1.82ms   med=402.29ms max=2.27s p(90)=994.04ms p(95)=1.13s p(99)=1.38s
+    http_req_failed................: 1.28%  100 out of 7763
+      { phase:load }...............: 0.00%  0 out of 7662
+    http_reqs......................: 7763   117.10953/s
+
+    EXECUTION
+    iteration_duration.............: avg=2.84s    min=380.42ms med=2.84s    max=5.63s p(90)=3.95s    p(95)=4.25s p(99)=4.7s 
+    iterations.....................: 1277   19.264314/s
+    vus............................: 44     min=0           max=60
+    vus_max........................: 60     min=60          max=60
+
+    NETWORK
+    data_received..................: 9.0 MB 136 kB/s
+    data_sent......................: 981 kB 15 kB/s
+
+
+
+
+running (1m06.3s), 00/60 VUs, 1277 complete and 0 interrupted iterations
+compare ✓ [ 100% ] 60 VUs  1m0s
+time="2026-10-24T08:13:00Z" level=error msg="thresholds on metrics 'http_req_duration{name:POST /auth/login}, http_req_duration{phase:load}' have been crossed"
+

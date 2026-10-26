@@ -1,0 +1,8 @@
+SERVICE    STATUS
+api1       Up 16 minutes (healthy)
+api3       Up 16 minutes (healthy)
+db         Up 17 minutes (healthy)
+nginx      Up 16 seconds (healthy)
+rabbitmq   Up 17 minutes (healthy)
+redis      Up 17 minutes (healthy)
+worker     Up 16 minutes
