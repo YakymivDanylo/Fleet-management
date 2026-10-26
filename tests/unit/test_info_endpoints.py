@@ -19,3 +19,10 @@ async def test_info_reports_version_and_pod():
         body = (await client.get("/info")).json()
     assert set(body) == {"app", "version", "pod"}
     assert body["pod"]
+
+
+async def test_version_matches_configured_app_version():
+    async with make_client() as client:
+        response = await client.get("/version")
+    assert response.status_code == 200
+    assert response.json() == {"version": app.state.settings.app_version}
