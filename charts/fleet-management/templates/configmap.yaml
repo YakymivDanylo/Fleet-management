@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "fleet.labels" (dict "root" . "component" "config") | nindent 4 }}
 data:
+  APP_ENV: {{ .Values.config.appEnv | quote }}
   APP_NAME: {{ .Values.config.appName | quote }}
   REDIS_URL: {{ printf "redis://%s:6379/0" (include "fleet.redisHost" .) | quote }}
   TELEMETRY_QUEUE: {{ .Values.config.telemetryQueue | quote }}

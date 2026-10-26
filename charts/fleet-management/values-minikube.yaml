@@ -3,8 +3,8 @@
 # No secrets here: the Secret "fleet-secret" is created by hand once (see docs/lab5-gitops/DEMO.md).
 replicaCount: 2
 
-# A broken image tag turns the app Degraded after 60 s instead of the default 10 min (demo, lab step 6b)
-progressDeadlineSeconds: 60
+# A broken image tag turns the app Degraded after 120 s instead of the default 10 min (demo, lab step 6b)
+progressDeadlineSeconds: 120
 
 # Created manually with kubectl; the chart renders no Secret of its own.
 existingSecret: fleet-secret

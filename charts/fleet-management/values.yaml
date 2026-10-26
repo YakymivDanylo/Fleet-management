@@ -87,7 +87,8 @@ config:
   telemetryQueue: telemetry
   resilienceEnabled: true
   accessTokenExpireMinutes: 30
-  postgresDb: fleet_management
+  appEnv: sandbox         # sandbox | production (the app validates the DB name suffix against it)
+  postgresDb: fleet_sandbox   # must end with _sandbox (sandbox) or _production (production)
   postgresUser: fleet_user
 
 # ---- Sensitive configuration (Secret) - never commit real values ----

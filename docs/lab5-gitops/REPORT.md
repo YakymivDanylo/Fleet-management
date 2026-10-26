@@ -26,8 +26,9 @@ charts/fleet-management/values-minikube.yaml   # значення для minikub
 | Зміна | Навіщо |
 |---|---|
 | `existingSecret` (values, `_helpers.tpl`, `secret.yaml`) | якщо заданий — Secret не рендериться, усі поди читають паролі з Secret, створеного вручну; паролі не потрапляють у Git |
-| `progressDeadlineSeconds` (Deployment API) | у minikube-значеннях 60 с замість 600 — зламаний реліз стає `Degraded` швидко, а не за 10 хв |
+| `progressDeadlineSeconds` (Deployment API) | у minikube-значеннях 120 с замість 600 — зламаний реліз стає `Degraded` швидко, а не за 10 хв |
 | `values-minikube.yaml` | `existingSecret: fleet-secret`, образи з GHCR, `hooks.preUpgrade.enabled: false` |
+| `config.appEnv` + `APP_ENV` у ConfigMap, `postgresDb: fleet_sandbox` | застосунок (ЛР «ізоляція середовищ») вимагає `APP_ENV` і ім'я БД із суфіксом `_sandbox`/`_production`; без цього поди падали з `ValidationError` — виявлено під час локального прогону |
 | `values.schema.json` | валідація нових параметрів |
 
 **Секрети.** Чому `existingSecret` обов'язковий саме з Argo CD: чарт ЛР-4 генерував паролі через `randAlphaNum` і
@@ -86,7 +87,8 @@ charts/fleet-management/values-minikube.yaml   # значення для minikub
 | `helm lint charts/fleet-management -f .../values-minikube.yaml` | 0 failed (лише INFO «icon is recommended») |
 | `helm template` з `values-minikube.yaml` | Secret не рендериться; усі `secretKeyRef` → `fleet-secret`; образи `ghcr.io/yakymivdanylo/...:1.0.0` |
 | `helm template` зі значеннями за замовчуванням | 1 Secret (поведінка ЛР-4 збережена) |
-| `pytest tests/unit/test_info_endpoints.py` | 3 passed (включно з `/version`) |
+| `pytest tests/unit` | 1301 passed |
+| minikube: чарт із `values-minikube.yaml` + ручний `fleet-secret`, локально зібрані образи 1.0.0 | усі поди Running, власний Secret чарту не створено, `/version` → `{"version":"1.0.0"}`, `/health` → `db: connected` |
 
 Живий прогін на minikube (виконується студентом за `DEMO.md`; сюди вставляються виводи та скриншоти):
 

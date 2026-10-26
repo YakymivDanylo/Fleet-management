@@ -192,7 +192,7 @@ git commit -am "chore(infra): deploy non-existent image tag 9.9.9" && git push
 
 argocd app get fleet-management --refresh
 #   Sync Status:   Synced        <- кластер ТОЧНО збігається з Git
-#   Health Status: Progressing -> Degraded (через ~60 с, progressDeadlineSeconds)
+#   Health Status: Progressing -> Degraded (через ~120 с, progressDeadlineSeconds)
 kubectl -n fleet get pods                 # нові поди: ErrImagePull / ImagePullBackOff
 curl localhost:8081/version               # досі 1.1.0 — старі поди обслуговують трафік
 ```
