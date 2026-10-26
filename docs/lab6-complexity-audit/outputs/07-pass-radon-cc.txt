@@ -1,0 +1,21 @@
+# 2026-10-24 14:46 UTC
+$ .venv/Scripts/python -m radon cc -s src/fleet_management/services/rental_service.py
+src/fleet_management/services/rental_service.py
+    F 47:0 end_rental - A (4)
+    F 26:0 start_rental - A (3)
+    F 252:0 validate_rental_eligibility - A (3)
+    C 207:0 RentalEligibilityContext - A (3)
+    M 219:4 RentalEligibilityContext.deposit_missing - A (3)
+    F 99:0 _weekend_zone_discount - A (2)
+    F 172:0 calculate_discount - A (2)
+    M 222:4 RentalEligibilityContext.unpaid_fees_with_active_rental - A (2)
+    M 225:4 RentalEligibilityContext.unpaid_fees_without_deposit - A (2)
+    F 18:0 calculate_cost - A (1)
+    F 91:0 _vip_discount - A (1)
+    F 95:0 _regular_discount - A (1)
+    F 103:0 _holiday_discount - A (1)
+    F 127:0 _flat - A (1)
+    C 108:0 DiscountContext - A (1)
+    M 228:4 RentalEligibilityContext.vehicle_unavailable - A (1)
+    M 231:4 RentalEligibilityContext.station_closed - A (1)
+[exit code: 0]

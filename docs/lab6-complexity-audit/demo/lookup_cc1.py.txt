@@ -1,0 +1,23 @@
+"""Demo fixture for the pre-commit PASS scenario: same behaviour via a lookup table, CC = 1."""
+
+LABELS = {
+    # (valid weight, express, country, fragile, insured) -> label; unknown keys fall back below
+    (True, True, "UA", True, False): "UA-EXPRESS-FRAGILE",
+    (True, True, "UA", True, True): "UA-EXPRESS-FRAGILE",
+    (True, True, "UA", False, True): "UA-EXPRESS-INSURED",
+    (True, True, "UA", False, False): "UA-EXPRESS",
+    (True, True, "PL", True, False): "PL-EXPRESS-FRAGILE",
+    (True, True, "PL", True, True): "PL-EXPRESS-FRAGILE",
+    (True, True, "PL", False, False): "PL-EXPRESS",
+    (True, True, "PL", False, True): "PL-EXPRESS-INSURED",
+    (True, False, "UA", True, False): "UA-FRAGILE",
+    (True, False, "UA", True, True): "UA-FRAGILE",
+    (True, False, "UA", False, False): "UA-STANDARD",
+    (True, False, "UA", False, True): "UA-INSURED",
+}
+FALLBACKS = {(True, True): "INTL-EXPRESS", (True, False): "INTL-STANDARD"}
+
+
+def shipping_label(weight: float, express: bool, country: str, fragile: bool, insured: bool) -> str:
+    key = (weight > 0, express, country, fragile, insured)
+    return LABELS.get(key, FALLBACKS.get(key[:2], "INVALID"))

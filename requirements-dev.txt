@@ -12,3 +12,4 @@ radon==6.0.1
 xenon==0.9.3
 complexipy==8.0.1
 pip-audit==2.10.1
+lizard==1.24.3
