@@ -1,5 +1,5 @@
 # Production-like environment: more replicas and resources, newer image, Ingress on.
-# helm install fleet chart/fleet-management -f chart/fleet-management/values-prod.yaml
+# helm install fleet charts/fleet-management -f charts/fleet-management/values-prod.yaml
 # Secrets are NOT stored here - pass them with --set secret.postgresPassword=... etc.
 replicaCount: 3
 

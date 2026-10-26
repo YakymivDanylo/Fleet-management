@@ -7,6 +7,8 @@ fullnameOverride: ""
 
 # ---- API (FastAPI) ----
 replicaCount: 2
+# Seconds a rollout may stay stuck before the Deployment is reported as failed (Argo CD: Degraded)
+progressDeadlineSeconds: 600
 
 image:
   repository: fleet-management-api
@@ -89,6 +91,10 @@ config:
   postgresUser: fleet_user
 
 # ---- Sensitive configuration (Secret) - never commit real values ----
+# existingSecret: name of a Secret created outside the chart (GitOps: kubectl create secret ...).
+# When set, the chart renders no Secret and all pods read credentials from that one.
+# It must contain the keys POSTGRES_PASSWORD, RABBITMQ_DEFAULT_USER, RABBITMQ_DEFAULT_PASS, JWT_SECRET_KEY.
+existingSecret: ""
 secret:
   postgresPassword: ""
   rabbitmqUser: fleet

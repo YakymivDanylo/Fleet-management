@@ -1,5 +1,5 @@
 # Development environment: minimal footprint, no Ingress, image 1.0.0.
-# helm install fleet chart/fleet-management -f chart/fleet-management/values-dev.yaml
+# helm install fleet charts/fleet-management -f charts/fleet-management/values-dev.yaml
 replicaCount: 1
 
 image:

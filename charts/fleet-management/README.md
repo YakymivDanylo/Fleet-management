@@ -17,25 +17,25 @@
 
 ```powershell
 # dev (значення за замовчуванням + values-dev.yaml)
-helm install fleet chart/fleet-management -n fleet-management --create-namespace -f chart/fleet-management/values-dev.yaml
+helm install fleet charts/fleet-management -n fleet-management --create-namespace -f charts/fleet-management/values-dev.yaml
 
 # prod (3 репліки, образ 1.1.0, Ingress)
-helm install fleet chart/fleet-management -n fleet-management --create-namespace -f chart/fleet-management/values-prod.yaml
+helm install fleet charts/fleet-management -n fleet-management --create-namespace -f charts/fleet-management/values-prod.yaml
 ```
 
 Паролі у файлах значень **не зберігаються**. Якщо `secret.*` порожні, чарт повторно використовує значення з уже наявного Secret, а при першому встановленні генерує випадкові. Задати власні:
 
 ```powershell
-helm install fleet chart/fleet-management -n fleet-management --create-namespace `
+helm install fleet charts/fleet-management -n fleet-management --create-namespace `
   --set secret.postgresPassword=$env:PG_PASS --set secret.rabbitmqPassword=$env:MQ_PASS --set secret.jwtSecretKey=$env:JWT_KEY
 ```
 
 Життєвий цикл і перевірка:
 
 ```powershell
-helm lint chart/fleet-management
-helm template fleet chart/fleet-management -f chart/fleet-management/values-prod.yaml   # без кластера
-helm upgrade fleet chart/fleet-management -n fleet-management --set image.tag=1.1.0
+helm lint charts/fleet-management
+helm template fleet charts/fleet-management -f charts/fleet-management/values-prod.yaml   # без кластера
+helm upgrade fleet charts/fleet-management -n fleet-management --set image.tag=1.1.0
 helm history fleet -n fleet-management
 helm rollback fleet 2 -n fleet-management
 helm test fleet -n fleet-management
@@ -83,7 +83,7 @@ helm uninstall fleet -n fleet-management
 ## Структура
 
 ```
-chart/fleet-management/
+charts/fleet-management/
 ├── Chart.yaml            values.yaml   values-dev.yaml   values-prod.yaml   values.schema.json
 └── templates/
     ├── _helpers.tpl                      # імена, мітки, образ, генерація секретів

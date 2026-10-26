@@ -1,0 +1,32 @@
+# Minikube environment deployed by Argo CD (Application argocd-apps/fleet-management.yaml).
+# The only thing that changes on a release is the image tag - Argo CD picks it up from Git.
+# No secrets here: the Secret "fleet-secret" is created by hand once (see docs/lab5-gitops/DEMO.md).
+replicaCount: 2
+
+# A broken image tag turns the app Degraded after 60 s instead of the default 10 min (demo, lab step 6b)
+progressDeadlineSeconds: 60
+
+# Created manually with kubectl; the chart renders no Secret of its own.
+existingSecret: fleet-secret
+
+image:
+  repository: ghcr.io/yakymivdanylo/fleet-management-api
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+worker:
+  image:
+    repository: ghcr.io/yakymivdanylo/fleet-management-worker
+    tag: "1.0.0"
+
+ingress:
+  enabled: false
+
+config:
+  appName: "Fleet Management (minikube, GitOps)"
+
+hooks:
+  # The pre-upgrade hook is mapped by Argo CD to PreSync, i.e. it would run BEFORE PostgreSQL
+  # exists on the very first sync and fail it. The API init container already waits for Postgres.
+  preUpgrade:
+    enabled: false
