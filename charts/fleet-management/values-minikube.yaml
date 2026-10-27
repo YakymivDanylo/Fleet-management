@@ -11,13 +11,13 @@ existingSecret: fleet-secret
 
 image:
   repository: ghcr.io/yakymivdanylo/fleet-management-api
-  tag: "1.1.0"
+  tag: "9.9.9"
   pullPolicy: IfNotPresent
 
 worker:
   image:
     repository: ghcr.io/yakymivdanylo/fleet-management-worker
-    tag: "1.1.0"
+    tag: "9.9.9"
 
 ingress:
   enabled: false
