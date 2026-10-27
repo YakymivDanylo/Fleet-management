@@ -64,5 +64,5 @@ source_paths = [
   "src/fleet_management/services/rental_service.py",
   "src/fleet_management/privacy/sanitizer.py",
 ]
-also_copy = ["src/fleet_management/"]
+also_copy = ["src/fleet_management/", "scripts/"]
 pytest_add_cli_args_test_selection = ["tests/unit/"]
