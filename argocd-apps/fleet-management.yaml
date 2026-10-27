@@ -17,6 +17,7 @@ spec:
     namespace: fleet
   syncPolicy:
     automated:
-      prune: true # selfHeal is added in step 6a of the lab
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
