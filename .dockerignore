@@ -17,7 +17,9 @@ config
 *.log
 logs
 .github
-chart
+charts
+bootstrap
+argocd-apps
 k8s
 loadtest
 scripts

@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fleet-management
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YakymivDanylo/Fleet-management.git
+    targetRevision: main
+    path: charts/fleet-management
+    helm:
+      valueFiles:
+        - values-minikube.yaml # path is relative to the chart directory
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fleet
+  syncPolicy:
+    automated:
+      prune: true # selfHeal is added in step 6a of the lab
+    syncOptions:
+      - CreateNamespace=true

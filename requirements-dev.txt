@@ -7,7 +7,7 @@ pytest-cov==7.1.0
 httpx==0.28.1
 # Transitive dep of pre-commit, pinned to fix GHSA-94p9-xgh2-xp45, GHSA-9h9j-4vrj-gf7g,
 # GHSA-x78j-v8h9-3j2q, GHSA-p58f-9548-mpm2 (vulnerable < 21.7.13)
-virtualenv==21.14.5
+virtualenv==21.14.10
 radon==6.0.1
 xenon==0.9.3
 complexipy==8.0.1

@@ -104,6 +104,10 @@ def _register_service_routes(app: FastAPI) -> None:
             "pod": socket.gethostname(),
         }
 
+    @app.get("/version")
+    async def app_version():
+        return {"version": app.state.settings.app_version}
+
     @app.get("/health")
     async def health_check(db: AsyncSession = Depends(get_db)):
         await db.execute(text("SELECT 1"))

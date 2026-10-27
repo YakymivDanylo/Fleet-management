@@ -1,5 +1,0 @@
-$ git log --oneline --graph bdd6416^..c6938c6
-* c6938c6 feat(infra): add complexity pre-commit gate (radon, CC <= 10)
-* 181d393 refactor(audit): eliminate conditional branches using lookup table, PASS
-* 625de47 feat(audit): simulate topological CC failure, FAIL
-* bdd6416 chore(audit): baseline complexity audit, calculate_discount CC=4

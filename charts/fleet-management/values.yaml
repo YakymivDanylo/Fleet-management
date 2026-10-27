@@ -1,0 +1,108 @@
+# Default values - correspond to the development environment.
+# Secrets are intentionally EMPTY here: when left empty the chart reuses the value
+# already stored in the cluster Secret, or generates a random one on first install.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# ---- API (FastAPI) ----
+replicaCount: 2
+# Seconds a rollout may stay stuck before the Deployment is reported as failed (Argo CD: Degraded)
+progressDeadlineSeconds: 600
+
+image:
+  repository: fleet-management-api
+  tag: "1.0.0"            # empty -> Chart.appVersion
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: null          # null -> auto-assigned (lets the chart be installed twice)
+
+ingress:
+  enabled: false
+  className: nginx
+  host: fleet.local
+  path: /
+  annotations: {}
+
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits:   { cpu: 500m, memory: 256Mi }
+
+# ---- Telemetry worker ----
+worker:
+  replicaCount: 1
+  image:
+    repository: fleet-management-worker
+    tag: "1.0.0"
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits:   { cpu: 250m, memory: 256Mi }
+
+# ---- PostgreSQL ----
+postgres:
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: "16"
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits:   { cpu: 500m, memory: 512Mi }
+  persistence:
+    enabled: true         # false -> emptyDir (data is lost with the pod)
+    size: 1Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+# ---- Redis ----
+redis:
+  replicaCount: 1
+  image:
+    repository: redis
+    tag: 7-alpine
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits:   { cpu: 250m, memory: 128Mi }
+
+# ---- RabbitMQ ----
+rabbitmq:
+  replicaCount: 1
+  image:
+    repository: rabbitmq
+    tag: 4-management-alpine
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits:   { cpu: 500m, memory: 512Mi }
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+# ---- Application configuration (ConfigMap) ----
+config:
+  appName: "Fleet Management (dev)"
+  telemetryQueue: telemetry
+  resilienceEnabled: true
+  accessTokenExpireMinutes: 30
+  appEnv: sandbox         # sandbox | production (the app validates the DB name suffix against it)
+  postgresDb: fleet_sandbox   # must end with _sandbox (sandbox) or _production (production)
+  postgresUser: fleet_user
+
+# ---- Sensitive configuration (Secret) - never commit real values ----
+# existingSecret: name of a Secret created outside the chart (GitOps: kubectl create secret ...).
+# When set, the chart renders no Secret and all pods read credentials from that one.
+# It must contain the keys POSTGRES_PASSWORD, RABBITMQ_DEFAULT_USER, RABBITMQ_DEFAULT_PASS, JWT_SECRET_KEY.
+existingSecret: ""
+secret:
+  postgresPassword: ""
+  rabbitmqUser: fleet
+  rabbitmqPassword: ""
+  jwtSecretKey: ""
+
+# ---- Hooks ----
+hooks:
+  preUpgrade:
+    enabled: true         # Job that checks PostgreSQL is reachable before every upgrade
