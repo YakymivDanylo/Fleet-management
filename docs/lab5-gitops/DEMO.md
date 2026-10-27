@@ -1,254 +1,289 @@
-# ЛР-5 (DevOps): GitOps через Argo CD — сценарій для захисту
+# ЛР-5 (DevOps): GitOps через Argo CD — сценарій захисту
 
-Усі команди — для **Git Bash** (на Windows). Назви в цьому проєкті:
+Усі команди — для **PowerShell**, з каталогу проєкту. Коментарі `#` — що сказати викладачу.
+
+**Вимога завдання (п. 7):** наживо показати пп. 3–6 — інтерфейс Argo CD, реліз комітом, ручну зміну, яку повертає
+selfHeal, Synced + Degraded і відкат через `git revert`; а також змінити будь-яке значення в Git і показати, як воно
+доїде до кластера.
+
+## Назви в проєкті
 
 | Що | Значення |
 |---|---|
-| Репозиторій (і застосунок, і конфігурація — варіант b) | `https://github.com/YakymivDanylo/Fleet-management.git` (публічний) |
-| Чарт | `charts/fleet-management`, значення для minikube — `values-minikube.yaml` |
-| Application (він же Helm-реліз) | `fleet-management` (namespace Argo CD: `argocd`) |
+| Репозиторій (застосунок + конфігурація, варіант b) | `https://github.com/YakymivDanylo/Fleet-management` (публічний) |
+| Чарт / значення для minikube | `charts/fleet-management` / `values-minikube.yaml` (тег образу — тут) |
+| Application-и | `root` (App of Apps) і `fleet-management` (namespace Argo CD: `argocd`) |
 | Namespace застосунку | `fleet` |
-| Service / Deployment API | `fleet-management-api` |
-| Secret із паролями (створюється вручну) | `fleet-secret` |
-| Образи | `ghcr.io/yakymivdanylo/fleet-management-api` та `...-worker`, теги `1.0.0`, `1.1.0` |
-
-Шпаргалка «що де лежить у Git»:
-
-```
-bootstrap/root.yaml                            # кореневий Application — єдине, що застосовується руками
-argocd-apps/fleet-management.yaml              # Application нашого чарту (його підхоплює root)
-charts/fleet-management/                       # чарт із ЛР-4 (+ existingSecret, progressDeadlineSeconds)
-charts/fleet-management/values-minikube.yaml   # тег образу — ТЕ, що змінюємо при релізі
-```
+| Deployment / Service API | `fleet-management-api` |
+| Secret із паролями (створений вручну, не в Git) | `fleet-secret` |
+| Образи | `ghcr.io/yakymivdanylo/fleet-management-{api,worker}:1.0.0` та `:1.1.0` |
 
 ---
 
-## Частина A. Підготовка (робиться ОДИН раз, до захисту)
+## 1. Перед захистом (за 10 хв)
 
-### A1. Злити гілку в `main` і опублікувати образи двох версій
+**Три вікна PowerShell** (усі в каталозі проєкту) і браузер:
 
-Argo CD читає `targetRevision: main`, тож `bootstrap/`, `argocd-apps/`, `charts/` мають бути в `main`.
+| Вікно | Що в ньому працює |
+|---|---|
+| 1 | `kubectl -n argocd port-forward svc/argocd-server 8080:443` — тунель до інтерфейсу Argo CD |
+| 2 | `kubectl -n fleet port-forward svc/fleet-management-api 8081:80` — тунель до застосунку |
+| 3 | робоче: усі команди сценарію |
+| браузер | `https://localhost:8080` (увійти як `admin`), відкрити `fleet-management` → дерево |
 
-```bash
-# після merge PR feat/lab5-gitops -> main
-git checkout main && git pull
-git tag v1.0.0 && git push origin v1.0.0     # CI збирає і публікує ghcr.io/.../fleet-management-{api,worker}:1.0.0
-git tag v1.1.0 && git push origin v1.1.0     # те саме для 1.1.0 (готуємо наперед для п. 5)
-```
-
-**Пояснення.** Пуш тегу `vX.Y.Z` запускає `.github/workflows/ci.yml`; job `publish` збирає образи з
-`--build-arg APP_VERSION=X.Y.Z` і пушить їх у GHCR з тегом `X.Y.Z` (не `latest`). Версія «вшита» в образ,
-тому `GET /version` повертає `{"version": "1.1.0"}`. Пуш змін у `bootstrap/`, `argocd-apps/`, `charts/`, `docs/`
-образ **не** перезбирає (`paths-ignore`).
-
-### A2. Зробити пакети публічними
-
-GitHub → профіль → *Packages* → `fleet-management-api` → *Package settings* → *Change visibility* → **Public**.
-Те саме для `fleet-management-worker`. Інакше під у кластері отримає `ImagePullBackOff`.
-
-Перевірка без автентифікації:
-
-```bash
-docker logout ghcr.io
-docker pull ghcr.io/yakymivdanylo/fleet-management-api:1.0.0
-docker pull ghcr.io/yakymivdanylo/fleet-management-api:1.1.0
-```
-
-### A3. Argo CD CLI (Windows)
-
-Завантажити `argocd-windows-amd64.exe` зі сторінки релізів
-(<https://github.com/argoproj/argo-cd/releases/latest>), перейменувати в `argocd.exe`, покласти в папку з PATH
-(наприклад `C:\Users\dryak\bin`).
-
-```bash
-argocd version --client
-```
-
----
-
-## Частина B. Лайв-демонстрація
-
-### B0. Піднімаємо кластер і Argo CD (п. 3)
-
-```bash
+```powershell
 minikube start
-kubectl create namespace argocd
-kubectl apply -n argocd --server-side --force-conflicts \
-  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl -n argocd get pods -w          # чекаємо, поки всі поди Running (Ctrl+C)
+kubectl -n argocd get pods                  # усі Running
+argocd login localhost:8080 --username admin --insecure
+argocd app list                             # root і fleet-management: Synced / Healthy
 ```
 
-**Пояснення.** Створюємо namespace `argocd` і ставимо офіційні маніфести Argo CD. `--server-side --force-conflicts`
-потрібні, бо CRD Argo CD завеликі для звичайного `kubectl apply` (анотація `last-applied` перевищує ліміт).
+### Допоміжні функції (вставити у вікно 3 один раз)
 
-Окремий термінал — доступ до інтерфейсу:
+```powershell
+# Змінює текст у файлі (регулярний вираз) — без зайвих «редагувань» кінців рядків
+function Edit-File($f, $old, $new) { $t = [IO.File]::ReadAllText($f); [IO.File]::WriteAllText($f, ($t -replace $old, $new)) }
 
-```bash
-kubectl -n argocd port-forward svc/argocd-server 8080:443
+# «Реліз через Git»: гілка → коміт → push → PR → merge → оновлений main
+function Ship($msg) {
+  $b = "demo/" + (Get-Date -Format HHmmss)
+  git checkout -b $b
+  git add charts argocd-apps; git commit -m $msg
+  if ($LASTEXITCODE -ne 0) { git add charts argocd-apps; git commit -m $msg }   # хук міг виправити кінці рядків — повтор
+  git push -u origin $b
+  gh pr create --title $msg --body "GitOps demo"
+  gh pr merge --merge
+  git checkout main; git pull
+}
 ```
 
-Основний термінал — вхід і зміна пароля:
+> Чому PR, а не пряме `git push` у `main`: у проєкті ніхто не працює напряму в `main`. `Ship` робить увесь цикл однією
+> командою, тож у демонстрації «зміна в Git → кластер» нічого не затягується.
 
-```bash
-argocd admin initial-password -n argocd                     # початковий пароль admin
-argocd login localhost:8080 --username admin --insecure     # --insecure: самопідписаний сертифікат
-argocd account update-password                              # змінюємо початковий пароль
-kubectl -n argocd delete secret argocd-initial-admin-secret # початковий пароль більше не потрібен
+### Початковий стан (якщо ти вже проганяв сценарій)
+
+Для показу потрібно: тег `1.0.0` і **вимкнений** selfHeal.
+
+```powershell
+git checkout main; git pull
+Edit-File charts/fleet-management/values-minikube.yaml 'tag: "1.1.0"' 'tag: "1.0.0"'
+Edit-File argocd-apps/fleet-management.yaml '\r?\n\s+selfHeal: true' ''
+git diff                                     # має бути: 2 рядки тегу + прибраний selfHeal
+Ship "chore(infra): reset demo to 1.0.0 without selfHeal"
+argocd app get root --refresh
+argocd app get fleet-management --refresh
+curl.exe localhost:8081/version              # {"version":"1.0.0"}  (якщо тунель обірвався — перезапусти вікно 2)
 ```
 
-Інтерфейс: <https://localhost:8080> (браузер попередить про сертифікат — продовжуємо).
-Репозиторій публічний, тому `argocd repo add` **не потрібен**.
+---
 
-### B1. Секрет (паролі НЕ в Git) і єдиний ручний apply (п. 1, 4)
+## 2. Показ (п. 3–4): Argo CD і дерево об'єктів
 
-```bash
-kubectl create namespace fleet
-kubectl -n fleet create secret generic fleet-secret \
-  --from-literal=POSTGRES_PASSWORD="$(openssl rand -hex 16)" \
-  --from-literal=RABBITMQ_DEFAULT_USER=fleet \
-  --from-literal=RABBITMQ_DEFAULT_PASS="$(openssl rand -hex 16)" \
-  --from-literal=JWT_SECRET_KEY="$(openssl rand -hex 32)"
-```
-
-**Пояснення.** `values-minikube.yaml` містить `existingSecret: fleet-secret`: чарт не рендерить свій Secret, а поди
-читають паролі з цього. Він створений руками, не з Git, тому Argo CD його не чіпає (навіть з `prune`) і паролі в
-репозиторій не потрапляють. Чому це обов'язково: без `existingSecret` чарт генерує випадкові паролі через
-`randAlphaNum`, а Argo CD лише рендерить шаблони (`lookup` у кластер не ходить) — кожна синхронізація давала б нові паролі.
-
-```bash
-kubectl apply -f bootstrap/root.yaml      # ЄДИНИЙ ручний apply
+```powershell
 argocd app list
 argocd app get fleet-management
-kubectl -n fleet get pods
-helm list -n fleet                        # порожньо: Helm лише рендерить шаблони, реліз не створює
+helm list -n fleet
 ```
 
-**Пояснення.** `root` стежить за каталогом `argocd-apps/` і сам створює дочірній Application `fleet-management`
-(App of Apps). Дочірній, своєю чергою, розгортає чарт у namespace `fleet`. Додати новий компонент надалі = додати
-один файл в `argocd-apps/`.
+- `argocd app list` — два застосунки. **root** — «застосунок над застосунками» (App of Apps): я вручну застосовував
+  лише `bootstrap/root.yaml`, а `fleet-management` Argo CD створив сам з Git (каталог `argocd-apps/`).
+- **Synced** — кластер збігається з Git. **Healthy** — усе розгорнуте працює. Це два незалежні статуси.
+- `helm list` порожній: Argo CD використовує Helm лише як шаблонізатор (рендерить YAML), реліз Helm не створює.
+- Секрети в Git не зберігаються: паролі лежать у `fleet-secret`, створеному вручну; чарт читає його через
+  `existingSecret: fleet-secret`.
 
-### B2. Показати інтерфейс (п. 4)
+**У браузері:** `root` → `fleet-management` → дерево: Deployment → ReplicaSet → Pod, Service, ConfigMap, PVC.
 
-<https://localhost:8080> → `root` → `fleet-management` → дерево об'єктів (Deployments, Services, ConfigMap, PVC, Pods).
-Очікувано: **Synced / Healthy**. Для консолі:
-
-```bash
-argocd app get fleet-management          # Sync Status: Synced, Health Status: Healthy
-kubectl -n fleet port-forward svc/fleet-management-api 8081:80     # окремий термінал
-curl localhost:8081/version              # {"version":"1.0.0"}
+```powershell
+curl.exe localhost:8081/version              # {"version":"1.0.0"}
 ```
-
-### B3. Реліз комітом (п. 5)
-
-```bash
-sed -i 's/tag: "1.0.0"/tag: "1.1.0"/' charts/fleet-management/values-minikube.yaml   # змінює api і worker
-git diff                                                                              # показати зміну
-git commit -am "chore(infra): release fleet-management 1.1.0" && git push
-
-argocd app get fleet-management --refresh      # не чекати опитування Git (до 3 хв)
-kubectl -n fleet get pods -w                   # rolling update: нові поди підіймаються, старі зникають
-curl localhost:8081/version                    # {"version":"1.1.0"}
-```
-
-**Пояснення.** Руками в кластері нічого не робимо — змінюється лише тег у Git. Argo CD бачить новий коміт
-(`--refresh` форсує перевірку замість очікування poll-інтервалу), порівнює його з кластером (OutOfSync), автоматично
-синхронізує, Deployment виконує rolling update (`maxUnavailable: 0` — без простою). Після оновлення подів старий
-port-forward може обірватися — перезапустіть його. В інтерфейсі: кнопка *Refresh* → OutOfSync → автосинхронізація →
-нові поди в дереві.
-
-### B4. Дрейф і selfHeal (п. 6a)
-
-Спершу **без** selfHeal:
-
-```bash
-kubectl -n fleet scale deployment fleet-management-api --replicas=5
-argocd app get fleet-management          # Sync Status: OutOfSync, репліки лишаються 5
-kubectl -n fleet get deploy fleet-management-api
-```
-
-**Пояснення.** `automated` без `selfHeal` синхронізує лише при **змінах у Git**. Ручна зміна кластера фіксується як
-дрейф (OutOfSync), але не виправляється.
-
-Тепер вмикаємо selfHeal — теж через Git (root сам застосує зміну Application):
-
-```bash
-sed -i 's/      prune: true.*/      prune: true\n      selfHeal: true/' argocd-apps/fleet-management.yaml
-git diff
-git commit -am "chore(infra): enable selfHeal for fleet-management" && git push
-argocd app get root --refresh && argocd app get fleet-management --refresh
-
-kubectl -n fleet scale deployment fleet-management-api --replicas=5
-kubectl -n fleet get deploy fleet-management-api -w     # за кілька секунд знову 2/2
-```
-
-**Пояснення.** З `selfHeal: true` Argo CD не лише виявляє дрейф, а й повертає бажаний стан із Git (кількість реплік 2
-із чарту).
-
-### B5. Synced, але Degraded (п. 6b)
-
-```bash
-sed -i 's/tag: "1.1.0"/tag: "9.9.9"/' charts/fleet-management/values-minikube.yaml
-git commit -am "chore(infra): deploy non-existent image tag 9.9.9" && git push
-
-argocd app get fleet-management --refresh
-#   Sync Status:   Synced        <- кластер ТОЧНО збігається з Git
-#   Health Status: Progressing -> Degraded (через ~120 с, progressDeadlineSeconds)
-kubectl -n fleet get pods                 # нові поди: ErrImagePull / ImagePullBackOff
-curl localhost:8081/version               # досі 1.1.0 — старі поди обслуговують трафік
-```
-
-**Пояснення.** Це важлива різниця: **Sync** відповідає на питання «чи збігається кластер із Git?», **Health** — «чи
-працює те, що розгорнуто?». Маніфест із неіснуючим тегом застосовано коректно (Synced), та образ не завантажити
-(Degraded). Завдяки `maxUnavailable: 0` старі поди не вимкнено — користувачі не постраждали.
-
-### B6. Відкат через `git revert` (п. 6c)
-
-```bash
-git log --oneline -5
-git revert --no-edit HEAD                  # HEAD = коміт з 9.9.9 (або вкажіть його хеш)
-git push
-
-argocd app get fleet-management --refresh  # знову Synced / Healthy
-argocd app history fleet-management        # кожна синхронізація прив'язана до коміту
-git log --oneline -5
-curl localhost:8081/version                # {"version":"1.1.0"}
-```
-
-**Пояснення.** Відкочуємо **опис**, а не кластер: `git revert` створює новий коміт, що скасовує зміну, і Argo CD
-розгортає його. Історія лишається повною та аудитованою (`git log` + `argocd app history`). `argocd app rollback` тут
-не підходить: він працює лише з вимкненою автосинхронізацією, інакше Argo CD одразу поверне стан із Git.
-
-### B7. Якщо викладач просить змінити інше значення
-
-Будь-яка зміна — тільки через Git, у `charts/fleet-management/values-minikube.yaml`:
-
-```bash
-# приклад: 3 репліки API
-sed -i 's/^replicaCount: 2/replicaCount: 3/' charts/fleet-management/values-minikube.yaml
-git commit -am "chore(infra): scale api to 3 replicas" && git push
-argocd app get fleet-management --refresh
-kubectl -n fleet get pods
-```
-
-Інші приклади: `config.appName` (змінює ConfigMap → rolling update завдяки `checksum/config`),
-`resources.limits.memory`.
 
 ---
 
-## Прибирання
+## 3. Реліз комітом (п. 5)
 
-```bash
-argocd app delete root --cascade        # видаляє root, fleet-management і всі їхні об'єкти
-kubectl delete namespace fleet argocd
-minikube stop
+```powershell
+Edit-File charts/fleet-management/values-minikube.yaml 'tag: "1.0.0"' 'tag: "1.1.0"'
+git diff                                     # показати: змінився лише тег образу (api і worker)
+Ship "chore(infra): release fleet-management 1.1.0"
+
+argocd app get fleet-management --refresh    # не чекати періодичного опитування Git (до 3 хв)
+kubectl -n fleet get pods -w                 # Ctrl+C коли нові поди Running
+```
+
+- **Руками в кластері я нічого не змінював** — лише тег у Git. Argo CD побачив новий коміт, порівняв його з
+  кластером (**OutOfSync**), сам синхронізував і запустив rolling update.
+- **Rolling update** — Kubernetes піднімає нові поди по одному, а старі прибирає лише коли нові готові
+  (`maxUnavailable: 0`): простою немає.
+- `--refresh` = кнопка **Refresh** в інтерфейсі: «перечитай Git зараз».
+
+Після заміни подів перезапусти тунель у вікні 2 (він був прив'язаний до старого пода), потім:
+
+```powershell
+curl.exe localhost:8081/version              # {"version":"1.1.0"}
+argocd app history fleet-management          # кожна синхронізація прив'язана до коміту
+```
+
+---
+
+## 4. Дрейф і selfHeal (п. 6а)
+
+**Дрейф** — розбіжність між Git і кластером після ручної зміни. **selfHeal** — режим, у якому Argo CD сам виправляє
+дрейф, повертаючи значення з Git.
+
+Без selfHeal:
+
+```powershell
+kubectl -n fleet scale deployment fleet-management-api --replicas=5
+argocd app get fleet-management --refresh    # Sync Status: OutOfSync
+kubectl -n fleet get deploy fleet-management-api   # 5/5 — Argo CD бачить дрейф, але не виправляє
+```
+
+- У браузері: жовтий **OutOfSync**, кнопка **Diff** показує `replicas: 2` проти `5`.
+
+Вмикаємо selfHeal — теж через Git (`root` сам застосує зміну опису Application):
+
+```powershell
+Edit-File argocd-apps/fleet-management.yaml 'prune: true[^\r\n]*' "prune: true`n      selfHeal: true"
+git diff                                     # додався рядок selfHeal: true
+Ship "chore(infra): enable selfHeal for fleet-management"
+argocd app get root --refresh
+argocd app get fleet-management --refresh
+```
+
+Повторюємо ручну зміну:
+
+```powershell
+kubectl -n fleet scale deployment fleet-management-api --replicas=5
+kubectl -n fleet get deploy fleet-management-api -w     # за секунди знову 2/2 — Ctrl+C
+```
+
+- З `selfHeal: true` Argo CD сам повертає значення з Git. **Правда — у Git, а не в кластері.**
+
+---
+
+## 5. Synced, але Degraded (п. 6б)
+
+```powershell
+Edit-File charts/fleet-management/values-minikube.yaml 'tag: "1.1.0"' 'tag: "9.9.9"'
+git diff
+Ship "chore(infra): deploy non-existent image tag 9.9.9"
+
+argocd app get fleet-management --refresh    # Synced; Health: Progressing → через ~2 хв Degraded
+kubectl -n fleet get pods                    # нові поди: ErrImagePull / ImagePullBackOff, старі Running
+curl.exe localhost:8081/version              # досі 1.1.0 — застосунок працює
+```
+
+- **Sync ≠ Health.** Sync: «кластер збігається з Git?» — так, маніфест застосовано. Health: «працює?» — ні, образу
+  `9.9.9` не існує (`ImagePullBackOff` — под не може завантажити образ і повторює спроби з наростаючою паузою).
+- `Degraded` з'являється не одразу: Kubernetes чекає `progressDeadlineSeconds: 120` і лише потім вважає розгортання
+  проваленим.
+- Старі поди не вимкнено (`maxUnavailable: 0`) — користувачі не постраждали.
+- У браузері: в шапці **Degraded** + **Synced**, у дереві червоні нові поди.
+
+---
+
+## 6. Відкат через `git revert` (п. 6в)
+
+```powershell
+git log --oneline -5                         # знайти хеш коміту "deploy non-existent image tag 9.9.9"
+git checkout -b revert/bad-tag
+git revert --no-edit <ХЕШ_КОМІТУ_З_9.9.9>    # НЕ merge-коміт, а сам коміт зі зміною тегу
+git push -u origin revert/bad-tag
+gh pr create --fill
+gh pr merge --merge
+git checkout main; git pull
+
+argocd app get fleet-management --refresh    # Synced / Healthy (за 10–20 с)
+kubectl -n fleet get pods                    # зіпсованих подів більше немає
+argocd app history fleet-management          # нова ревізія після відкату
+git log --oneline -6
+curl.exe localhost:8081/version              # {"version":"1.1.0"}
+```
+
+- **`git revert`** створює **новий коміт**, що скасовує зміну. Історія не переписується: поганий коміт лишається в
+  `git log`, видно хто, що і коли змінив. Це відкат **опису**, а не кластера.
+- Чому не `argocd app rollback`: він працює лише з вимкненою автосинхронізацією, інакше Argo CD одразу поверне стан
+  із Git. До того ж кластер і Git розійшлись би.
+- Відкат миттєвий: Kubernetes повторно використав старий ReplicaSet, нові поди не створюються.
+
+---
+
+## 7. Якщо викладач просить змінити інше значення
+
+Будь-яка зміна — лише через Git. Варіанти:
+
+```powershell
+# кількість реплік API
+Edit-File charts/fleet-management/values-minikube.yaml '(?m)^replicaCount: \d+' 'replicaCount: 3'
+Ship "chore(infra): scale api to 3 replicas"
+argocd app get fleet-management --refresh
+kubectl -n fleet get pods
+```
+
+```powershell
+# назва застосунку (змінює ConfigMap → поди перезапустяться) — перевірка через /info
+Edit-File charts/fleet-management/values-minikube.yaml 'appName: ".*"' 'appName: "Fleet Management (DEMO)"'
+Ship "chore(infra): change app name"
+argocd app get fleet-management --refresh
+curl.exe localhost:8081/info
+```
+
+- Поради: не питай «чи можна руками» — завжди «змінюю в Git, Argo CD доставляє». Обмеження пам'яті —
+  `resources.limits.memory`, змінна середовища — `config.*` у `values-minikube.yaml`.
+
+---
+
+## 8. Короткі відповіді на можливі питання
+
+| Питання | Відповідь |
+|---|---|
+| Що таке GitOps? | Бажаний стан кластера описаний у Git; агент у кластері (Argo CD) сам приводить кластер до нього. |
+| Навіщо `root`? | Application теж треба кимось створити. `root` — єдиний вручну застосований; решта береться з `argocd-apps/` у Git. |
+| Що робить `prune`? | Об'єкт, видалений з Git, Argo CD видаляє й з кластера. |
+| Що робить `selfHeal`? | Повертає значення з Git після ручних змін у кластері. |
+| Де паролі? | Не в Git. `fleet-secret` створено вручну; чарт читає його через `existingSecret`. Для production — Sealed Secrets / SOPS / External Secrets. |
+| Чому образи з тегом, а не `latest`? | Тег фіксує версію: за Git видно, що саме розгорнуто, і можна відкотитись. `latest` не відтворюється. |
+| Чому `helm list` порожній? | Argo CD лише рендерить шаблони (`helm template`), сам Helm-реліз не створюється. |
+| Чому відкат комітом? | Відкочується опис, історія зберігається; `argocd app rollback` із автосинхронізацією не працює. |
+
+---
+
+## 9. Відновлення «з нуля» (якщо кластер втрачено)
+
+```powershell
+minikube start
+kubectl create namespace argocd
+kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl -n argocd get pods -w                                   # чекати Running (Ctrl+C)
+kubectl -n argocd port-forward svc/argocd-server 8080:443       # у вікні 1
+argocd admin initial-password -n argocd                         # початковий пароль admin
+argocd login localhost:8080 --username admin --insecure
+argocd account update-password
+kubectl -n argocd delete secret argocd-initial-admin-secret
+
+function New-Hex($n) { $b = New-Object byte[] $n; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); -join ($b | ForEach-Object { $_.ToString('x2') }) }
+kubectl create namespace fleet
+kubectl -n fleet create secret generic fleet-secret --from-literal=POSTGRES_PASSWORD=$(New-Hex 16) --from-literal=RABBITMQ_DEFAULT_USER=fleet --from-literal=RABBITMQ_DEFAULT_PASS=$(New-Hex 16) --from-literal=JWT_SECRET_KEY=$(New-Hex 32)
+kubectl apply -f bootstrap/root.yaml                            # єдиний ручний apply
 ```
 
 ## Типові проблеми
 
 | Симптом | Причина / дія |
 |---|---|
-| `ImagePullBackOff` на тегах 1.0.0/1.1.0 | пакет GHCR приватний або тег не опубліковано (перевірити A1, A2) |
-| Поди `CreateContainerConfigError` | не створено `fleet-secret` у namespace `fleet` (B1) |
-| `ComparisonError ... repository not found` | помилка в `repoURL` |
-| Зміна не приїхала | запушено не в `main` або не минув poll — `argocd app get ... --refresh` |
-| `values-minikube.yaml: no such file` | `valueFiles` рахується від `path` чарту, не від кореня репозиторію |
+| `curl` повертає `Temporary Redirect` | на 8081 слухає не застосунок — перезапусти тунель у вікні 2 (`svc/fleet-management-api 8081:80`) |
+| `/version` зі старою версією після релізу | тунель прив'язаний до старого пода — перезапусти вікно 2 |
+| Хук `mixed line ending` перервав коміт | `Ship` повторює коміт сам; вручну — `git add -A` і `git commit` ще раз |
+| `git checkout main` каже про локальні зміни | лише різниця кінців рядків: `git checkout -- charts argocd-apps` |
+| `OutOfSync` одразу після `--refresh` | Argo CD ще синхронізує — повтори команду через 10–20 с |
+| `ImagePullBackOff` на `1.0.0`/`1.1.0` | пакет GHCR приватний або тег не опубліковано |
+| Поди `CreateContainerConfigError` | немає `fleet-secret` у namespace `fleet` |
+
+## Прибирання (після захисту)
+
+```powershell
+argocd app delete root --cascade             # видаляє root, fleet-management і всі їхні об'єкти
+kubectl delete namespace fleet argocd
+minikube stop
+```
