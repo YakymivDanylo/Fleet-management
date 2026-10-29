@@ -90,18 +90,23 @@ charts/fleet-management/values-minikube.yaml   # значення для minikub
 | `pytest tests/unit` | 1301 passed |
 | minikube: чарт із `values-minikube.yaml` + ручний `fleet-secret`, локально зібрані образи 1.0.0 | усі поди Running, власний Secret чарту не створено, `/version` → `{"version":"1.0.0"}`, `/health` → `db: connected` |
 
-Живий прогін на minikube (виконується студентом за `DEMO.md`; сюди вставляються виводи та скриншоти):
+Живий прогін на minikube (Argo CD v3.5.6, GHCR-образи 1.0.0 / 1.1.0, дата прогону 2026-10-27):
 
-| № | Що зафіксувати | Статус |
-|---|---|---|
-| 1 | `kubectl -n argocd get pods` — Argo CD Running | ☐ |
-| 2 | Інтерфейс: `root` → `fleet-management`, дерево, Synced / Healthy | ☐ |
-| 3 | `argocd app list`, `helm list -n fleet` (порожньо) | ☐ |
-| 4 | `curl /version` → `1.0.0`, після релізу → `1.1.0` | ☐ |
-| 5 | `argocd app get` при OutOfSync (scale без selfHeal) | ☐ |
-| 6 | Повернення реплік після увімкнення selfHeal | ☐ |
-| 7 | Synced + Degraded, `kubectl get pods` з `ImagePullBackOff` | ☐ |
-| 8 | `git log --oneline`, `argocd app history fleet-management` після revert | ☐ |
+| № | Крок | Результат | Підтвердження |
+|---|---|---|---|
+| 1 | Образи в GHCR | теги `v1.0.0`, `v1.1.0` → CI опублікував `fleet-management-{api,worker}:1.0.0` і `:1.1.0`; анонімний `docker pull` проходить, у `1.1.0` `APP_VERSION=1.1.0` | вивід `docker pull` / `docker run` |
+| 2 | Argo CD встановлено, пароль `admin` змінено, `argocd-initial-admin-secret` видалено | усі 7 подів `argocd` Running | `kubectl -n argocd get pods` |
+| 3 | `kubectl apply -f bootstrap/root.yaml` (єдиний ручний apply) | `root` і `fleet-management` — Synced; `fleet-management` → Healthy; `helm list -n fleet` порожній | `argocd app list`, `argocd app get` |
+| 4 | Версія до релізу | `GET /version` → `{"version":"1.0.0"}`, `/health` → `db: connected` | `curl` |
+| 5 | Реліз 1.1.0 комітом (PR #25) | OutOfSync → автосинхронізація → rolling update; `GET /version` → `{"version":"1.1.0"}` | `argocd app history` (ревізія `7592def`) |
+| 6а | Дрейф без selfHeal | `kubectl scale --replicas=5` → `OutOfSync`, 5/5 реплік не повертаються | `screenshots/6a-1-drift-outofsync-5-replicas.png` |
+| 6а | selfHeal через Git (PR #26) і повторний scale | Argo CD повертає 2/2 за секунди | `screenshots/6a-2-selfheal-restored-2-replicas.png` |
+| 6б | Неіснуючий тег `9.9.9` (PR #27) | `Synced`, але `Degraded`: нові поди `ImagePullBackOff`, старі Running, `/version` усе ще `1.1.0` | `screenshots/6b-1-synced-degraded-app-header-api-pods.png`, `screenshots/6b-2-synced-degraded-worker-imagepullbackoff.png` |
+| 6в | Відкат `git revert dee990e` (PR #28) | `Synced` + `Healthy`, зіпсовані поди зникли, `/version` = `1.1.0`; в `argocd app history` ревізії `6fc025b`, `7592def`, `c01bea2`, `bccec09`, `81a7d2b` | `screenshots/6c-rollback-synced-healthy.png` |
+
+Історія Git після відкату (`git log --oneline`): `Merge PR #28` → `Revert "...9.9.9"` → `Merge PR #27` → `chore(infra): deploy non-existent image tag 9.9.9` → `Merge PR #26` → `enable selfHeal`. Поганий коміт не стирається — відкат є окремим комітом.
+
+Спостереження: після відкату Kubernetes повторно використав старий ReplicaSet (`rev:4` замість нового), тому нові поди не створювались і відкат був миттєвим; користувачі не помітили поломки, бо `maxUnavailable: 0` залишав старі поди Running.
 
 ## 7. Висновки
 
