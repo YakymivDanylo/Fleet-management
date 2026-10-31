@@ -1,0 +1,5 @@
+src/fleet_management/services/marketing_service.py
+    F 58:0 dispatch_pending_marketing - A (4)
+    F 19:0 _require_consent - A (2)
+    F 36:0 enqueue_marketing_email - A (1)
+    F 47:0 record_analytics_event - A (1)
