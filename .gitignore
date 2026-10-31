@@ -17,3 +17,4 @@ coverage.json
 
 # raw k6 samples (tens of MB); summary.md and charts are committed instead
 loadtest/results/lab4/k6*.csv
+loadtest/results/lab7/**/k6*.csv
