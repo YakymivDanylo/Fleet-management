@@ -5,6 +5,7 @@ The dispatcher rewrites ORM rows (``message.status``, ``message.processed_at``) 
 implementation guarantees; against the mutable baseline they FAIL.
 """
 
+from dataclasses import FrozenInstanceError
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
 
@@ -13,6 +14,7 @@ import pytest
 from fleet_management.models import MarketingStatus
 from fleet_management.services import marketing_service
 from fleet_management.services.consent_service import ConsentPolicyGate, GateDecision
+from fleet_management.services.marketing_service import DispatchOutcome
 
 ALLOW = GateDecision(True, "granted")
 DENY = GateDecision(False, "consent_withdrawn")
@@ -71,3 +73,24 @@ async def test_one_batch_shares_one_immutable_processed_at(monkeypatch):
 
     assert counts == {"sent": 2, "skipped": 1}
     assert len({m.processed_at for m in messages}) == 1, "processed_at drifted inside one batch"
+
+
+@pytest.mark.parametrize(
+    ("allowed", "status"),
+    [(True, MarketingStatus.SENT), (False, MarketingStatus.SKIPPED)],
+)
+def test_outcome_is_an_immutable_value_object(allowed, status):
+    moment = datetime(2026, 1, 1, tzinfo=UTC)
+    message = _message(1)
+    outcome = DispatchOutcome(message, allowed, moment)
+
+    assert outcome.status == status
+    with pytest.raises(FrozenInstanceError):
+        outcome.allowed = not allowed
+    with pytest.raises(FrozenInstanceError):
+        outcome.processed_at = moment + timedelta(days=1)
+    assert message.status == MarketingStatus.QUEUED, "deciding must not touch the row"
+
+    outcome.apply()
+
+    assert (message.status, message.processed_at) == (status, moment)

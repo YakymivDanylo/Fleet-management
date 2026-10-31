@@ -1,0 +1,82 @@
+diff --git a/src/fleet_management/services/marketing_service.py b/src/fleet_management/services/marketing_service.py
+index 3657ecb..fc144db 100644
+--- a/src/fleet_management/services/marketing_service.py
++++ b/src/fleet_management/services/marketing_service.py
+@@ -1,5 +1,7 @@
+ """Consent-dependent (optional) actions. Contract functions such as rentals skip the gate."""
+ 
++from collections import Counter
++from dataclasses import dataclass
+ from datetime import UTC, datetime
+ 
+ from sqlalchemy import select
+@@ -55,8 +57,35 @@ async def record_analytics_event(
+     return event
+ 
+ 
+-async def dispatch_pending_marketing(db: AsyncSession) -> dict[str, int]:
+-    """Background job: consent is re-checked per queued item, right before it is 'sent'."""
++@dataclass(frozen=True)
++class DispatchOutcome:
++    """Value Object: the immutable verdict for one queued message.
++
++    The consent decision and the processing instant are fixed at construction; the ORM row is
++    touched only by ``apply``, after every verdict of the batch exists.
++    """
++
++    message: MarketingMessage
++    allowed: bool
++    processed_at: datetime
++
++    @property
++    def status(self) -> MarketingStatus:
++        return MarketingStatus.SENT if self.allowed else MarketingStatus.SKIPPED
++
++    def apply(self) -> None:
++        self.message.status = self.status
++        self.message.processed_at = self.processed_at
++
++
++async def _verdict(
++    db: AsyncSession, message: MarketingMessage, processed_at: datetime
++) -> DispatchOutcome:
++    decision = await ConsentPolicyGate.check(db, message.user_id, ConsentPurpose.MARKETING_EMAIL)
++    return DispatchOutcome(message, decision.allowed, processed_at)
++
++
++async def _decide_queue(db: AsyncSession, processed_at: datetime) -> tuple[DispatchOutcome, ...]:
+     queued = (
+         (
+             await db.execute(
+@@ -66,13 +95,22 @@ async def dispatch_pending_marketing(db: AsyncSession) -> dict[str, int]:
+         .scalars()
+         .all()
+     )
+-    counts = {"sent": 0, "skipped": 0}
+-    for message in queued:
+-        decision = await ConsentPolicyGate.check(
+-            db, message.user_id, ConsentPurpose.MARKETING_EMAIL
+-        )
+-        message.status = MarketingStatus.SENT if decision.allowed else MarketingStatus.SKIPPED
+-        message.processed_at = datetime.now(UTC)
+-        counts["sent" if decision.allowed else "skipped"] += 1
++    return tuple([await _verdict(db, message, processed_at) for message in queued])
++
++
++def _summary(outcomes: tuple[DispatchOutcome, ...]) -> dict[str, int]:
++    tally = Counter(outcome.status for outcome in outcomes)
++    return {"sent": tally[MarketingStatus.SENT], "skipped": tally[MarketingStatus.SKIPPED]}
++
++
++async def dispatch_pending_marketing(db: AsyncSession) -> dict[str, int]:
++    """Background job: consent is re-checked per queued item, right before it is 'sent'.
++
++    Decide first (pure, one shared timestamp), mutate rows second: a gate failure midway leaves
++    every message untouched.
++    """
++    outcomes = await _decide_queue(db, datetime.now(UTC))
++    for outcome in outcomes:
++        outcome.apply()
+     await db.commit()
+-    return counts
++    return _summary(outcomes)
