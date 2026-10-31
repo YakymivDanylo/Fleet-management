@@ -2,9 +2,11 @@ from collections import Counter
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..cache import VEHICLES_LIST_KEY, get_redis, invalidate
 from ..database import get_db
 from ..models import Rental, RentalStatus
 from ..schemas import RentalEnd, RentalRead, RentalStart
@@ -24,14 +26,26 @@ def rental_with_cost(rental: Rental) -> RentalRead:
 
 
 @router.post("/start", response_model=RentalRead, status_code=201)
-async def start_rental(payload: RentalStart, db: AsyncSession = Depends(get_db)):
+async def start_rental(
+    payload: RentalStart,
+    db: AsyncSession = Depends(get_db),
+    redis: Redis = Depends(get_redis),
+):
     rental = await rental_service.start_rental(db, payload.renter_id, payload.vehicle_id)
+    # The vehicle changed status, so the cached /vehicles list is stale.
+    await invalidate(redis, VEHICLES_LIST_KEY)
     return rental
 
 
 @router.post("/{rental_id}/end", response_model=RentalRead)
-async def end_rental(rental_id: int, payload: RentalEnd, db: AsyncSession = Depends(get_db)):
+async def end_rental(
+    rental_id: int,
+    payload: RentalEnd,
+    db: AsyncSession = Depends(get_db),
+    redis: Redis = Depends(get_redis),
+):
     rental = await rental_service.end_rental(db, rental_id, payload.end_station_id)
+    await invalidate(redis, VEHICLES_LIST_KEY)
     cost = rental_service.calculate_cost(rental.started_at, rental.ended_at)
     return RentalRead.model_validate(rental).model_copy(update={"cost": cost})
 
