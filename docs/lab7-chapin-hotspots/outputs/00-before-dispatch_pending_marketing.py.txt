@@ -1,0 +1,21 @@
+async def dispatch_pending_marketing(db: AsyncSession) -> dict[str, int]:
+    """Background job: consent is re-checked per queued item, right before it is 'sent'."""
+    queued = (
+        (
+            await db.execute(
+                select(MarketingMessage).where(MarketingMessage.status == MarketingStatus.QUEUED)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    counts = {"sent": 0, "skipped": 0}
+    for message in queued:
+        decision = await ConsentPolicyGate.check(
+            db, message.user_id, ConsentPurpose.MARKETING_EMAIL
+        )
+        message.status = MarketingStatus.SENT if decision.allowed else MarketingStatus.SKIPPED
+        message.processed_at = datetime.now(UTC)
+        counts["sent" if decision.allowed else "skipped"] += 1
+    await db.commit()
+    return counts

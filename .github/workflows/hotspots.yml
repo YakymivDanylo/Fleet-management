@@ -1,0 +1,57 @@
+# Lab 7: complexity x churn "Hotspots" report. Runs on every push and pull request,
+# inside a Docker container, and publishes the machine-readable reports as a build artifact.
+name: Hotspots
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: hotspots-${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  hotspots:
+    name: Complexity x Churn matrix
+    runs-on: ubuntu-latest
+    # The scan runs in a container; the full python image ships git, which the churn step needs.
+    container:
+      image: python:3.13
+    steps:
+      - name: Checkout (full history for churn)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Allow git to read the mounted workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install complexity scanner
+        run: pip install radon==6.0.1
+
+      - name: Complexity scan of the whole repository (JSON)
+        run: |
+          mkdir -p hotspots-report
+          radon cc . -j --exclude ".venv/*,node_modules/*,alembic/*" > hotspots-report/complexity.json
+          radon hal . -j --exclude ".venv/*,node_modules/*,alembic/*" > hotspots-report/halstead.json
+
+      - name: Churn rate, last 90 days (git log)
+        run: |
+          git log --since="90 days ago" --format=format: --name-only \
+            | grep -Ev '^$' | sort | uniq -c | sort -nr | tee hotspots-report/churn-90d.txt
+
+      - name: Build the Hotspots matrix
+        run: |
+          python scripts/hotspots.py --radon-json hotspots-report/complexity.json \
+            --out-dir hotspots-report | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hotspots-report
+          path: hotspots-report/
+          if-no-files-found: error

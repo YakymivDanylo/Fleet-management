@@ -41,6 +41,15 @@ class Settings(BaseSettings):
     redis_retry_base_delay_ms: int = 50
     redis_retry_max_delay_ms: int = 400
 
+    # Lab 7: read-through cache for the public list endpoints (/stations, /vehicles).
+    # The TTL is a safety net; writes invalidate the keys immediately.
+    list_cache_enabled: bool = True
+    list_cache_ttl_seconds: int = 30
+
+    # Lab 7: Argon2 runs in a small dedicated thread pool instead of on the event loop.
+    # Each hash needs ~64 MiB, so the pool size also caps memory; 0 = old inline behaviour.
+    password_hash_workers: int = 1
+
     jwt_secret_key: str | None = None
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
