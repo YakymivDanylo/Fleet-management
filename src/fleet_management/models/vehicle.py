@@ -1,7 +1,7 @@
 import enum
 
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, Index, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..database import Base
@@ -15,6 +15,8 @@ class VehicleStatus(enum.StrEnum):
 
 class Vehicle(Base):
     __tablename__ = "vehicles"
+    # Lab 7: station occupancy check (station_id + status != rented) on every rental return.
+    __table_args__ = (Index("ix_vehicles_station_id_status", "station_id", "status"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     license_plate: Mapped[str] = mapped_column(String(20), unique=True, index=True)
