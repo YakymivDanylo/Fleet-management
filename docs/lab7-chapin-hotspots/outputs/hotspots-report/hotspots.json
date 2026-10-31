@@ -1,0 +1,730 @@
+[
+  {
+    "file": "src/fleet_management/services/rental_service.py",
+    "total_cc": 32,
+    "max_cc": 4,
+    "churn": 8,
+    "category": "Hotspot",
+    "zone": "red"
+  },
+  {
+    "file": "scripts/seed_loadtest.py",
+    "total_cc": 32,
+    "max_cc": 9,
+    "churn": 6,
+    "category": "Hotspot",
+    "zone": "red"
+  },
+  {
+    "file": "src/fleet_management/config.py",
+    "total_cc": 14,
+    "max_cc": 4,
+    "churn": 11,
+    "category": "Active",
+    "zone": "green"
+  },
+  {
+    "file": "tests/integration/test_auth_api.py",
+    "total_cc": 65,
+    "max_cc": 6,
+    "churn": 2,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "scripts/halstead_tokens.py",
+    "total_cc": 48,
+    "max_cc": 7,
+    "churn": 2,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/schemas.py",
+    "total_cc": 15,
+    "max_cc": 1,
+    "churn": 6,
+    "category": "Active",
+    "zone": "green"
+  },
+  {
+    "file": "src/fleet_management/main.py",
+    "total_cc": 7,
+    "max_cc": 4,
+    "churn": 12,
+    "category": "Active",
+    "zone": "green"
+  },
+  {
+    "file": "src/fleet_management/api/rentals.py",
+    "total_cc": 15,
+    "max_cc": 4,
+    "churn": 5,
+    "category": "Active",
+    "zone": "green"
+  },
+  {
+    "file": "loadtest/report.py",
+    "total_cc": 72,
+    "max_cc": 28,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/integration/test_privacy_export.py",
+    "total_cc": 72,
+    "max_cc": 20,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/integration/test_privacy_consent.py",
+    "total_cc": 63,
+    "max_cc": 10,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_rental_service.py",
+    "total_cc": 14,
+    "max_cc": 2,
+    "churn": 4,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_vehicle_state_service.py",
+    "total_cc": 52,
+    "max_cc": 13,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/services/vehicle_state_service.py",
+    "total_cc": 26,
+    "max_cc": 9,
+    "churn": 2,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/integration/test_privacy_erasure.py",
+    "total_cc": 48,
+    "max_cc": 10,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/integration/test_api.py",
+    "total_cc": 43,
+    "max_cc": 7,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_privacy_logging.py",
+    "total_cc": 43,
+    "max_cc": 7,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/privacy/logging_setup.py",
+    "total_cc": 41,
+    "max_cc": 10,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_resilience.py",
+    "total_cc": 41,
+    "max_cc": 6,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/telemetry/worker.py",
+    "total_cc": 13,
+    "max_cc": 5,
+    "churn": 3,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/integration/test_fleet_positions_api.py",
+    "total_cc": 36,
+    "max_cc": 11,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/exceptions.py",
+    "total_cc": 9,
+    "max_cc": 2,
+    "churn": 4,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/stability_test.py",
+    "total_cc": 34,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_error_handling.py",
+    "total_cc": 34,
+    "max_cc": 7,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/services/marketing_service.py",
+    "total_cc": 17,
+    "max_cc": 3,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/resilience.py",
+    "total_cc": 16,
+    "max_cc": 4,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/services/user_service.py",
+    "total_cc": 8,
+    "max_cc": 4,
+    "churn": 4,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/seed_demo.py",
+    "total_cc": 31,
+    "max_cc": 6,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/services/consent_service.py",
+    "total_cc": 31,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "src/fleet_management/telemetry/simulator.py",
+    "total_cc": 30,
+    "max_cc": 6,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/integration/test_telemetry_worker.py",
+    "total_cc": 29,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_discount_equivalence.py",
+    "total_cc": 28,
+    "max_cc": 24,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_telemetry_simulator.py",
+    "total_cc": 28,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_config.py",
+    "total_cc": 27,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Sleeping",
+    "zone": "yellow"
+  },
+  {
+    "file": "tests/unit/test_marketing_dispatch_mutation.py",
+    "total_cc": 13,
+    "max_cc": 4,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/privacy/sanitizer.py",
+    "total_cc": 24,
+    "max_cc": 9,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/schemas_privacy.py",
+    "total_cc": 23,
+    "max_cc": 2,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/integration/test_me_api.py",
+    "total_cc": 22,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/metrics_probe.py",
+    "total_cc": 21,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/secrets_trap.py",
+    "total_cc": 21,
+    "max_cc": 8,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/integration/test_vehicle_state_api.py",
+    "total_cc": 21,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/hotspots.py",
+    "total_cc": 20,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/integration/privacy_support.py",
+    "total_cc": 20,
+    "max_cc": 7,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_info_endpoints.py",
+    "total_cc": 10,
+    "max_cc": 3,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_goodhart_rentals.py",
+    "total_cc": 18,
+    "max_cc": 8,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/vehicles.py",
+    "total_cc": 6,
+    "max_cc": 2,
+    "churn": 3,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/fault.py",
+    "total_cc": 16,
+    "max_cc": 8,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/cache.py",
+    "total_cc": 8,
+    "max_cc": 2,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/complexity_gate.py",
+    "total_cc": 15,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/privacy.py",
+    "total_cc": 15,
+    "max_cc": 2,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_complexity_gate.py",
+    "total_cc": 15,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_rental_eligibility_characterization.py",
+    "total_cc": 15,
+    "max_cc": 11,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/auth.py",
+    "total_cc": 5,
+    "max_cc": 3,
+    "churn": 3,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_security.py",
+    "total_cc": 14,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/security.py",
+    "total_cc": 7,
+    "max_cc": 2,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/services/export_service.py",
+    "total_cc": 12,
+    "max_cc": 7,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_web_ui.py",
+    "total_cc": 12,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/privacy.py",
+    "total_cc": 11,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/quality_gate.py",
+    "total_cc": 10,
+    "max_cc": 6,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/services/erasure_service.py",
+    "total_cc": 10,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/auth.py",
+    "total_cc": 5,
+    "max_cc": 4,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/cfg_cc.py",
+    "total_cc": 9,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/docker_stats.py",
+    "total_cc": 9,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_hotspots.py",
+    "total_cc": 9,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/unit/test_telemetry_schema.py",
+    "total_cc": 9,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/privacy_log_demo.py",
+    "total_cc": 8,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/home.py",
+    "total_cc": 4,
+    "max_cc": 2,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/services/station_service.py",
+    "total_cc": 4,
+    "max_cc": 2,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "tests/integration/conftest.py",
+    "total_cc": 4,
+    "max_cc": 1,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/reliability_test.py",
+    "total_cc": 7,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/check_analyzable.py",
+    "total_cc": 6,
+    "max_cc": 6,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/lb_check.py",
+    "total_cc": 6,
+    "max_cc": 4,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/cli.py",
+    "total_cc": 6,
+    "max_cc": 5,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/me.py",
+    "total_cc": 6,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/privacy/correlation.py",
+    "total_cc": 6,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/privacy/middleware.py",
+    "total_cc": 6,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/telemetry/processor.py",
+    "total_cc": 6,
+    "max_cc": 3,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/user.py",
+    "total_cc": 2,
+    "max_cc": 1,
+    "churn": 3,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "scripts/goodhart_trap.py",
+    "total_cc": 4,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/renters.py",
+    "total_cc": 4,
+    "max_cc": 2,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/stations.py",
+    "total_cc": 4,
+    "max_cc": 2,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/services/audit_service.py",
+    "total_cc": 4,
+    "max_cc": 2,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/api/admin.py",
+    "total_cc": 2,
+    "max_cc": 1,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/database.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 3,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/rental.py",
+    "total_cc": 2,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/vehicle.py",
+    "total_cc": 2,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/renter.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 2,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/station.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/models/telemetry.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/telemetry/schemas.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  },
+  {
+    "file": "src/fleet_management/web/__init__.py",
+    "total_cc": 1,
+    "max_cc": 1,
+    "churn": 1,
+    "category": "Stable",
+    "zone": "grey"
+  }
+]
