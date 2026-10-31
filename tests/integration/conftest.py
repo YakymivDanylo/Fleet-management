@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from fleet_management import models  # noqa: F401  (registers tables in Base.metadata)
+from fleet_management.cache import get_redis
 from fleet_management.database import Base, get_db
 from fleet_management.main import app
 
@@ -36,12 +37,14 @@ async def redis_client():
 
 
 @pytest.fixture
-async def client(session_factory):
+async def client(session_factory, redis_client):
     async def override_get_db():
         async with session_factory() as session:
             yield session
 
     app.dependency_overrides[get_db] = override_get_db
+    # The list endpoints are cached in Redis; a per-test (flushed) client keeps tests isolated.
+    app.dependency_overrides[get_redis] = lambda: redis_client
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as http_client:
         yield http_client
