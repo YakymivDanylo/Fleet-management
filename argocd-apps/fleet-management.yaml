@@ -19,5 +19,10 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    # The Rollout kind exists only after the argo-rollouts controller (CRDs) is installed;
+    # retry until it appears instead of staying in SyncFailed.
+    retry:
+      limit: 5
+      backoff: {duration: 10s, factor: 2, maxDuration: 3m}
     syncOptions:
       - CreateNamespace=true

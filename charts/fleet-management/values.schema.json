@@ -4,6 +4,13 @@
   "properties": {
     "replicaCount": { "type": "integer", "minimum": 0 },
     "progressDeadlineSeconds": { "type": "integer", "minimum": 1 },
+    "rollout": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "strategy": { "type": "object" }
+      }
+    },
     "existingSecret": { "type": "string" },
     "image": {
       "type": "object",

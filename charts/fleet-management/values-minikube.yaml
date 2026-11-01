@@ -1,7 +1,21 @@
 # Minikube environment deployed by Argo CD (Application argocd-apps/fleet-management.yaml).
 # The only thing that changes on a release is the image tag - Argo CD picks it up from Git.
 # No secrets here: the Secret "fleet-secret" is created by hand once (see docs/lab5-gitops/DEMO.md).
-replicaCount: 2
+replicaCount: 5
+
+# Progressive delivery with Argo Rollouts (lab 6): canary, 5 replicas -> 20% = 1 pod, 60% = 3, 80% = 4.
+# Rollout starts only when the pod template changes (image tag), not when replicas/strategy change.
+rollout:
+  enabled: true
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {}               # manual gate: wait for `kubectl argo rollouts promote`
+        - setWeight: 60
+        - pause: {duration: 30s}
+        - setWeight: 80
+        - pause: {duration: 30s}
 
 # A broken image tag turns the app Degraded after 120 s instead of the default 10 min (demo, lab step 6b)
 progressDeadlineSeconds: 120
