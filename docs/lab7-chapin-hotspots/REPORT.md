@@ -85,6 +85,8 @@ FAILED ...::test_one_batch_shares_one_immutable_processed_at
 
 Коміт: `feat(audit): simulate data mutation issue, FAIL`.
 
+> **Скріншот (додати):** термінал із `pytest tests/unit/test_marketing_dispatch_mutation.py` на коміті `f6e21cb` — `2 failed`.
+
 ### 2.2 Архітектурний рефакторинг — коміт `33a71b7`
 
 **Імутабельність.** Рішення ухвалюються *першими* і лише створюють значення; рядки БД змінюються в єдиному місці (`DispatchOutcome.apply`) *після* того, як усі вердикти вже існують. Акумулятор `counts` зник: підсумок обчислюється з кортежу вердиктів. Колекція вердиктів — `tuple`, а не `list`.
@@ -93,9 +95,9 @@ FAILED ...::test_one_batch_shares_one_immutable_processed_at
 
 **Порівняння «до / після»:**
 
-| ДО (мутабельний цикл) | ПІСЛЯ (імутабельні вердикти) |
-|---|---|
-| ```python
+**ДО (мутабельний цикл):**
+
+```python
 counts = {"sent": 0, "skipped": 0}
 for message in queued:
     decision = await ConsentPolicyGate.check(
@@ -105,13 +107,17 @@ for message in queued:
     counts["sent" if decision.allowed else "skipped"] += 1
 await db.commit()
 return counts
-``` | ```python
+```
+
+**ПІСЛЯ (імутабельні вердикти):**
+
+```python
 outcomes = await _decide_queue(db, datetime.now(UTC))
 for outcome in outcomes:
     outcome.apply()
 await db.commit()
 return _summary(outcomes)
-``` |
+```
 
 Повний новий код — [`marketing_service.py`](../../src/fleet_management/services/marketing_service.py); diff — [`outputs/05-diff-fail-to-pass.diff`](outputs/05-diff-fail-to-pass.diff).
 
@@ -119,11 +125,11 @@ return _summary(outcomes)
 
 Метод `dispatch_pending_marketing`:
 
-| Змінна | Клас | Обґрунтування | Вага |
-|---|---|---|---:|
-| `db` | **T** | Лише прокидається в `_decide_queue` і `commit` | 0.5 |
-| `outcomes` | **P** | Незмінний кортеж: читається в циклі й передається в `_summary` | 1 |
-| `outcome` | **P** | Змінна циклу, лише читається (`apply()` не перез'єднує змінну) | 1 |
+| Змінна | Тип даних | Клас | Обґрунтування | Вага |
+|---|---|---|---|---:|
+| `db` | `AsyncSession` | **T** | Лише прокидається в `_decide_queue` і `commit` | 0.5 |
+| `outcomes` | `tuple[DispatchOutcome, ...]` | **P** | Незмінний кортеж: читається в циклі й передається в `_summary` | 1 |
+| `outcome` | `DispatchOutcome` (frozen) | **P** | Змінна циклу, лише читається (`apply()` не перез'єднує змінну) | 1 |
 
 ```
 C_ch = 1·2 + 2·0 + 3·0 + 0.5·1 = 2 + 0.5 = 2.5
@@ -152,6 +158,8 @@ C_ch = 1·2 + 2·0 + 3·0 + 0.5·1 = 2 + 0.5 = 2.5
 * Увесь юніт-набір: `1306 passed` на момент коміту. Інтеграційні тести (`test_privacy_consent.py`, `test_api.py`) перевірено проти тимчасових Postgres 16 і Redis 7 у Docker: `23 passed`, включно з реальним `dispatch`.
 * CC після: `dispatch_pending_marketing` = 2 (було 4) — [`outputs/04-pass-radon-cc.txt`](outputs/04-pass-radon-cc.txt); `xenon --max-absolute B src` і `complexipy` (≤ 15) проходять.
 
+> **Скріншот (додати):** той самий `pytest` на коміті `33a71b7` — `4 passed` (статус GREEN/PASS).
+
 ### 2.5 Git History
 
 ```
@@ -161,7 +169,8 @@ C_ch = 1·2 + 2·0 + 3·0 + 0.5·1 = 2 + 0.5 = 2.5
 *   abba681 (main) Merge pull request #30 from YakymivDanylo/demo/reset
 ```
 
-Дерево: [`outputs/09-git-graph.txt`](outputs/09-git-graph.txt). Скріншот для захисту — `git log --graph --oneline`.
+Дерево: [`outputs/09-git-graph.txt`](outputs/09-git-graph.txt). 
+> **Скріншот (додати):** `git log --graph --oneline` із переходом FAIL → PASS.
 
 ---
 
@@ -209,6 +218,8 @@ jobs:
 ```
 
 (У файлі в репозиторії додатково є `concurrency`, `permissions: contents: read` та коментарі.) Вимоги лаби: встановлення сканера на кожен push/PR ✔, скан усього репозиторію в JSON ✔, збереження як Build Artifact ✔, виконання в Docker-контейнері ✔. Логіку матриці винесено в [`scripts/hotspots.py`](../../scripts/hotspots.py) (стандартна бібліотека, 4 юніт-тести в `tests/unit/test_hotspots.py`). Синтаксис YAML перевірено парсером; **у хмарі запущено успішно:** [Actions run #41337613006](https://github.com/YakymivDanylo/Fleet-management/actions/runs/41337613006) — job `Complexity x Churn matrix` ✓ (27 с), артефакт `hotspots-report`.
+
+> **Скріншот (додати):** сторінка запуску в Actions (зелений job `Complexity x Churn matrix`, розділ Artifacts → `hotspots-report`).
 
 ### 3.2 Лог метрик процесу (Churn Rate, 90 днів)
 
