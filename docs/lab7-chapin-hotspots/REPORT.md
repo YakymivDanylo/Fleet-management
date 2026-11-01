@@ -208,7 +208,7 @@ jobs:
           if-no-files-found: error
 ```
 
-(У файлі в репозиторії додатково є `concurrency`, `permissions: contents: read` та коментарі.) Вимоги лаби: встановлення сканера на кожен push/PR ✔, скан усього репозиторію в JSON ✔, збереження як Build Artifact ✔, виконання в Docker-контейнері ✔. Логіку матриці винесено в [`scripts/hotspots.py`](../../scripts/hotspots.py) (стандартна бібліотека, 4 юніт-тести в `tests/unit/test_hotspots.py`). Синтаксис YAML перевірено парсером; **у хмарі ще не запускалось** (див. примітку нагорі).
+(У файлі в репозиторії додатково є `concurrency`, `permissions: contents: read` та коментарі.) Вимоги лаби: встановлення сканера на кожен push/PR ✔, скан усього репозиторію в JSON ✔, збереження як Build Artifact ✔, виконання в Docker-контейнері ✔. Логіку матриці винесено в [`scripts/hotspots.py`](../../scripts/hotspots.py) (стандартна бібліотека, 4 юніт-тести в `tests/unit/test_hotspots.py`). Синтаксис YAML перевірено парсером; **у хмарі запущено успішно:** [Actions run #41337613006](https://github.com/YakymivDanylo/Fleet-management/actions/runs/41337613006) — job `Complexity x Churn matrix` ✓ (27 с), артефакт `hotspots-report`.
 
 ### 3.2 Лог метрик процесу (Churn Rate, 90 днів)
 

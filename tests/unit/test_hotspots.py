@@ -1,6 +1,7 @@
 """Lab 7: the Hotspots matrix classifies files on the complexity x churn quadrant."""
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -51,6 +52,7 @@ def test_build_matrix_ranks_by_complexity_times_churn():
     ]
 
 
+@pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
 def test_read_churn_counts_commits_per_file_from_git_log(tmp_path, monkeypatch):
     def git(*args):
         subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
