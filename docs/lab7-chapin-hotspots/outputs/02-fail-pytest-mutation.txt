@@ -1,0 +1,63 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_gate_failure_midway_must_not_leave_phantom_sent_messages ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013DB1844640>
+
+    async def test_gate_failure_midway_must_not_leave_phantom_sent_messages(monkeypatch):
+        """Gate answers ALLOW for message 1, then crashes on message 2.
+    
+        Nothing was committed, so message 1 must still be QUEUED. The mutable loop has
+        already overwritten its status to SENT: a phantom "sent" mail that was never sent.
+        """
+        first, second = _message(1), _message(2)
+        gate = AsyncMock(side_effect=[ALLOW, RuntimeError("consent store unavailable")])
+        monkeypatch.setattr(ConsentPolicyGate, "check", gate)
+        db = _session(first, second)
+    
+        with pytest.raises(RuntimeError):
+            await marketing_service.dispatch_pending_marketing(db)
+    
+        db.commit.assert_not_awaited()
+>       assert first.status == MarketingStatus.QUEUED, "message 1 was mutated to SENT before commit"
+E       AssertionError: message 1 was mutated to SENT before commit
+E       assert <MarketingStatus.SENT: 'SENT'> == <MarketingSta...UED: 'QUEUED'>
+E         
+E         - QUEUED
+E         + SENT
+
+tests\unit\test_marketing_dispatch_mutation.py:49: AssertionError
+______________ test_one_batch_shares_one_immutable_processed_at _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013DB1895EB0>
+
+    async def test_one_batch_shares_one_immutable_processed_at(monkeypatch):
+        """Every message of one dispatch run must carry the same processed_at instant.
+    
+        The mutable loop re-reads the clock for each row, so the audit trail of a single run
+        drifts: rows of one batch claim different processing times.
+        """
+        ticks = iter(datetime(2026, 1, 1, tzinfo=UTC) + timedelta(seconds=n) for n in range(10))
+    
+        class TickingClock:
+            @staticmethod
+            def now(_tz=None):
+                return next(ticks)
+    
+        monkeypatch.setattr(marketing_service, "datetime", TickingClock)
+        monkeypatch.setattr(ConsentPolicyGate, "check", AsyncMock(side_effect=[ALLOW, DENY, ALLOW]))
+        messages = [_message(1), _message(2), _message(3)]
+    
+        counts = await marketing_service.dispatch_pending_marketing(_session(*messages))
+    
+        assert counts == {"sent": 2, "skipped": 1}
+>       assert len({m.processed_at for m in messages}) == 1, "processed_at drifted inside one batch"
+E       AssertionError: processed_at drifted inside one batch
+E       assert 3 == 1
+E        +  where 3 = len({datetime.datetime(2026, 1, 1, 0, 0, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 1, 1, 0, 0, 1, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 1, 1, 0, 0, 2, tzinfo=datetime.timezone.utc)})
+
+tests\unit\test_marketing_dispatch_mutation.py:73: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/unit/test_marketing_dispatch_mutation.py::test_gate_failure_midway_must_not_leave_phantom_sent_messages
+FAILED tests/unit/test_marketing_dispatch_mutation.py::test_one_batch_shares_one_immutable_processed_at
+2 failed in 0.96s

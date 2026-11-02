@@ -1,0 +1,14 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\dryak\Uni\Web_Python\.venv\Scripts\python.exe
+rootdir: C:\Users\dryak\Uni\Web_Python
+configfile: pyproject.toml
+plugins: anyio-4.15.0, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+tests/unit/test_marketing_dispatch_mutation.py::test_gate_failure_midway_must_not_leave_phantom_sent_messages PASSED [ 25%]
+tests/unit/test_marketing_dispatch_mutation.py::test_one_batch_shares_one_immutable_processed_at PASSED [ 50%]
+tests/unit/test_marketing_dispatch_mutation.py::test_outcome_is_an_immutable_value_object[True-SENT] PASSED [ 75%]
+tests/unit/test_marketing_dispatch_mutation.py::test_outcome_is_an_immutable_value_object[False-SKIPPED] PASSED [100%]
+
+============================== 4 passed in 0.51s ==============================

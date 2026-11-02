@@ -1,0 +1,9 @@
+* 06d90c6 (HEAD -> feat/lab7-chapin-hotspots) feat(infra): add hotspots workflow (radon JSON x git churn matrix)
+* 33a71b7 refactor(audit): reduce Chapin complexity using immutable Value Objects, PASS
+* f6e21cb feat(audit): simulate data mutation issue, FAIL
+*   abba681 (origin/main, origin/HEAD, main, feat/lab7-performance-optimization) Merge pull request #30 from YakymivDanylo/demo/reset
+|\  
+| * 44b2735 (origin/demo/reset, demo/reset) test lab 5
+|/  
+*   cead727 Merge pull request #29 from YakymivDanylo/docs/lab5-gitops-report
+|\  

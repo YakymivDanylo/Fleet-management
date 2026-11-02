@@ -1,0 +1,11 @@
+src/fleet_management/services/marketing_service.py
+    C 61:0 DispatchOutcome - A (3)
+    F 21:0 _require_consent - A (2)
+    F 88:0 _decide_queue - A (2)
+    F 101:0 _summary - A (2)
+    F 106:0 dispatch_pending_marketing - A (2)
+    M 73:4 DispatchOutcome.status - A (2)
+    F 38:0 enqueue_marketing_email - A (1)
+    F 49:0 record_analytics_event - A (1)
+    F 81:0 _verdict - A (1)
+    M 76:4 DispatchOutcome.apply - A (1)
