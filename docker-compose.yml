@@ -90,6 +90,9 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       RESILIENCE_ENABLED: ${RESILIENCE_ENABLED:-true}
+      # Lab 7 optimisations; switch one off to measure the other on its own.
+      LIST_CACHE_ENABLED: ${LIST_CACHE_ENABLED:-true}
+      PASSWORD_HASH_WORKERS: ${PASSWORD_HASH_WORKERS:-1}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in the env file}
     # backend is internal, so the replicas are reachable only from nginx and other services.
     networks: [backend]

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..exceptions import EmailAlreadyRegisteredError
 from ..models import User, UserRole
-from ..security import hash_password, verify_password
+from ..security import hash_password, hash_password_async, verify_password_async
 
 _DUMMY_PASSWORD_HASH = hash_password("dummy-password-for-timing")
 
@@ -28,7 +28,7 @@ async def create_user(
 ) -> User:
     user = User(
         email=normalize_email(email),
-        hashed_password=hash_password(password),
+        hashed_password=await hash_password_async(password),
         full_name=full_name,
         phone=phone,
         role=role,
@@ -46,8 +46,8 @@ async def create_user(
 async def authenticate(db: AsyncSession, email: str, password: str) -> User | None:
     user = await get_user_by_email(db, email)
     if user is None:
-        verify_password(password, _DUMMY_PASSWORD_HASH)
+        await verify_password_async(password, _DUMMY_PASSWORD_HASH)
         return None
-    if not verify_password(password, user.hashed_password) or not user.is_active:
+    if not await verify_password_async(password, user.hashed_password) or not user.is_active:
         return None
     return user

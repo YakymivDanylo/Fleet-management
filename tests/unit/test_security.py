@@ -66,3 +66,27 @@ def test_token_without_subject_is_rejected():
 
     with pytest.raises(InvalidTokenError):
         decode_access_token(token)
+
+
+async def test_async_hashing_round_trips_and_keeps_the_event_loop_responsive():
+    import asyncio
+
+    from fleet_management.security import hash_password_async, verify_password_async
+
+    ticks = 0
+
+    async def ticker():
+        nonlocal ticks
+        while True:
+            await asyncio.sleep(0.005)
+            ticks += 1
+
+    task = asyncio.create_task(ticker())
+    hashed = await hash_password_async("s3cret-pass")
+    verified = await verify_password_async("s3cret-pass", hashed)
+    rejected = await verify_password_async("wrong-pass", hashed)
+    task.cancel()
+
+    assert verified and not rejected
+    # Argon2 takes tens of ms; if it ran on the loop the ticker could not have ticked.
+    assert ticks >= 3

@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, Index
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -16,6 +16,8 @@ class RentalStatus(enum.StrEnum):
 
 class Rental(Base):
     __tablename__ = "rentals"
+    # Lab 7: GET /me/rentals filters by renter and sorts by newest first.
+    __table_args__ = (Index("ix_rentals_renter_id_started_at", "renter_id", "started_at"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     renter_id: Mapped[int] = mapped_column(ForeignKey("renters.id"))
