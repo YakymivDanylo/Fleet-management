@@ -10,6 +10,12 @@ replicaCount: 2
 # Seconds a rollout may stay stuck before the Deployment is reported as failed (Argo CD: Degraded)
 progressDeadlineSeconds: 600
 
+# Progressive delivery (Argo Rollouts). false -> a plain Deployment with RollingUpdate;
+# true -> the API is a Rollout (Deployment is not rendered) and `strategy` is passed to it as is.
+rollout:
+  enabled: false
+  strategy: {}
+
 image:
   repository: fleet-management-api
   tag: "1.0.0"            # empty -> Chart.appVersion
