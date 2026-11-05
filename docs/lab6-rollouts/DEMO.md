@@ -76,7 +76,9 @@ kubectl -n fleet run curl --rm -it --image=curlimages/curl -- sh -c 'while true;
 
 ```powershell
 git checkout -b demo/release-1.2.0
-(Get-Content charts/fleet-management/values-minikube.yaml) -replace '(?m)^(  tag: )"1.0.0"','$1"1.2.0"' | Set-Content charts/fleet-management/values-minikube.yaml
+$f = "charts/fleet-management/values-minikube.yaml"
+$t = [IO.File]::ReadAllText($f) -replace '(?m)^(  tag: )"1.0.0"','$1"1.2.0"'
+[IO.File]::WriteAllText($f, $t)
 git diff                                     # лише тег API (worker має свій тег глибше)
 git commit -am "chore(infra): release api 1.2.0"
 git push -u origin demo/release-1.2.0
