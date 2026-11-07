@@ -18,13 +18,16 @@ rollout:
       steps:
         - setWeight: 20
         - pause: {duration: 30s}          # let the metrics of the new pod accumulate
+        - analysis:
+            templates:
+              - templateName: fleet-management-success-rate
         - setWeight: 60
         - pause: {duration: 30s}
 
 # Extra env of the API pods. FAIL_RATE = share of requests answered with 500 (bad release demo).
 env:
   - name: FAIL_RATE
-    value: "0.5"
+    value: "0"
 
 # Lab 7: ServiceMonitor + Grafana dashboard (ConfigMap) + PrometheusRule alert
 metrics:
