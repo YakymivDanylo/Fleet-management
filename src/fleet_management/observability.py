@@ -4,7 +4,7 @@ Labels are low-cardinality on purpose: the *route template* (``/vehicles/{vehicl
 never the raw path, so ids cannot blow up the number of time series.
 """
 
-import random
+import secrets
 import time
 
 from fastapi import HTTPException, Request
@@ -15,6 +15,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 # Probes and the scrape itself would drown real traffic and must never be failed on purpose.
 SKIPPED_PATHS = frozenset({"/metrics", "/health", "/livez"})
 UNKNOWN_ROUTE = "unknown"
+_RNG = secrets.SystemRandom()  # not a security decision; avoids a predictable PRNG
 
 REQUESTS = Counter("http_requests_total", "HTTP requests", ["method", "route", "status"])
 LATENCY = Histogram("http_request_duration_seconds", "HTTP request latency", ["route"])
@@ -67,7 +68,7 @@ def failure_injector(fail_rate: float):
 
     async def inject_failure(request: Request) -> None:
         if fail_rate > 0 and request.url.path not in SKIPPED_PATHS:
-            if random.random() < fail_rate:  # noqa: S311 - not a security decision
+            if _RNG.random() < fail_rate:
                 raise HTTPException(status_code=500, detail="injected failure")
 
     return inject_failure
