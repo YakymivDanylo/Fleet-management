@@ -1,0 +1,24 @@
+{{- if and .Values.rollout.enabled .Values.rollout.analysis.enabled }}
+{{- $a := .Values.rollout.analysis }}
+{{- $sel := $a.selector }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "fleet.fullname" . }}-success-rate
+  labels:
+    {{- include "fleet.labels" (dict "root" . "component" "api") | nindent 4 }}
+spec:
+  metrics:
+    - name: success-rate
+      interval: {{ $a.interval }}
+      count: {{ $a.count }}
+      failureLimit: {{ $a.failureLimit }}
+      successCondition: result[0] >= {{ $a.successThreshold }}
+      provider:
+        prometheus:
+          address: {{ $a.prometheusAddress }}
+          query: |
+            sum(rate(http_requests_total{ {{- $sel -}},status!~"5.."}[1m]))
+            /
+            sum(rate(http_requests_total{ {{- $sel -}} }[1m]))
+{{- end }}

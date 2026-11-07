@@ -15,6 +15,37 @@ progressDeadlineSeconds: 600
 rollout:
   enabled: false
   strategy: {}
+  # Lab 7: AnalysisTemplate "<fullname>-success-rate" asks Prometheus for the share of non-5xx
+  # requests (threshold 95 %). A canary `analysis` step (or blue-green prePromotionAnalysis)
+  # references it by name; a failed run aborts the rollout automatically.
+  analysis:
+    enabled: false
+    prometheusAddress: http://kps-prometheus.monitoring:9090
+    selector: 'namespace="fleet"'   # label filter of the PromQL query
+    successThreshold: 0.95
+    interval: 30s
+    count: 4
+    failureLimit: 1
+
+# Extra environment variables of the API container (e.g. FAIL_RATE - share of requests answered
+# with 500, simulates a bad release; lab 7 step 6).
+env: []
+# stdout log format of the API: json (machine-readable, for Loki) | text
+logFormat: json
+
+# ---- Observability (Lab 7) ----
+# metrics.enabled renders a ServiceMonitor (Prometheus scrapes GET <path> from the API Service)
+# and a ConfigMap with the Grafana dashboard (picked up by the Grafana sidecar by its label).
+metrics:
+  enabled: false
+  path: /metrics
+  interval: 15s
+
+# PrometheusRule: alert when more than `threshold` of the responses are 5xx for `for`.
+alerts:
+  enabled: false
+  threshold: 0.05
+  for: 1m
 
 image:
   repository: fleet-management-api
