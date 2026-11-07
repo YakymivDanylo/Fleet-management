@@ -1,0 +1,21 @@
+{{- if and .Values.metrics.enabled .Values.alerts.enabled }}
+{{- $ctx := dict "root" . "component" "api" }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "fleet.componentName" $ctx }}-alerts
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+spec:
+  groups:
+    - name: fleet-management
+      rules:
+        - alert: FleetHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{namespace="{{ .Release.Namespace }}",status=~"5.."}[1m]))
+            / sum(rate(http_requests_total{namespace="{{ .Release.Namespace }}"}[1m])) > {{ .Values.alerts.threshold }}
+          for: {{ .Values.alerts.for }}
+          labels: {severity: warning}
+          annotations:
+            summary: "fleet-management: more than {{ mulf .Values.alerts.threshold 100 }}% of responses are 5xx"
+{{- end }}

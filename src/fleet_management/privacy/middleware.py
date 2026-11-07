@@ -41,11 +41,22 @@ class CorrelationIdMiddleware:
         try:
             await self.app(scope, receive, send_with_header)
         finally:
-            logger.info(
+            duration_ms = (time.perf_counter() - started) * 1000
+            app_state = getattr(scope.get("app"), "state", None)
+            logger.log(
+                logging.ERROR if status_code >= 500 else logging.INFO,
                 "http_request method=%s path=%s status=%s duration_ms=%.1f",
                 scope["method"],
                 scope["path"],
                 status_code,
-                (time.perf_counter() - started) * 1000,
+                duration_ms,
+                # Structured fields: with LOG_FORMAT=json they become keys of the JSON line.
+                extra={
+                    "method": scope["method"],
+                    "route": getattr(scope.get("route"), "path", "unknown"),
+                    "status": status_code,
+                    "duration_ms": round(duration_ms, 1),
+                    "version": getattr(getattr(app_state, "settings", None), "app_version", "dev"),
+                },
             )
             correlation_id_var.reset(token)

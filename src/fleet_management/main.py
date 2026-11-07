@@ -20,6 +20,7 @@ from .exceptions import (
     StationFullError,
     VehicleNotAvailableError,
 )
+from .observability import MetricsMiddleware, failure_injector, metrics_endpoint
 from .privacy import configure_logging
 from .privacy.middleware import CorrelationIdMiddleware
 from .web import mount_ui
@@ -96,6 +97,8 @@ def _register_service_routes(app: FastAPI) -> None:
     async def liveness_check():
         return {"status": "alive"}
 
+    app.add_api_route("/metrics", metrics_endpoint, methods=["GET"], include_in_schema=False)
+
     @app.get("/info")
     async def app_info():
         return {
@@ -125,9 +128,11 @@ def create_app(cfg: Settings = settings) -> FastAPI:
         docs_url="/docs" if docs_enabled else None,
         redoc_url="/redoc" if docs_enabled else None,
         openapi_url="/openapi.json" if docs_enabled else None,
+        dependencies=[Depends(failure_injector(cfg.fail_rate))],
     )
     app.state.settings = cfg
     app.add_middleware(CorrelationIdMiddleware)
+    app.add_middleware(MetricsMiddleware)  # outermost: also counts what the other layers do
     app.include_router(api_router)
     _register_error_handlers(app)
     _register_service_routes(app)

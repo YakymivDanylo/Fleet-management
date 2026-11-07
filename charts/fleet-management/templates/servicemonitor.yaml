@@ -1,0 +1,17 @@
+{{- if .Values.metrics.enabled }}
+{{- $ctx := dict "root" . "component" "api" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "fleet.componentName" $ctx }}
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "fleet.selectorLabels" $ctx | nindent 6 }}
+  endpoints:
+    - port: http          # named port of the API Service
+      path: {{ .Values.metrics.path }}
+      interval: {{ .Values.metrics.interval }}
+{{- end }}

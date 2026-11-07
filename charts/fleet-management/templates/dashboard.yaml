@@ -1,0 +1,13 @@
+{{- if .Values.metrics.enabled }}
+{{- $ctx := dict "root" . "component" "dashboard" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fleet.componentName" $ctx }}
+  labels:
+    {{- include "fleet.labels" $ctx | nindent 4 }}
+    grafana_dashboard: "1"      # the Grafana sidecar loads every ConfigMap with this label
+data:
+  fleet-management.json: |-
+{{ .Files.Get "dashboards/fleet-management.json" | indent 4 }}
+{{- end }}

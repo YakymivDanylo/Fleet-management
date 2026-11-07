@@ -1,0 +1,55 @@
+# Lab 7: Prometheus + Alertmanager + Grafana (kube-prometheus-stack), installed from Git.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kps          # release name; with fullnameOverride the Services are kps-prometheus, kps-grafana ...
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 93.0.0 # helm search repo prometheus-community/kube-prometheus-stack
+    helm:
+      valuesObject:
+        fullnameOverride: kps
+        # control-plane components of minikube are not reachable for scraping - disabled to avoid noise
+        kubeEtcd: {enabled: false}
+        kubeControllerManager: {enabled: false}
+        kubeScheduler: {enabled: false}
+        kubeProxy: {enabled: false}
+        # fewer moving parts: no admission webhook and its TLS jobs
+        prometheusOperator:
+          admissionWebhooks: {enabled: false}
+          tls: {enabled: false}
+        prometheus:
+          prometheusSpec:
+            retention: 2d
+            # pick up ServiceMonitor / PodMonitor / PrometheusRule without the `release` label
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+        grafana:
+          admin:
+            existingSecret: grafana-admin     # created by hand, never stored in Git
+            userKey: admin-user
+            passwordKey: admin-password
+          sidecar:
+            dashboards:
+              searchNamespace: ALL            # load dashboard ConfigMaps from every namespace
+          additionalDataSources:
+            - name: Loki
+              uid: loki
+              type: loki
+              access: proxy
+              url: http://loki-gateway.monitoring
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated: {prune: true, selfHeal: true}
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true      # the CRDs of this chart are too big for client-side apply

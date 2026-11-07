@@ -41,6 +41,12 @@ spec:
           valueFrom: { secretKeyRef: { name: {{ include "fleet.secretName" . }}, key: JWT_SECRET_KEY } }
         - name: DATABASE_URL
           value: "postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@{{ include "fleet.postgresHost" . }}:5432/$(POSTGRES_DB)"
+        # One JSON object per line on stdout (parsed by LogQL `| json`)
+        - name: LOG_FORMAT
+          value: {{ .Values.logFormat | quote }}
+        {{- with .Values.env }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       resources:
         {{- toYaml .Values.resources | nindent 8 }}
       startupProbe:
