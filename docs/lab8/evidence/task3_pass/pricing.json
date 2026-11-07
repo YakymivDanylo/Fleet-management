@@ -1,0 +1,39 @@
+{
+  "BasePricing": {
+    "class_complexity": 14,
+    "coupling_between_objects": 1,
+    "lcom4": 2,
+    "lcom": 0.83,
+    "rfc": 18,
+    "dit": 1,
+    "public_interface_size": 13,
+    "overridden_methods": 0,
+    "new_methods": 13
+  }
+}
+{
+  "WeekendPricing": {
+    "class_complexity": 12,
+    "coupling_between_objects": 2,
+    "lcom4": 1,
+    "lcom": 0.69,
+    "rfc": 19,
+    "dit": 1,
+    "public_interface_size": 10,
+    "overridden_methods": 0,
+    "new_methods": 10
+  }
+}
+{
+  "CorporatePricing": {
+    "class_complexity": 10,
+    "coupling_between_objects": 1,
+    "lcom4": 1,
+    "lcom": 0.66,
+    "rfc": 14,
+    "dit": 1,
+    "public_interface_size": 9,
+    "overridden_methods": 0,
+    "new_methods": 9
+  }
+}

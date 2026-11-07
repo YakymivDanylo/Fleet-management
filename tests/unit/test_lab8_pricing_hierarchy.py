@@ -27,30 +27,30 @@ def test_base_quote_and_billable_hours():
 
 
 def test_weekend_rate_has_surcharge_and_lower_tax():
-    pricing = WeekendPricing()
+    pricing = WeekendPricing(BasePricing())
     assert pricing.subtotal(2, "car") == 12.0
     assert pricing.total(2, "car") == 13.8
 
 
 def test_weekend_helpers():
-    pricing = WeekendPricing()
+    pricing = WeekendPricing(BasePricing())
     saturday, monday = date(2026, 11, 7), date(2026, 11, 9)
     assert pricing.weekend_summary(saturday, 10.0) == "weekend: +2.00"
     assert pricing.weekend_label(monday) == "weekday"
 
 
 def test_weekend_quote():
-    assert WeekendPricing().quote(2, "car")["tariff"] == "Weekend tariff"
+    assert WeekendPricing(BasePricing()).quote(2, "car")["tariff"] == "Weekend tariff"
 
 
 def test_corporate_total_has_discount_no_tax_and_fee():
-    pricing = CorporatePricing("C-1")
+    pricing = CorporatePricing(WeekendPricing(BasePricing()), "C-1")
     assert pricing.subtotal(2, "car") == 10.8
     assert pricing.total(2, "car") == 12.0
 
 
 def test_corporate_quote_mentions_contract():
-    assert CorporatePricing("C-1").quote(2, "car") == {
+    assert CorporatePricing(WeekendPricing(BasePricing()), "C-1").quote(2, "car") == {
         "tariff": "Corporate Weekend tariff",
         "total": "12.00 EUR (contract C-1)",
         "contract": "C-1",
@@ -58,7 +58,20 @@ def test_corporate_quote_mentions_contract():
 
 
 def test_corporate_extras():
-    pricing = CorporatePricing("C-1")
+    pricing = CorporatePricing(WeekendPricing(BasePricing()), "C-1")
     assert pricing.corporate_discount(50.0) == 5.0
     assert pricing.invoice_header() == "Contract C-1 / net 30 days"
     assert pricing.contract_id() == "C-1"
+
+
+def test_airport_zone_is_forwarded_through_every_layer():
+    corporate = CorporatePricing(WeekendPricing(BasePricing()), "C-1")
+    assert BasePricing().subtotal(2, "car", "airport") == 15.0
+    assert WeekendPricing(BasePricing()).subtotal(2, "car", "airport") == 18.0
+    assert corporate.subtotal(2, "car", "airport") == 16.2
+
+
+def test_layers_do_not_inherit_from_each_other():
+    assert BasePricing.__mro__ == (BasePricing, object)
+    assert WeekendPricing.__mro__ == (WeekendPricing, object)
+    assert CorporatePricing.__mro__ == (CorporatePricing, object)

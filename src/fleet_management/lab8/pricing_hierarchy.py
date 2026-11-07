@@ -1,4 +1,4 @@
-"""Baseline design: three-level tariff hierarchy (Base -> Weekend -> Corporate pricing)."""
+"""Tariff layers combined by composition: Corporate -> Weekend -> Base (no inheritance)."""
 
 import math
 from datetime import date
@@ -57,20 +57,34 @@ class BasePricing:
         }
 
 
-class WeekendPricing(BasePricing):
+class WeekendPricing:
     SURCHARGE = 0.2
+    MIN_CHARGE = 8.0
+    TAX_RATE = 0.15
 
-    def base_rate(self, vehicle_type: str) -> float:
-        return super().base_rate(vehicle_type) * (1 + self.SURCHARGE)
+    def __init__(self, base: BasePricing):
+        self._base = base
 
-    def min_charge(self) -> float:
-        return 8.0
+    def subtotal(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        rate = self._base.base_rate(vehicle_type, zone) * (1 + self.SURCHARGE)
+        return max(self._base.validate_hours(hours) * rate, self.MIN_CHARGE)
 
     def tax(self, amount: float) -> float:
-        return amount * 0.15
+        return amount * self.TAX_RATE
+
+    def total(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        subtotal = self.subtotal(hours, vehicle_type, zone)
+        return self._base.round_amount(self._base.apply_fee(subtotal + self.tax(subtotal)))
+
+    def format_price(self, amount: float) -> str:
+        return self._base.format_price(amount)
 
     def describe(self) -> str:
         return "Weekend tariff"
+
+    def quote(self, hours: float, vehicle_type: str, zone: str = "city") -> dict[str, str]:
+        total = self.total(hours, vehicle_type, zone)
+        return {"tariff": self.describe(), "total": self.format_price(total)}
 
     def weekend_surcharge(self, amount: float) -> float:
         return round(amount * self.SURCHARGE, 2)
@@ -85,33 +99,33 @@ class WeekendPricing(BasePricing):
         return f"{self.weekend_label(day)}: +{self.weekend_surcharge(amount):.2f}"
 
 
-class CorporatePricing(WeekendPricing):
+class CorporatePricing:
     DISCOUNT = 0.1
     ADMIN_FEE = 1.0
 
-    def __init__(self, contract: str):
+    def __init__(self, weekend: WeekendPricing, contract: str):
+        self._weekend = weekend
         self._contract = contract
 
-    def subtotal(self, hours: float, vehicle_type: str) -> float:
-        return round(super().subtotal(hours, vehicle_type) * (1 - self.DISCOUNT), 4)
+    def subtotal(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        return round(self._weekend.subtotal(hours, vehicle_type, zone) * (1 - self.DISCOUNT), 4)
 
-    def tax(self, amount: float) -> float:
-        return 0.0
-
-    def apply_fee(self, amount: float) -> float:
-        return amount + self.ADMIN_FEE
-
-    def round_amount(self, amount: float) -> float:
-        return round(amount * 2) / 2
+    def total(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        return round((self.subtotal(hours, vehicle_type, zone) + self.ADMIN_FEE) * 2) / 2
 
     def format_price(self, amount: float) -> str:
-        return f"{super().format_price(amount)} (contract {self._contract})"
+        return f"{self._weekend.format_price(amount)} (contract {self._contract})"
 
     def describe(self) -> str:
-        return f"Corporate {super().describe()}"
+        return f"Corporate {self._weekend.describe()}"
 
-    def quote(self, hours: float, vehicle_type: str) -> dict[str, str]:
-        return {**super().quote(hours, vehicle_type), "contract": self._contract}
+    def quote(self, hours: float, vehicle_type: str, zone: str = "city") -> dict[str, str]:
+        total = self.total(hours, vehicle_type, zone)
+        return {
+            "tariff": self.describe(),
+            "total": self.format_price(total),
+            "contract": self._contract,
+        }
 
     def corporate_discount(self, amount: float) -> float:
         return round(amount * self.DISCOUNT, 2)
