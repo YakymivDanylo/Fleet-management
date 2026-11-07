@@ -40,17 +40,28 @@ class RenterDirectory:
         return self._renters[renter_id]
 
 
-class RentalStore:
-    def __init__(self):
+class Clock:
+    def now(self) -> datetime:
+        return datetime.now(UTC).replace(tzinfo=None)
+
+
+class RentalStore:  # implements LedgerPort
+    def __init__(self, clock: Clock):
+        self._clock = clock
         self._rentals: dict[int, RentalRecord] = {}
         self._next_id = 1
 
-    def next_id(self) -> int:
-        rental_id, self._next_id = self._next_id, self._next_id + 1
-        return rental_id
-
-    def add(self, rental: RentalRecord) -> None:
+    def open(self, renter_id: int, vehicle_id: int, station_id: int) -> RentalRecord:
+        rental = RentalRecord(self._next_id, renter_id, vehicle_id, station_id, self._clock.now())
+        self._next_id += 1
         self._rentals[rental.id] = rental
+        return rental
+
+    def close(self, rental_id: int, station_id: int) -> RentalRecord:
+        rental = self.get(rental_id)
+        rental.ended_at = self._clock.now()
+        rental.end_station_id = station_id
+        return rental
 
     def get(self, rental_id: int) -> RentalRecord:
         if rental_id not in self._rentals:
@@ -59,6 +70,9 @@ class RentalStore:
 
     def all(self) -> list[RentalRecord]:
         return list(self._rentals.values())
+
+    def for_renter(self, renter_id: int) -> list[RentalRecord]:
+        return [r for r in self._rentals.values() if r.renter_id == renter_id]
 
 
 class Mailer:
@@ -75,8 +89,3 @@ class AuditLog:
 
     def record(self, event: str, **fields) -> None:
         self.events.append((event, fields))
-
-
-class Clock:
-    def now(self) -> datetime:
-        return datetime.now(UTC).replace(tzinfo=None)

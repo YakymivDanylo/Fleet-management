@@ -45,6 +45,7 @@ IGNORED_NAMES = frozenset(
         "RuntimeError", "NotImplementedError", "annotations", "Any", "Optional", "Callable",
         "Self", "ClassVar", "Final", "Literal", "TypeVar", "Generic", "Protocol", "Iterable",
         "Iterator", "Sequence", "Mapping", "frozenset", "getattr", "setattr", "hasattr",
+        "dataclass",
     }
 )  # fmt: skip
 
@@ -197,15 +198,26 @@ class Project:
             and n.value.id == "self"
         }
 
-    def _cohesion_methods(self, info: ClassInfo) -> dict[str, set[str]]:
+    @staticmethod
+    def _propagate(usage: dict[str, set[str]], calls: dict[str, set[str]]) -> None:
+        for _ in range(len(usage)):  # propagate through (possibly nested) self-calls
+            for name, callees in calls.items():
+                for callee in callees:
+                    usage[name] |= usage[callee]
+
+    def _direct_usage(self, info: ClassInfo) -> tuple[dict, dict]:
         names = set(info.methods)
-        result = {}
-        for name, fn in info.methods.items():
-            if name.startswith("__"):
-                continue
-            attrs = self._self_attrs(fn)
-            result[name] = {a for a in attrs if a not in names} | {f"(){a}" for a in attrs & names}
-        return result
+        direct = {n: self._self_attrs(fn) for n, fn in info.methods.items()}
+        usage = {n: attrs - names for n, attrs in direct.items()}
+        calls = {n: attrs & names for n, attrs in direct.items()}
+        return usage, calls
+
+    def _cohesion_methods(self, info: ClassInfo) -> dict[str, set[str]]:
+        """Attributes touched by each method; calling ``self.other()`` inherits other's attrs."""
+        usage, calls = self._direct_usage(info)
+        self._propagate(usage, calls)
+        public = [n for n in info.methods if not n.startswith("__")]
+        return {n: usage[n] | {f"(){c}" for c in calls[n]} for n in public}
 
     @staticmethod
     def _linked(usage: dict[str, set[str]], a: str, b: str) -> bool:
@@ -236,7 +248,7 @@ class Project:
         if m <= 1 or a == 0:
             return 0.0
         mean_access = sum(sum(1 for used in usage.values() if attr in used) for attr in attrs) / a
-        return round((mean_access - m) / (1 - m), 2)
+        return round((mean_access - m) / (1 - m), 2) + 0.0
 
     def lorenz_kidd(self, info: ClassInfo) -> tuple[int, int, int]:
         inherited = set()

@@ -4,7 +4,17 @@ RATES = {"car": 5.0, "premium": 9.0, "electric": 7.0}
 ZONE_FACTOR = {"city": 1.0, "airport": 1.5}
 
 
+class FineCalculator:
+    FINE_PER_HOUR = 3.0
+
+    def late_fee(self, hours_over: int) -> float:
+        return round(max(hours_over, 0) * self.FINE_PER_HOUR, 2)
+
+
 class TariffCalculator:
+    def late_fee(self, hours_over: int) -> float:
+        return FineCalculator().late_fee(hours_over)
+
     def price(self, hours: int, vehicle_type: str, zone: str) -> float:
         rate = RATES.get(vehicle_type, RATES["car"]) * ZONE_FACTOR[zone]
         return round(max(hours, 1) * rate, 2)
@@ -18,10 +28,3 @@ class TariffCalculator:
     @staticmethod
     def billable_hours(seconds: float) -> int:
         return max(math.ceil(seconds / 3600), 1)
-
-
-class FineCalculator:
-    FINE_PER_HOUR = 3.0
-
-    def late_fee(self, hours_over: int) -> float:
-        return round(max(hours_over, 0) * self.FINE_PER_HOUR, 2)
