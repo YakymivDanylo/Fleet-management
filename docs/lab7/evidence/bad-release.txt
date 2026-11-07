@@ -1,0 +1,76 @@
+## rollout
+Name:            fleet-management-api
+Namespace:       fleet
+Status:          ✖ Degraded
+Message:         RolloutAborted: Rollout aborted update to revision 8: Step-based analysis phase error/failed: Metric "success-rate" assessed Failed due to failed (2) > failureLimit (1)
+Strategy:        Canary
+  Step:          0/5
+  SetWeight:     0
+  ActualWeight:  0
+Images:          ghcr.io/yakymivdanylo/fleet-management-api:1.5.0 (stable)
+Replicas:
+  Desired:       5
+  Current:       5
+  Updated:       0
+  Ready:         5
+  Available:     5
+
+NAME                                              KIND         STATUS        AGE    INFO
+⟳ fleet-management-api                            Rollout      ✖ Degraded    2d22h  
+├──# revision:8                                                                     
+│  ├──⧉ fleet-management-api-5f6f6c48fc           ReplicaSet   • ScaledDown  113s   canary
+│  └──α fleet-management-api-5f6f6c48fc-8-2       AnalysisRun  ✖ Failed      77s    ✔ 1,✖ 2
+├──# revision:7                                                                     
+│  ├──⧉ fleet-management-api-5798f4648d           ReplicaSet   ✔ Healthy     16m    stable
+│  │  ├──□ fleet-management-api-5798f4648d-4pd24  Pod          ✔ Running     5m56s  ready:1/1
+│  │  ├──□ fleet-management-api-5798f4648d-rflrg  Pod          ✔ Running     3m49s  ready:1/1
+│  │  ├──□ fleet-management-api-5798f4648d-nmhv6  Pod          ✔ Running     3m11s  ready:1/1
+│  │  ├──□ fleet-management-api-5798f4648d-tpm2d  Pod          ✔ Running     3m11s  ready:1/1
+│  │  └──□ fleet-management-api-5798f4648d-4ftrc  Pod          ✔ Running     17s    ready:1/1
+│  ├──α fleet-management-api-5798f4648d-7-2       AnalysisRun  ⚠ Error       15m    ⚠ 5
+│  └──α fleet-management-api-5798f4648d-7-2.1     AnalysisRun  ✔ Successful  5m19s  ✔ 4
+├──# revision:6                                                                     
+│  └──⧉ fleet-management-api-59bfc766cc           ReplicaSet   • ScaledDown  20m    
+├──# revision:5                                                                     
+│  └──⧉ fleet-management-api-6bd69bc89            ReplicaSet   • ScaledDown  2d22h  
+└──# revision:4                                                                     
+   └──⧉ fleet-management-api-84c595767d           ReplicaSet   • ScaledDown  2d22h  
+
+## analysisrun
+fleet-management-api-5798f4648d-7-2     Error        15m
+fleet-management-api-5798f4648d-7-2.1   Successful   5m19s
+fleet-management-api-5f6f6c48fc-8-2     Failed       77s
+Status:
+  Completed At:  2026-11-07T18:42:19Z
+  Dry Run Summary:
+  Message:  Metric "success-rate" assessed Failed due to failed (2) > failureLimit (1)
+  Metric Results:
+    Count:   3
+    Failed:  2
+    Measurements:
+      Finished At:  2026-11-07T18:41:19Z
+      Phase:        Successful
+      Started At:   2026-11-07T18:41:19Z
+      Value:        [0.9684430654350901]
+      Finished At:  2026-11-07T18:41:49Z
+      Phase:        Failed
+      Started At:   2026-11-07T18:41:49Z
+      Value:        [0.9205968380817252]
+      Finished At:  2026-11-07T18:42:19Z
+      Phase:        Failed
+      Started At:   2026-11-07T18:42:19Z
+      Value:        [0.9133368172517639]
+    Metadata:
+      Resolved Prometheus Query:  sum(rate(http_requests_total{namespace="fleet",status!~"5.."}[1m]))
+/
+sum(rate(http_requests_total{namespace="fleet"}[1m]))
+
+    Name:        success-rate
+    Phase:       Failed
+    Successful:  1
+  Phase:         Failed
+  Run Summary:
+    Count:     1
+    Failed:    1
+  Started At:  2026-11-07T18:41:19Z
+Events:
