@@ -4,6 +4,7 @@ import math
 from datetime import date
 
 RATES = {"car": 5.0, "premium": 9.0, "electric": 7.0}
+ZONE_FACTOR = {"city": 1.0, "airport": 1.5}
 
 
 class BasePricing:
@@ -17,14 +18,14 @@ class BasePricing:
             raise ValueError("hours must be positive")
         return hours
 
-    def base_rate(self, vehicle_type: str) -> float:
-        return RATES.get(vehicle_type, RATES["car"])
+    def base_rate(self, vehicle_type: str, zone: str) -> float:
+        return RATES.get(vehicle_type, RATES["car"]) * ZONE_FACTOR[zone]
 
     def min_charge(self) -> float:
         return 5.0
 
-    def subtotal(self, hours: float, vehicle_type: str) -> float:
-        raw = self.validate_hours(hours) * self.base_rate(vehicle_type)
+    def subtotal(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        raw = self.validate_hours(hours) * self.base_rate(vehicle_type, zone)
         return max(raw, self.min_charge())
 
     def tax(self, amount: float) -> float:
@@ -36,8 +37,8 @@ class BasePricing:
     def round_amount(self, amount: float) -> float:
         return round(amount, 2)
 
-    def total(self, hours: float, vehicle_type: str) -> float:
-        subtotal = self.subtotal(hours, vehicle_type)
+    def total(self, hours: float, vehicle_type: str, zone: str = "city") -> float:
+        subtotal = self.subtotal(hours, vehicle_type, zone)
         return self.round_amount(self.apply_fee(subtotal + self.tax(subtotal)))
 
     def currency(self) -> str:

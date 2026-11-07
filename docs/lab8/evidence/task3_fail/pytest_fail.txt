@@ -1,0 +1,16 @@
+....F.FFF.                                                               [100%]
+================================== FAILURES ===================================
+E   TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\pricing_hierarchy.py:28: TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+E   TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\pricing_hierarchy.py:28: TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+E   TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\pricing_hierarchy.py:28: TypeError: WeekendPricing.base_rate() takes 2 positional arguments but 3 were given
+E   TypeError: CorporatePricing.subtotal() takes 3 positional arguments but 4 were given
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\pricing_hierarchy.py:41: TypeError: CorporatePricing.subtotal() takes 3 positional arguments but 4 were given
+=========================== short test summary info ===========================
+FAILED tests/unit/test_lab8_pricing_hierarchy.py::test_weekend_rate_has_surcharge_and_lower_tax
+FAILED tests/unit/test_lab8_pricing_hierarchy.py::test_weekend_quote - TypeEr...
+FAILED tests/unit/test_lab8_pricing_hierarchy.py::test_corporate_total_has_discount_no_tax_and_fee
+FAILED tests/unit/test_lab8_pricing_hierarchy.py::test_corporate_quote_mentions_contract
+4 failed, 6 passed in 0.03s
