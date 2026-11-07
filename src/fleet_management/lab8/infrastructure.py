@@ -9,7 +9,8 @@ class StationRegistry:
         self._capacity = dict(capacity)
         self._docked: dict[int, int] = {station: 0 for station in capacity}
 
-    def has_free_slot(self, station_id: int) -> bool:
+    def has_free_slot(self, station_id: int, vehicle_type: str) -> bool:
+        """A slot is free for the given vehicle type (per-type slot policy, e.g. EV chargers)."""
         return self._docked[station_id] < self._capacity[station_id]
 
     def dock(self, station_id: int) -> None:

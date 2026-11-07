@@ -1,11 +1,13 @@
 import math
 
 RATES = {"car": 5.0, "premium": 9.0, "electric": 7.0}
+ZONE_FACTOR = {"city": 1.0, "airport": 1.5}
 
 
 class TariffCalculator:
-    def price(self, hours: int, vehicle_type: str) -> float:
-        return round(max(hours, 1) * RATES.get(vehicle_type, RATES["car"]), 2)
+    def price(self, hours: int, vehicle_type: str, zone: str) -> float:
+        rate = RATES.get(vehicle_type, RATES["car"]) * ZONE_FACTOR[zone]
+        return round(max(hours, 1) * rate, 2)
 
     def discount(self, subtotal: float, rental_count: int, has_coupon: bool, is_vip: bool) -> float:
         percent = 10 if is_vip else 0
