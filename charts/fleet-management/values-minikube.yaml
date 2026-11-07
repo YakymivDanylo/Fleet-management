@@ -3,19 +3,37 @@
 # No secrets here: the Secret "fleet-secret" is created by hand once (see docs/lab5-gitops/DEMO.md).
 replicaCount: 5
 
-# Progressive delivery with Argo Rollouts (lab 6): canary, 5 replicas -> 20% = 1 pod, 60% = 3, 80% = 4.
-# Rollout starts only when the pod template changes (image tag), not when replicas/strategy change.
+# Progressive delivery with Argo Rollouts (lab 6) + automatic rollback by metrics (lab 7).
+# Canary, 5 replicas -> 20% = 1 pod, 60% = 3. The manual gate is replaced by an `analysis` step:
+# AnalysisTemplate "fleet-management-success-rate" asks Prometheus for the share of non-5xx
+# requests; < 95 % -> AnalysisRun Failed -> automatic abort, traffic returns to the stable version.
 rollout:
   enabled: true
+  analysis:
+    enabled: true
+    prometheusAddress: http://kps-prometheus.monitoring:9090
+    selector: 'namespace="fleet"'
   strategy:
     canary:
       steps:
         - setWeight: 20
-        - pause: {}               # manual gate: wait for `kubectl argo rollouts promote`
+        - pause: {duration: 30s}          # let the metrics of the new pod accumulate
+        - analysis:
+            templates:
+              - templateName: fleet-management-success-rate
         - setWeight: 60
         - pause: {duration: 30s}
-        - setWeight: 80
-        - pause: {duration: 30s}
+
+# Extra env of the API pods. FAIL_RATE = share of requests answered with 500 (bad release demo).
+env:
+  - name: FAIL_RATE
+    value: "0"
+
+# Lab 7: ServiceMonitor + Grafana dashboard (ConfigMap) + PrometheusRule alert
+metrics:
+  enabled: true
+alerts:
+  enabled: true
 
 # A broken image tag turns the app Degraded after 120 s instead of the default 10 min (demo, lab step 6b)
 progressDeadlineSeconds: 120
@@ -25,7 +43,7 @@ existingSecret: fleet-secret
 
 image:
   repository: ghcr.io/yakymivdanylo/fleet-management-api
-  tag: "1.3.0"
+  tag: "1.5.0"
   pullPolicy: IfNotPresent
 
 worker:
