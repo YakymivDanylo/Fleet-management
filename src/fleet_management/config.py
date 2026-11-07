@@ -1,7 +1,7 @@
 import os
 from typing import Literal, Self
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     # Lab 7: Argon2 runs in a small dedicated thread pool instead of on the event loop.
     # Each hash needs ~64 MiB, so the pool size also caps memory; 0 = old inline behaviour.
     password_hash_workers: int = 1
+
+    # Lab 7: share of requests answered with HTTP 500 (0..1) - simulates a bad release.
+    fail_rate: float = Field(default=0.0, ge=0.0, le=1.0)
 
     jwt_secret_key: str | None = None
     jwt_algorithm: str = "HS256"
