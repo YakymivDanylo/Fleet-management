@@ -1,4 +1,0 @@
-## Prometheus alert
-FleetHighErrorRate firing {'summary': 'fleet-management: more than 5% of responses are 5xx'} 3.786677085586284e-01
-## 5xx share
-0.4087086681472056
