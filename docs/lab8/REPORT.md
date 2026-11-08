@@ -17,8 +17,6 @@ LCOM = Henderson-Sellers LCOM* ∈ [0,1] (0 — ідеал), LCOM4 = число 
 
 ## Завдання 1 — базова лінія (ЛР№6: Core / Infrastructure / DTO)
 
-Запити (еквівалент curl, `scripts/sonar_api.py <path>` друкує їх перед виконанням):
-
 ```
 python scripts/ck_metrics.py component src/fleet_management/services/rental_service.py
 python scripts/ck_metrics.py component src/fleet_management/resilience.py
