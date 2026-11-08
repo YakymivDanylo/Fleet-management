@@ -73,6 +73,20 @@ Rollout: `Degraded`, "RolloutAborted ... assessed Failed due to failed (2) > fai
 5xx зникли, алерт згас). Точніше рішення - аналізувати лише canary через `rollouts-pod-template-hash`
 (необов'язкова частина лаби, не реалізована).
 
+## Скріншоти
+Знято під час повторного прогону (час на скріншотах - локальний, UTC+2): фонове навантаження, збільшення трафіку
+(`load` 1 -> 3 репліки, ~100 req/s), поганий реліз `FAIL_RATE=0.5` о 09:21, автоматичний abort о 09:23, `git revert`.
+
+1. Дашборд під навантаженням і під час поганого релізу - сплеск частки 5xx, помилки лише з одного пода нового
+   ReplicaSet (`5f6f6c48fc-...`), CPU/пам'ять подів, логи помилок з Loki:
+   ![dashboard](screenshots/01-dashboard-full.png)
+2. Grafana Explore, Loki: `{namespace="fleet"} | json | status >= 500` (725 рядків, JSON-поля method/route/status/version):
+   ![loki](screenshots/02-loki-explore-5xx.png)
+3. Prometheus -> Targets (цілі застосунку UP):
+   ![targets](screenshots/03-prometheus-targets.png)
+4. PromQL: `sum by (pod) (rate(http_requests_total{namespace="fleet",status=~"5.."}[1m]))`:
+   ![promql](screenshots/04-prometheus-5xx-by-pod.png)
+
 ## Керування середовищем
 * minikube не перестворювався: ліміт пам'яті наявного контейнера піднято до 8 ГБ (`docker update --memory 8g
   --memory-swap 8g minikube`), 4 CPU.
