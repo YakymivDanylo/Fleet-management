@@ -1,0 +1,4 @@
+ Container fleet_sandbox-k6-run-f0d539300f68 Creating 
+ Container fleet_sandbox-k6-run-f0d539300f68 Created 
+
+summary saved to /scripts/results/lab8/soak_summary.json

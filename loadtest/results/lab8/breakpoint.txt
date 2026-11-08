@@ -1,0 +1,6 @@
+ Container fleet_sandbox-k6-run-0f74880a5c3e Creating 
+ Container fleet_sandbox-k6-run-0f74880a5c3e Created 
+
+summary saved to /scripts/results/lab8/breakpoint_summary.json
+time="2026-11-08T07:48:37Z" level=error msg="thresholds on metrics 'http_req_duration{phase:load}' have been crossed"
+

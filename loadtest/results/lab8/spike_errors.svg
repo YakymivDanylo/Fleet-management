@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" font-family="sans-serif" font-size="12">
+<rect width="900" height="380" fill="white"/>
+<text x="450.0" y="22" text-anchor="middle" font-size="15" font-weight="bold">Error rate (%)</text>
+<line x1="70" y1="330.0" x2="830" y2="330.0" stroke="#e5e7eb"/>
+<text x="64" y="334.0" text-anchor="end">0</text>
+<line x1="70" y1="272.0" x2="830" y2="272.0" stroke="#e5e7eb"/>
+<text x="64" y="276.0" text-anchor="end">17</text>
+<line x1="70" y1="214.0" x2="830" y2="214.0" stroke="#e5e7eb"/>
+<text x="64" y="218.0" text-anchor="end">33</text>
+<line x1="70" y1="156.0" x2="830" y2="156.0" stroke="#e5e7eb"/>
+<text x="64" y="160.0" text-anchor="end">50</text>
+<line x1="70" y1="98.0" x2="830" y2="98.0" stroke="#e5e7eb"/>
+<text x="64" y="102.0" text-anchor="end">66</text>
+<line x1="70" y1="40.0" x2="830" y2="40.0" stroke="#e5e7eb"/>
+<text x="64" y="44.0" text-anchor="end">83</text>
+<text x="70.0" y="348" text-anchor="middle">0</text>
+<text x="196.66666666666669" y="348" text-anchor="middle">1</text>
+<text x="323.33333333333337" y="348" text-anchor="middle">3</text>
+<text x="450.0" y="348" text-anchor="middle">4</text>
+<text x="576.6666666666667" y="348" text-anchor="middle">5</text>
+<text x="703.3333333333334" y="348" text-anchor="middle">7</text>
+<text x="830.0" y="348" text-anchor="middle">8</text>
+<text x="450.0" y="370" text-anchor="middle">minutes</text>
+<text transform="translate(16 185.0) rotate(-90)" text-anchor="middle">%</text>
+<polyline points="93.8,330.0 117.5,330.0 141.2,330.0 165.0,330.0 188.8,330.0 212.5,330.0 236.2,330.0 260.0,330.0 283.8,330.0 307.5,330.0 331.2,330.0 355.0,328.0 378.8,93.7 402.5,72.5 426.2,104.6 450.0,286.4 473.8,85.7 497.5,66.4 521.2,141.4 545.0,330.0 568.8,330.0 592.5,330.0 616.2,330.0 640.0,330.0 663.8,330.0 687.5,330.0 711.2,330.0 735.0,330.0 758.8,330.0 782.5,330.0 806.2,330.0 830.0,330.0" fill="none" stroke="#2563eb" stroke-width="2"/>
+<line x1="80" y1="48" x2="104" y2="48" stroke="#2563eb" stroke-width="2"/><text x="110" y="52">failed requests</text>
+</svg>
