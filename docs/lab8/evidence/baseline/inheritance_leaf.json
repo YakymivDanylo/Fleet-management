@@ -1,0 +1,13 @@
+{
+  "CorporatePricing": {
+    "class_complexity": 12,
+    "coupling_between_objects": 1,
+    "lcom4": 6,
+    "lcom": 0.87,
+    "rfc": 18,
+    "dit": 3,
+    "public_interface_size": 21,
+    "overridden_methods": 7,
+    "new_methods": 4
+  }
+}

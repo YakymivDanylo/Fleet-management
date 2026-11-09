@@ -1,0 +1,52 @@
+{
+  "RentalLifecycleService": {
+    "class_complexity": 5,
+    "coupling_between_objects": 8,
+    "lcom4": 1,
+    "lcom": 0.2,
+    "rfc": 14,
+    "dit": 1,
+    "public_interface_size": 2,
+    "overridden_methods": 0,
+    "new_methods": 2
+  }
+}
+{
+  "BillingService": {
+    "class_complexity": 5,
+    "coupling_between_objects": 5,
+    "lcom4": 1,
+    "lcom": 0.0,
+    "rfc": 13,
+    "dit": 1,
+    "public_interface_size": 3,
+    "overridden_methods": 0,
+    "new_methods": 4
+  }
+}
+{
+  "NotificationService": {
+    "class_complexity": 5,
+    "coupling_between_objects": 4,
+    "lcom4": 1,
+    "lcom": 0.0,
+    "rfc": 6,
+    "dit": 1,
+    "public_interface_size": 3,
+    "overridden_methods": 0,
+    "new_methods": 3
+  }
+}
+{
+  "ReportingService": {
+    "class_complexity": 10,
+    "coupling_between_objects": 6,
+    "lcom4": 1,
+    "lcom": 0.12,
+    "rfc": 13,
+    "dit": 1,
+    "public_interface_size": 2,
+    "overridden_methods": 0,
+    "new_methods": 3
+  }
+}

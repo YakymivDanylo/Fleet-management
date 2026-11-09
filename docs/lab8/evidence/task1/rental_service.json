@@ -1,0 +1,51 @@
+{
+  "component": {
+    "key": "fleet-management:src/fleet_management/services/rental_service.py",
+    "path": "src/fleet_management/services/rental_service.py",
+    "qualifier": "FIL",
+    "measures": [
+      {
+        "metric": "class_complexity",
+        "value": "28"
+      },
+      {
+        "metric": "coupling_between_objects",
+        "value": "14"
+      },
+      {
+        "metric": "lcom4",
+        "value": "10"
+      },
+      {
+        "metric": "lcom",
+        "value": "0.86"
+      },
+      {
+        "metric": "rfc",
+        "value": "34"
+      },
+      {
+        "metric": "dit",
+        "value": "1"
+      },
+      {
+        "metric": "public_interface_size",
+        "value": "5"
+      },
+      {
+        "metric": "overridden_methods",
+        "value": "0"
+      },
+      {
+        "metric": "new_methods",
+        "value": "10"
+      }
+    ],
+    "classes": [
+      "DiscountContext",
+      "RentalEligibilityContext",
+      "<module rental_service>"
+    ]
+  },
+  "source": "scripts/ck_metrics.py (AST analyser; values are max over classes, WMC is a sum)"
+}

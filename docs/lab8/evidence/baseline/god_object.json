@@ -1,0 +1,13 @@
+{
+  "RentalManager": {
+    "class_complexity": 23,
+    "coupling_between_objects": 16,
+    "lcom4": 1,
+    "lcom": 0.59,
+    "rfc": 49,
+    "dit": 1,
+    "public_interface_size": 11,
+    "overridden_methods": 0,
+    "new_methods": 11
+  }
+}
