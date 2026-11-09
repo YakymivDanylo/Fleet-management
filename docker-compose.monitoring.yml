@@ -1,0 +1,44 @@
+# Lab 8: real-time monitoring for the soak test (Prometheus + Grafana + docker exporter).
+#   docker compose -p fleet_sandbox --env-file .env.sandbox \
+#     -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+# Prometheus scrapes the three API replicas (/metrics), the host-side docker exporter
+# (scripts/docker_exporter.py: container CPU/RAM) and
+# receives the k6 metrics through remote write, so one Grafana dashboard shows both sides.
+services:
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-remote-write-receiver
+    ports: ["9090:9090"]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    networks: [backend, edge]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+
+  grafana:
+    image: grafana/grafana:12.1.0
+    ports: ["3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks: [edge]
+    depends_on: [prometheus]
+
+  k6:
+    environment:
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_STATS: "p(95),p(99),avg,min,max"
+      K6_PROMETHEUS_RW_PUSH_INTERVAL: 5s
+    depends_on:
+      prometheus:
+        condition: service_started
+
+volumes:
+  promdata:

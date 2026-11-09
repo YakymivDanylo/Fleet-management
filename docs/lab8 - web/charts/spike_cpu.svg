@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" font-family="sans-serif" font-size="12">
+<rect width="900" height="380" fill="white"/>
+<text x="450.0" y="22" text-anchor="middle" font-size="15" font-weight="bold">CPU of API replicas (% of 2-CPU quota)</text>
+<line x1="70" y1="330.0" x2="830" y2="330.0" stroke="#e5e7eb"/>
+<text x="64" y="334.0" text-anchor="end">0</text>
+<line x1="70" y1="272.0" x2="830" y2="272.0" stroke="#e5e7eb"/>
+<text x="64" y="276.0" text-anchor="end">23</text>
+<line x1="70" y1="214.0" x2="830" y2="214.0" stroke="#e5e7eb"/>
+<text x="64" y="218.0" text-anchor="end">46</text>
+<line x1="70" y1="156.0" x2="830" y2="156.0" stroke="#e5e7eb"/>
+<text x="64" y="160.0" text-anchor="end">69</text>
+<line x1="70" y1="98.0" x2="830" y2="98.0" stroke="#e5e7eb"/>
+<text x="64" y="102.0" text-anchor="end">91</text>
+<line x1="70" y1="40.0" x2="830" y2="40.0" stroke="#e5e7eb"/>
+<text x="64" y="44.0" text-anchor="end">114</text>
+<text x="70.0" y="348" text-anchor="middle">0</text>
+<text x="196.66666666666669" y="348" text-anchor="middle">1</text>
+<text x="323.33333333333337" y="348" text-anchor="middle">3</text>
+<text x="450.0" y="348" text-anchor="middle">4</text>
+<text x="576.6666666666667" y="348" text-anchor="middle">5</text>
+<text x="703.3333333333334" y="348" text-anchor="middle">7</text>
+<text x="830.0" y="348" text-anchor="middle">8</text>
+<text x="450.0" y="370" text-anchor="middle">minutes</text>
+<text transform="translate(16 185.0) rotate(-90)" text-anchor="middle">%</text>
+<polyline points="70.0,205.6 93.8,132.1 117.5,138.7 141.2,180.1 165.0,175.4 188.8,188.8 212.5,180.7 236.2,234.2 260.0,242.1 283.8,87.3 307.5,68.3 331.2,74.5 355.0,74.6 378.8,74.3 402.5,102.8 426.2,79.8 450.0,67.8 473.8,329.8 497.5,75.8 521.2,233.6 545.0,181.5 568.8,151.9 592.5,254.3 616.2,153.7 640.0,237.9 663.8,210.1 687.5,254.4 711.2,255.0 735.0,86.4 758.8,186.0 782.5,206.6 806.2,203.3 830.0,166.1" fill="none" stroke="#2563eb" stroke-width="2"/>
+<polyline points="70.0,220.7 93.8,276.9 117.5,251.9 141.2,204.7 165.0,204.6 188.8,254.7 212.5,217.3 236.2,272.7 260.0,251.4 283.8,87.5 307.5,68.3 331.2,77.4 355.0,69.8 378.8,76.1 402.5,104.1 426.2,71.0 450.0,75.6 473.8,70.1 497.5,285.5 521.2,104.9 545.0,277.3 568.8,280.8 592.5,248.7 616.2,253.9 640.0,77.5 663.8,222.0 687.5,226.4 711.2,256.7 735.0,249.0 758.8,253.6 782.5,241.6 806.2,277.9 830.0,231.8" fill="none" stroke="#dc2626" stroke-width="2"/>
+<polyline points="70.0,213.6 93.8,152.2 117.5,244.3 141.2,217.8 165.0,211.4 188.8,208.3 212.5,188.0 236.2,157.3 260.0,132.9 283.8,76.1 307.5,69.2 331.2,71.6 355.0,66.4 378.8,75.5 402.5,107.3 426.2,102.3 450.0,69.9 473.8,69.2 497.5,76.8 521.2,254.3 545.0,190.3 568.8,170.7 592.5,127.8 616.2,283.2 640.0,161.1 663.8,173.4 687.5,146.3 711.2,142.0 735.0,274.9 758.8,191.7 782.5,172.5 806.2,166.7 830.0,271.8" fill="none" stroke="#16a34a" stroke-width="2"/>
+<line x1="80" y1="48" x2="104" y2="48" stroke="#2563eb" stroke-width="2"/><text x="110" y="52">api1</text>
+<line x1="250" y1="48" x2="274" y2="48" stroke="#dc2626" stroke-width="2"/><text x="280" y="52">api2</text>
+<line x1="420" y1="48" x2="444" y2="48" stroke="#16a34a" stroke-width="2"/><text x="450" y="52">api3</text>
+</svg>
