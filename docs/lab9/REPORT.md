@@ -148,8 +148,9 @@ python scripts/financial_simulator.py docs/lab9/report.json
 [ledger] OK: financial ledger written to C:\Users\dryak\Uni\Web_Python\FINANCIAL_LEDGER.md
 ```
 
-(лог — `evidence/simulator_console.txt`; скріншот терміналу: `docs/lab9/screenshots/console.png` — зробити
-під час захисту тією ж командою.)
+Скріншот терміналу (окреме вікно PowerShell, той самий запуск; текстовий лог — `evidence/simulator_console.txt`):
+
+![Запуск фінансового симулятора](screenshots/console.png)
 
 ### 2.4 Згенерований артефакт `FINANCIAL_LEDGER.md` (корінь репозиторію)
 
@@ -223,7 +224,12 @@ Principal / CoD = (TDD · 0.5 · ncloc) / (ncloc / 100) = 50 · TDD  (місяц
 `GET|POST /user/password/`, `GET /user/api-tokens/`, `GET|POST /user/api-tokens/add/`,
 `…/{pk}/edit/`, `…/{pk}/delete/`.
 
-**Актори та прецеденти** — див. 3.3 та діаграму `docs/lab9/users_use_cases.drawio` (відкривається в draw.io).
+**Актори та прецеденти** — див. 3.3. UML Use Case діаграма: джерело `docs/lab9/users_use_cases.drawio`
+(відкривається в draw.io), експорт — `screenshots/users_use_cases.png` / `.svg`:
+
+![UML Use Case — netbox/users](screenshots/users_use_cases.png)
+
+Те саме у вигляді Mermaid:
 
 ```mermaid
 flowchart LR

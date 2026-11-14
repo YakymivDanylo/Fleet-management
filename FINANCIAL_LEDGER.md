@@ -1,6 +1,6 @@
 # SOFTWARE ECONOMICS & FINANCIAL QUALITY LEDGER
 
-> Згенеровано автоматично `scripts/financial_simulator.py` 2026-11-14 08:26 UTC
+> Згенеровано автоматично `scripts/financial_simulator.py` 2026-11-14 08:55 UTC
 > з файлу `docs/lab9/report.json`. Не редагувати вручну.
 
 ## 1. Вхідні параметри аудиту (System Baseline)
