@@ -53,6 +53,7 @@ DOCS: dict[str, tuple[list[str], bool]] = {
     ),  # noqa: E501
     "docs/architecture/adr/0002-gitops-argo-canary-delivery.md": (["charts", "argocd-apps"], False),
     "docs/maintenance.md": ([".github/workflows", "scripts/doc_audit.py"], False),
+    "docs/handover.md": (["src", "charts", "argocd-apps", ".github/workflows"], False),
     "charts/fleet-management/README.md": (["charts/fleet-management"], False),
     "CHANGELOG.md": (["src", "charts"], False),
     ".env.example": (["src/fleet_management/config.py", "docker-compose.yml"], False),

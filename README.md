@@ -45,8 +45,8 @@ docker compose -p fleet_sandbox --env-file .env.sandbox down        # додай
 2. **[SDD](docs/sdd.md)** — C4-діаграма контейнерів, відповідальність кожного компонента, модель даних, API.
 3. **[ISD](docs/isd.md)** — де що працює, змінні оточення, порядок старту, CI/CD-гейти, моніторинг, бекап.
 4. **[ADR](docs/architecture/adr/README.md)** — чому обрано PostgreSQL+Redis+RabbitMQ і GitOps/canary.
-5. **[Регламент документації](docs/maintenance.md)** — власники, цикли перегляду, правило «зміна коду = зміна
-   документації».
+5. **[Handover](docs/handover.md)** і **[регламент документації](docs/maintenance.md)** — власники, Bus Factor,
+   правило «зміна коду = зміна документації».
 
 ## Предметна область
 
@@ -128,6 +128,7 @@ SonarCloud і Trivy на кожен pull request і push у `main` — пере�
 | [docs/isd.md](docs/isd.md) | продукт, експлуатаційна | DevOps |
 | [docs/architecture/adr/](docs/architecture/adr/README.md) | продукт, архітектурна (рішення) | розробники, архітектор |
 | [docs/maintenance.md](docs/maintenance.md) | процес (регламент) | уся команда |
+| [docs/handover.md](docs/handover.md) | продукт, експлуатаційна (передача знань) | команда супроводу |
 | [charts/fleet-management/README.md](charts/fleet-management/README.md) | продукт, експлуатаційна | DevOps |
 | [CHANGELOG.md](CHANGELOG.md) | процес (історія змін) | бізнес, усі |
 | [docs/history/](docs/history/sonarqube-quality-gate-lab.md), [k8s/README.md](k8s/README.md) | deprecated | — |
