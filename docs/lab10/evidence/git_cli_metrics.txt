@@ -1,0 +1,47 @@
+$ git log -1 --format=%cs -- README.md
+2026-10-26
+$ git log -1 --format=%cs -- charts/fleet-management/README.md
+2026-10-26
+$ git log -1 --format=%cs -- CHANGELOG.md
+2026-11-07
+$ git log -1 --format=%cs -- .env.example
+2026-10-17
+$ git log -1 --format=%cs -- alembic/README
+2026-09-15
+$ git log -1 --format=%cs -- .github/workflows/ci.yml
+2026-10-26
+$ git log -1 --format=%cs -- docker-compose.yml
+2026-10-31
+$ git log -1 --format=%cs -- k8s/40-api-deployment.yaml
+2026-10-06
+$ git log -1 --format=%cs -- config/docker-compose.yml
+2026-10-10
+$ git log -1 --format=%cs -- sonar-project.properties
+2026-10-05
+$ git log --oneline -- src/fleet_management | wc -l
+47
+$ git log --oneline -- src/fleet_management/api | wc -l
+15
+$ git log --oneline -- src/fleet_management/services | wc -l
+21
+$ git log --oneline -- src/fleet_management/models | wc -l
+7
+$ git log --oneline -- src/fleet_management/telemetry | wc -l
+4
+$ git log --oneline -- charts | wc -l
+19
+$ git log --oneline -- k8s | wc -l
+3
+$ git log --oneline -- .github/workflows | wc -l
+15
+$ git log --oneline -- README.md | wc -l
+16
+$ git log --oneline 97069ce..HEAD -- src | wc -l   # code commits after last README update
+12
+$ git log --oneline -- k8s | head -3
+2026-10-10 327d038 feat(infra): parametrize compose and k8s config per environment
+2026-10-06 459ff65 fix(infra): pass db user to pg_isready in api init container
+2026-10-06 744b62a feat(infra): add kubernetes manifests for minikube deployment
+$ git shortlog -sne HEAD -- src
+    46	Danylo Yakymiv
+     2	YakymivDanylo
