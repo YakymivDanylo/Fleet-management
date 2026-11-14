@@ -19,6 +19,14 @@ class StationRead(BaseModel):
     capacity: int
 
 
+class StationAvailability(BaseModel):
+    station_id: int
+    capacity: int
+    parked_vehicles: int
+    free_slots: int
+    available_vehicles: int
+
+
 class RenterCreate(BaseModel):
     full_name: str
     license_number: str

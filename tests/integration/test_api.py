@@ -158,3 +158,27 @@ async def test_rentals_summary_counts_by_status(client: AsyncClient):
 
     assert response.status_code == 200
     assert response.json() == {"active": 1, "completed": 0, "cancelled": 0, "total_revenue": 0}
+
+
+async def test_station_availability_counts_slots_and_free_vehicles(client: AsyncClient):
+    station = await create_station(client, capacity=3)
+    first = await create_vehicle(client, station["id"], plate="BC0001AA")
+    await create_vehicle(client, station["id"], plate="BC0002AA")
+    renter = await create_renter(client)
+    assert (await start_rental(client, renter["id"], first["id"])).status_code == 201
+
+    response = await client.get(f"/stations/{station['id']}/availability")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "station_id": station["id"],
+        "capacity": 3,
+        "parked_vehicles": 1,
+        "free_slots": 2,
+        "available_vehicles": 1,
+    }
+
+
+async def test_availability_of_missing_station_returns_404(client: AsyncClient):
+    response = await client.get("/stations/999/availability")
+    assert response.status_code == 404
