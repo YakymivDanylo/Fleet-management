@@ -1,0 +1,8 @@
+de9646d09 2022-11-18 Arthur Hanson 10653 log failed login attempts on INFO (#10843)
+cc00789d3 2022-10-05 Arthur Hanson 9669 sanitize social auth usernames (#10549)
+e05696dfc 2022-09-15 jeremystretch Fixes #10337: Display SSO links when local authentication fails
+b11fa5351 2022-09-01 Andreas Nieß Closes #10231: Add missing serializer annotations
+2a7bad326 2022-08-26 Arthur #9962 add next param to sso url
+a9ddd4172 2022-08-25 Arthur Hanson Fix SSO signon for SAML with idp (#10137)
+bfbf97aec 2022-08-24 jeremystretch Closes #10031: Enforce 'application/json' content type for REST API requests
+caca07416 2022-08-08 jeremystretch Fixes #9950: Prevent redirection to arbitrary URLs via 'next' parameter on login URL

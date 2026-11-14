@@ -1,0 +1,435 @@
+{
+  "fpa": [
+    {
+      "id": "D1",
+      "category": "ILF",
+      "function": "User (django.contrib.auth)",
+      "source": "users/api/serializers.py:UserSerializer; models.py:AdminUser",
+      "ret_ftr": "1",
+      "det": "11",
+      "complexity": "Low",
+      "weight": 7
+    },
+    {
+      "id": "D2",
+      "category": "ILF",
+      "function": "Group (django.contrib.auth)",
+      "source": "users/api/serializers.py:GroupSerializer; models.py:AdminGroup",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 7
+    },
+    {
+      "id": "D3",
+      "category": "ILF",
+      "function": "Token",
+      "source": "users/models.py:Token",
+      "ret_ftr": "1",
+      "det": "11",
+      "complexity": "Low",
+      "weight": 7
+    },
+    {
+      "id": "D4",
+      "category": "ILF",
+      "function": "ObjectPermission",
+      "source": "users/models.py:ObjectPermission",
+      "ret_ftr": "1",
+      "det": "10",
+      "complexity": "Low",
+      "weight": 7
+    },
+    {
+      "id": "D5",
+      "category": "ILF",
+      "function": "UserConfig",
+      "source": "users/models.py:UserConfig",
+      "ret_ftr": "1",
+      "det": "7",
+      "complexity": "Low",
+      "weight": 7
+    },
+    {
+      "id": "D6",
+      "category": "EIF",
+      "function": "ContentType (contenttypes)",
+      "source": "ObjectPermission.object_types -> ContentType",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 5
+    },
+    {
+      "id": "D7",
+      "category": "EIF",
+      "function": "ConfigRevision (extras / get_config)",
+      "source": "UserConfig.get(); LoginView.post(); create_userconfig()",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 5
+    },
+    {
+      "id": "T1",
+      "category": "EI",
+      "function": "Create user",
+      "source": "POST /api/users/users/ -> UserSerializer.create()",
+      "ret_ftr": "2",
+      "det": "10",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T2",
+      "category": "EI",
+      "function": "Update user",
+      "source": "PUT|PATCH /api/users/users/{id}/",
+      "ret_ftr": "2",
+      "det": "10",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T3",
+      "category": "EI",
+      "function": "Delete user",
+      "source": "DELETE /api/users/users/{id}/",
+      "ret_ftr": "1",
+      "det": "2",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T4",
+      "category": "EI",
+      "function": "Create group",
+      "source": "POST /api/users/groups/",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T5",
+      "category": "EI",
+      "function": "Update group",
+      "source": "PUT|PATCH /api/users/groups/{id}/",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T6",
+      "category": "EI",
+      "function": "Delete group",
+      "source": "DELETE /api/users/groups/{id}/",
+      "ret_ftr": "1",
+      "det": "2",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T7",
+      "category": "EI",
+      "function": "Create API token",
+      "source": "POST /api/users/tokens/; POST /user/api-tokens/add/ (TokenEditView.post)",
+      "ret_ftr": "2",
+      "det": "7",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T8",
+      "category": "EI",
+      "function": "Update API token",
+      "source": "PUT|PATCH /api/users/tokens/{id}/; POST /user/api-tokens/{pk}/edit/",
+      "ret_ftr": "2",
+      "det": "7",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T9",
+      "category": "EI",
+      "function": "Delete API token",
+      "source": "DELETE /api/users/tokens/{id}/; POST /user/api-tokens/{pk}/delete/",
+      "ret_ftr": "1",
+      "det": "2",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T10",
+      "category": "EI",
+      "function": "Provision token by credentials",
+      "source": "POST /api/users/tokens/provision/ (TokenProvisionView.post)",
+      "ret_ftr": "2",
+      "det": "13",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T11",
+      "category": "EI",
+      "function": "Create object permission",
+      "source": "POST /api/users/permissions/",
+      "ret_ftr": "4",
+      "det": "8",
+      "complexity": "High",
+      "weight": 6
+    },
+    {
+      "id": "T12",
+      "category": "EI",
+      "function": "Update object permission",
+      "source": "PUT|PATCH /api/users/permissions/{id}/",
+      "ret_ftr": "4",
+      "det": "8",
+      "complexity": "High",
+      "weight": 6
+    },
+    {
+      "id": "T13",
+      "category": "EI",
+      "function": "Delete object permission",
+      "source": "DELETE /api/users/permissions/{id}/",
+      "ret_ftr": "1",
+      "det": "2",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T14",
+      "category": "EI",
+      "function": "Save user preferences",
+      "source": "POST /user/preferences/ (UserConfigView.post); PATCH /api/users/config/",
+      "ret_ftr": "2",
+      "det": "8",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T15",
+      "category": "EI",
+      "function": "Change password",
+      "source": "POST /user/password/ (ChangePasswordView.post)",
+      "ret_ftr": "1",
+      "det": "4",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T16",
+      "category": "EI",
+      "function": "Log in (updates last_login + UserConfig)",
+      "source": "POST /login/ (LoginView.post)",
+      "ret_ftr": "3",
+      "det": "4",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T17",
+      "category": "EO",
+      "function": "Group list with derived user_count",
+      "source": "GET /api/users/groups/ (annotate Count('user'))",
+      "ret_ftr": "2",
+      "det": "5",
+      "complexity": "Low",
+      "weight": 4
+    },
+    {
+      "id": "T18",
+      "category": "EO",
+      "function": "Preferences form with resolved defaults",
+      "source": "GET /user/preferences/ (UserConfigForm + UserConfig.get fallback)",
+      "ret_ftr": "2",
+      "det": "8",
+      "complexity": "Average",
+      "weight": 5
+    },
+    {
+      "id": "T19",
+      "category": "EO",
+      "function": "Token list with masked key and expiry status",
+      "source": "GET /user/api-tokens/ (Token.__str__, Token.is_expired)",
+      "ret_ftr": "2",
+      "det": "9",
+      "complexity": "Average",
+      "weight": 5
+    },
+    {
+      "id": "T20",
+      "category": "EQ",
+      "function": "View / filter users",
+      "source": "GET /api/users/users/[{id}] + UserFilterSet",
+      "ret_ftr": "2",
+      "det": "12",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T21",
+      "category": "EQ",
+      "function": "View / filter object permissions",
+      "source": "GET /api/users/permissions/[{id}] + ObjectPermissionFilterSet",
+      "ret_ftr": "4",
+      "det": "11",
+      "complexity": "High",
+      "weight": 6
+    },
+    {
+      "id": "T22",
+      "category": "EQ",
+      "function": "View own API tokens (API)",
+      "source": "GET /api/users/tokens/[{id}] (TokenViewSet.get_queryset)",
+      "ret_ftr": "2",
+      "det": "11",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T23",
+      "category": "EQ",
+      "function": "Read user config (API)",
+      "source": "GET /api/users/config/ (UserConfigViewSet.list)",
+      "ret_ftr": "1",
+      "det": "6",
+      "complexity": "Low",
+      "weight": 3
+    },
+    {
+      "id": "T24",
+      "category": "EQ",
+      "function": "View profile",
+      "source": "GET /user/profile/ (ProfileView.get)",
+      "ret_ftr": "2",
+      "det": "7",
+      "complexity": "Average",
+      "weight": 4
+    },
+    {
+      "id": "T25",
+      "category": "EQ",
+      "function": "Login page with SSO backends",
+      "source": "GET /login/ (LoginView.get_auth_backends)",
+      "ret_ftr": "1",
+      "det": "3",
+      "complexity": "Low",
+      "weight": 3
+    }
+  ],
+  "fpa_totals": {
+    "ILF": 35,
+    "EIF": 10,
+    "EI": 61,
+    "EO": 14,
+    "EQ": 24
+  },
+  "UFP": 144,
+  "ucp": {
+    "actors": [
+      {
+        "id": "A1",
+        "kind": "actor",
+        "name": "NetBox user (human via web GUI)",
+        "source": "users/urls.py: /login/ /user/profile/ /user/preferences/ /user/password/ /user/api-tokens/",
+        "type_or_transactions": "complex",
+        "weight": 3
+      },
+      {
+        "id": "A2",
+        "kind": "actor",
+        "name": "Administrator (human via web GUI / admin)",
+        "source": "users/admin/*; superuser branch of TokenViewSet.get_queryset",
+        "type_or_transactions": "complex",
+        "weight": 3
+      },
+      {
+        "id": "A3",
+        "kind": "actor",
+        "name": "API client / automation script (REST over HTTP)",
+        "source": "users/api/urls.py (router + tokens/provision/)",
+        "type_or_transactions": "average",
+        "weight": 2
+      },
+      {
+        "id": "A4",
+        "kind": "actor",
+        "name": "Authentication backend (ModelBackend / LDAP / RemoteUser)",
+        "source": "django.contrib.auth.authenticate() in LoginForm and TokenProvisionView",
+        "type_or_transactions": "simple",
+        "weight": 1
+      }
+    ],
+    "use_cases": [
+      {
+        "id": "UC1",
+        "kind": "usecase",
+        "name": "Log in / log out",
+        "source": "LoginView.get/post/redirect_to_next, LogoutView.get",
+        "type_or_transactions": "6",
+        "weight": 10
+      },
+      {
+        "id": "UC2",
+        "kind": "usecase",
+        "name": "View profile and change password",
+        "source": "ProfileView.get, ChangePasswordView.get/post",
+        "type_or_transactions": "5",
+        "weight": 10
+      },
+      {
+        "id": "UC3",
+        "kind": "usecase",
+        "name": "Manage user preferences (UI + API)",
+        "source": "UserConfigView.get/post, UserConfigViewSet.list/patch, UserConfig.get/set/clear",
+        "type_or_transactions": "7",
+        "weight": 10
+      },
+      {
+        "id": "UC4",
+        "kind": "usecase",
+        "name": "Manage own API tokens (UI + API)",
+        "source": "TokenListView, TokenEditView.get/post, TokenDeleteView.get/post, TokenViewSet, Token.generate_key/is_expired/validate_client_ip",
+        "type_or_transactions": "9",
+        "weight": 15
+      },
+      {
+        "id": "UC5",
+        "kind": "usecase",
+        "name": "Provision token by username/password",
+        "source": "TokenProvisionView.post, TokenProvisionSerializer, TokenSerializer",
+        "type_or_transactions": "5",
+        "weight": 10
+      },
+      {
+        "id": "UC6",
+        "kind": "usecase",
+        "name": "Administer users and groups",
+        "source": "UserViewSet, GroupViewSet, UserSerializer.create, UserFilterSet, GroupFilterSet",
+        "type_or_transactions": "8",
+        "weight": 15
+      },
+      {
+        "id": "UC7",
+        "kind": "usecase",
+        "name": "Administer object permissions (RBAC)",
+        "source": "ObjectPermissionViewSet, ObjectPermissionSerializer, ObjectPermission.list_constraints, ObjectPermissionFilterSet",
+        "type_or_transactions": "8",
+        "weight": 15
+      }
+    ],
+    "UAW": 9,
+    "UUCW": 85,
+    "UUCP": 94,
+    "TCF": 1.0,
+    "ECF": 1.0,
+    "UCP": 94.0
+  },
+  "effort_hours": 370.1,
+  "PF": 3.94,
+  "hours_per_fp": 2.57
+}

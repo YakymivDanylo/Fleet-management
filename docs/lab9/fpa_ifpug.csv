@@ -1,0 +1,33 @@
+id,category,function,source,ret_ftr,det
+D1,ILF,User (django.contrib.auth),"users/api/serializers.py:UserSerializer; models.py:AdminUser",1,11
+D2,ILF,Group (django.contrib.auth),"users/api/serializers.py:GroupSerializer; models.py:AdminGroup",1,3
+D3,ILF,Token,"users/models.py:Token",1,11
+D4,ILF,ObjectPermission,"users/models.py:ObjectPermission",1,10
+D5,ILF,UserConfig,"users/models.py:UserConfig",1,7
+D6,EIF,ContentType (contenttypes),"ObjectPermission.object_types -> ContentType",1,3
+D7,EIF,ConfigRevision (extras / get_config),"UserConfig.get(); LoginView.post(); create_userconfig()",1,3
+T1,EI,Create user,"POST /api/users/users/ -> UserSerializer.create()",2,10
+T2,EI,Update user,"PUT|PATCH /api/users/users/{id}/",2,10
+T3,EI,Delete user,"DELETE /api/users/users/{id}/",1,2
+T4,EI,Create group,"POST /api/users/groups/",1,3
+T5,EI,Update group,"PUT|PATCH /api/users/groups/{id}/",1,3
+T6,EI,Delete group,"DELETE /api/users/groups/{id}/",1,2
+T7,EI,Create API token,"POST /api/users/tokens/; POST /user/api-tokens/add/ (TokenEditView.post)",2,7
+T8,EI,Update API token,"PUT|PATCH /api/users/tokens/{id}/; POST /user/api-tokens/{pk}/edit/",2,7
+T9,EI,Delete API token,"DELETE /api/users/tokens/{id}/; POST /user/api-tokens/{pk}/delete/",1,2
+T10,EI,Provision token by credentials,"POST /api/users/tokens/provision/ (TokenProvisionView.post)",2,13
+T11,EI,Create object permission,"POST /api/users/permissions/",4,8
+T12,EI,Update object permission,"PUT|PATCH /api/users/permissions/{id}/",4,8
+T13,EI,Delete object permission,"DELETE /api/users/permissions/{id}/",1,2
+T14,EI,Save user preferences,"POST /user/preferences/ (UserConfigView.post); PATCH /api/users/config/",2,8
+T15,EI,Change password,"POST /user/password/ (ChangePasswordView.post)",1,4
+T16,EI,Log in (updates last_login + UserConfig),"POST /login/ (LoginView.post)",3,4
+T17,EO,Group list with derived user_count,"GET /api/users/groups/ (annotate Count('user'))",2,5
+T18,EO,Preferences form with resolved defaults,"GET /user/preferences/ (UserConfigForm + UserConfig.get fallback)",2,8
+T19,EO,Token list with masked key and expiry status,"GET /user/api-tokens/ (Token.__str__, Token.is_expired)",2,9
+T20,EQ,View / filter users,"GET /api/users/users/[{id}] + UserFilterSet",2,12
+T21,EQ,View / filter object permissions,"GET /api/users/permissions/[{id}] + ObjectPermissionFilterSet",4,11
+T22,EQ,View own API tokens (API),"GET /api/users/tokens/[{id}] (TokenViewSet.get_queryset)",2,11
+T23,EQ,Read user config (API),"GET /api/users/config/ (UserConfigViewSet.list)",1,6
+T24,EQ,View profile,"GET /user/profile/ (ProfileView.get)",2,7
+T25,EQ,Login page with SSO backends,"GET /login/ (LoginView.get_auth_backends)",1,3
