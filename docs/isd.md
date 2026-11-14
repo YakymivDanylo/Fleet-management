@@ -3,7 +3,7 @@ title: Infrastructure Specification Document (ISD) — Fleet Management
 owner: Danylo Yakymiv (DevOps)
 category: експлуатаційна документація продукту
 review_cycle: 90 днів
-last_review: 2026-11-14
+last_review: 2026-11-14 (PASS після краш-тесту ЛР№10)
 ---
 
 # Infrastructure Specification Document — Fleet Management
@@ -66,6 +66,7 @@ flowchart LR
     RD[(redis:7-alpine)]
     MQ[(rabbitmq:4-management<br/>vol rabbitmq_data)]
     MIG[migrate<br/>alembic upgrade head]
+    MIG -. completed .-> W
     A1[api1] & A2[api2] & A3[api3]
     W[worker]
   end
@@ -86,7 +87,11 @@ flowchart LR
 1. `db` (healthy: `pg_isready`), `redis` (healthy: `redis-cli ping`), `rabbitmq` (healthy: `rabbitmq-diagnostics ping`) — паралельно;
 2. `migrate` — після `db healthy`; виконує `alembic upgrade head` і завершується (`service_completed_successfully`);
 3. `api1`, `api2`, `api3` — після `migrate` completed + `db` і `redis` healthy; healthy = `GET /health`;
-4. `nginx` — після healthy всіх трьох реплік; `worker` — після `api1` healthy + `rabbitmq` і `redis` healthy.
+4. `worker` — одразу після `migrate` completed + `rabbitmq` і `redis` healthy (**не чекає API**: потрібна лише схема БД);
+5. `nginx` — після healthy `api1`, `api2`, `api3`.
+
+Наслідок для експлуатації: worker починає споживати чергу `telemetry` паралельно зі стартом реплік API, тому
+збій API більше не блокує запис телеметрії; при діагностиці «worker не стартує» перевіряйте `docker compose logs migrate`.
 
 <a id="isd-k8s"></a>
 ### 2.2 Kubernetes (minikube) через GitOps

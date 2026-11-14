@@ -3,7 +3,7 @@ title: System Design Document (SDD) — Fleet Management
 owner: Danylo Yakymiv (Tech Lead / архітектор)
 category: архітектурна документація продукту
 review_cycle: 180 днів
-last_review: 2026-11-14
+last_review: 2026-11-14 (PASS після краш-тесту ЛР№10)
 ---
 
 # System Design Document — Fleet Management (станційний каршерінг)
@@ -37,7 +37,7 @@ C4Container
 
   System_Boundary(fm, "Fleet Management") {
     Container(lb, "nginx", "nginx 1.27", "Reverse proxy + балансування на 3 репліки API")
-    Container(api, "API", "Python 3.13, FastAPI, SQLAlchemy async", "REST API, JWT, бізнес-правила оренди, GDPR, /metrics")
+    Container(api, "API", "Python 3.13, FastAPI, SQLAlchemy async", "REST API, JWT, бізнес-правила оренди, доступність станцій, GDPR, /metrics")
     Container(spa, "Web UI (SPA)", "HTML + JS, роздається API з /app", "Інтерфейс орендаря і адміністратора")
     Container(worker, "Telemetry worker", "Python, aio-pika", "Споживає чергу telemetry, пише історію і гарячий стан")
     ContainerDb(db, "PostgreSQL 16", "Реляційна БД", "Довідники, оренди, телеметрія, GDPR-журнали")
@@ -94,7 +94,7 @@ FastAPI-застосунок, `create_app()` у `main.py`. Шари: `api/` (HTT
 |---|---|
 | `auth.py`, `security.py`, `api/auth.py` | Реєстрація, логін, JWT (HS256, `ACCESS_TOKEN_EXPIRE_MINUTES`), Argon2id-хеш паролів у пулі потоків; залежності `get_current_user`, `require_admin` |
 | `services/rental_service.py` | Старт/завершення оренди, `calculate_cost`, знижки, `validate_rental_eligibility` |
-| `services/station_service.py` | Пошук станції, підрахунок авто на станції, `has_free_slot` |
+| `services/station_service.py` | Пошук станції, підрахунок авто на станції, `has_free_slot`; **доступність станції** `get_availability()` → `StationAvailability` (зайняті місця = авто не в статусі `rented`, вільні місця, авто `available`) |
 | `services/vehicle_state_service.py` | Стан авто: Redis → fallback на останній запис PostgreSQL (`degraded=true`), позиції всього парку |
 | `cache.py`, `resilience.py` | Клієнт Redis, власний retry (3 спроби, таймаут 200 мс, експоненційна затримка + jitter), read-through кеш списків (TTL 30 с) |
 | `services/{consent,export,erasure,marketing,audit}_service.py`, `privacy/` | GDPR: згоди з історією, експорт персональних даних, анонімізація, журнал аудиту, санітайзер логів і correlation id |
@@ -238,6 +238,7 @@ OpenAPI-схема генерується автоматично: `/docs`, `/red
 | `POST /stations` | публічний* | Створити станцію (інвалідує кеш списку) |
 | `GET /stations` | публічний | Список станцій (Redis read-through, TTL 30 с) |
 | `GET /stations/{station_id}` | публічний | Станція |
+| `GET /stations/{station_id}/availability` | публічний | Доступність: `{station_id, capacity, parked_vehicles, free_slots, available_vehicles}`; 404, якщо станції нема; без кешу (завжди актуально з PostgreSQL) |
 | `POST /vehicles` | публічний* | Додати авто на станцію (404, якщо станції нема; інвалідує кеш списку) |
 | `GET /vehicles` | публічний | Список авто (кеш) |
 | `GET /vehicles/positions` | admin | Позиції всього парку (Redis pipeline + fallback) |
