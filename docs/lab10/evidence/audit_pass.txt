@@ -1,0 +1,14 @@
+today=2026-11-14 head=859860e api_routes=35
+| Document | Last updated | Age, d | Doc commits | Code commits (total / since doc) | Broken links | Inbound refs | Mentions 30d | Missing routes | Verdict |
+|---|---|---|---|---|---|---|---|---|---|
+| `README.md` | 2026-11-14 | 0 | 18 | 82 / 0 | 0 | 8 | 0 | 0 | PASS |
+| `docs/sdd.md` | 2026-11-14 | 0 | 2 | 48 / 0 | 0 | 8 | 0 | 0 | PASS |
+| `docs/isd.md` | 2026-11-14 | 0 | 2 | 59 / 0 | 0 | 14 | 0 | 0 | PASS |
+| `docs/architecture/adr/0001-postgresql-redis-rabbitmq-storage.md` | 2026-11-14 | 0 | 1 | 11 / 0 | 0 | 6 | 0 | 0 | PASS |
+| `docs/architecture/adr/0002-gitops-argo-canary-delivery.md` | 2026-11-14 | 0 | 1 | 23 / 0 | 0 | 5 | 0 | 0 | PASS |
+| `docs/maintenance.md` | 2026-11-14 | 0 | 2 | 17 / 0 | 0 | 7 | 0 | 0 | PASS |
+| `charts/fleet-management/README.md` | 2026-11-14 | 0 | 2 | 20 / 0 | 0 | 9 | 0 | 0 | PASS |
+| `CHANGELOG.md` | 2026-11-14 | 0 | 2 | 68 / 0 | 0 | 7 | 0 | 0 | PASS |
+| `.env.example` | 2026-11-14 | 0 | 8 | 22 / 1 | 0 | 6 | 0 | 0 | PASS |
+documentation currency: PASS
+exit=0
