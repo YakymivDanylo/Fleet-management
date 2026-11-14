@@ -1,78 +1,81 @@
 # Fleet Management System (Каршерінг)
 
-## Обґрунтування вибору предметної області
+**Що це і для кого.** Бекенд і вебінтерфейс **станційного каршерінгу** (Fleet Management з IoT-телеметрією,
+варіант №13): компанія володіє парком авто, клієнти орендують їх на короткий термін, забираючи й повертаючи
+на фіксованих станціях. Система веде станції, авто, орендарів і оренди, приймає безперервну телеметрію авто
+(координати, пальне/заряд, замок) і показує актуальний стан парку; підтримує ролі `user`/`admin` та вимоги
+GDPR (експорт, анонімізація, згоди).
 
-Обрана предметна область — **Fleet Management з IoT-телеметрією** (варіант №13), реалізована на прикладі **станційного каршерінгу**: компанія володіє парком автомобілів, які клієнти орендують на короткий термін, забираючи та повертаючи авто на фіксованих станціях.
+| Аудиторія | Почніть з |
+|---|---|
+| Бізнес / замовник | цей розділ і [«Предметна область»](#предметна-область) |
+| Новачок-розробник | [Швидкий старт](#швидкий-старт-5-хвилин) → [Шлях онбордингу](#шлях-онбордингу) |
+| Розробник | [SDD](docs/sdd.md) — компоненти, модель даних, API-контракти |
+| QA | [SDD §5 — контракти API](docs/sdd.md#5-api-контракти), `/docs` (OpenAPI), `tests/` |
+| DevOps | [ISD](docs/isd.md) — середовища, розгортання, CI/CD, моніторинг, бекап (RTO/RPO) |
 
-Цей напрямок цікавий поєднанням реального бізнес-кейсу (сервіси на кшталт станційного каршерінгу) з технічно складним навантаженням — безперервним потоком телеметрії від автомобілів і конкурентним доступом до обмеженої кількості авто/місць на популярних станціях, що дає простір для практики роботи з чергами повідомлень та подієво-керованою архітектурою.
+## Швидкий старт (5 хвилин)
+
+Потрібно: Docker Desktop (Compose v2), Git. Python 3.13 — лише для тестів поза контейнерами.
+
+```powershell
+git clone https://github.com/YakymivDanylo/Fleet-management.git
+cd Fleet-management
+Copy-Item .env.sandbox.example .env.sandbox
+python -c "import secrets; print(secrets.token_urlsafe(48))"   # вставте як JWT_SECRET_KEY у .env.sandbox
+docker compose -p fleet_sandbox --env-file .env.sandbox up -d --build
+```
+
+Перевірка: `docker compose -p fleet_sandbox ps` — усі сервіси `healthy`; http://localhost:8000/health →
+`{"status":"ok","db":"connected"}`; вебінтерфейс — http://localhost:8000/app/, OpenAPI — http://localhost:8000/docs.
+
+Перший адміністратор і зупинка:
+
+```powershell
+docker compose -p fleet_sandbox --env-file .env.sandbox exec -it api1 create-admin --email admin@example.com
+docker compose -p fleet_sandbox --env-file .env.sandbox down        # додайте -v, щоб видалити дані БД
+```
+
+Міграції (`alembic upgrade head`) виконує одноразовий сервіс `migrate` до старту реплік API.
+
+## Шлях онбордингу
+
+1. **README** (цей файл) — призначення, швидкий старт, запуск тестів.
+2. **[SDD](docs/sdd.md)** — C4-діаграма контейнерів, відповідальність кожного компонента, модель даних, API.
+3. **[ISD](docs/isd.md)** — де що працює, змінні оточення, порядок старту, CI/CD-гейти, моніторинг, бекап.
+4. **[ADR](docs/architecture/adr/README.md)** — чому обрано PostgreSQL+Redis+RabbitMQ і GitOps/canary.
+5. **[Регламент документації](docs/maintenance.md)** — власники, цикли перегляду, правило «зміна коду = зміна
+   документації».
+
+## Предметна область
 
 ### Ключові сутності
 
 - **Vehicle** — автомобіль парку: держномер, модель, статус (available / rented / maintenance), поточна станція.
-- **Station** — фіксована станція видачі/повернення: адреса, місткість, кількість вільних місць.
-- **Renter** — клієнт, що орендує авто: ім'я, номер посвідчення, історія оренд.
-- **Rental** — оренда/бронювання: клієнт, авто, станція старту та фінішу, час початку/кінця, статус.
-- **TelemetryReading** — показник телеметрії з датчиків авто: координати, рівень пального/заряду, статус замка, часова мітка.
+- **Station** — фіксована станція видачі/повернення: адреса, місткість.
+- **Renter** — клієнт, що орендує авто: ім'я, номер посвідчення, прив'язка до облікового запису.
+- **Rental** — оренда: клієнт, авто, станція старту та фінішу, час початку/кінця, статус, вартість.
+- **TelemetryReading** — показник телеметрії авто: координати, рівень пального/заряду, статус замка, часова мітка.
 
 ### Сценарій навантаження
 
-1. **Безперервний потік телеметрії**: кожен автомобіль парку регулярно надсилає координати, рівень пального/заряду та статус замка. Ці дані йдуть через **RabbitMQ**, щоб згладити пікове навантаження запису в базу даних і не блокувати основний API.
-2. **Конкурентний доступ (race condition)**: у пікові години кілька клієнтів можуть одночасно намагатися забронювати останнє вільне авто на популярній станції — це вимагає коректної обробки конкурентних транзакцій при створенні `Rental`.
+1. **Безперервний потік телеметрії** йде через **RabbitMQ** (черга `telemetry`) до окремого worker'а, щоб
+   пікові записи не блокували API; останній стан авто кешується в **Redis**.
+2. **Конкурентний доступ:** у пікові години кілька клієнтів можуть одночасно бронювати останнє авто на станції.
+   Зараз старт оренди перевіряє статус авто без блокування рядка (`SELECT … FOR UPDATE` не застосовується) —
+   це відоме обмеження, описане в [SDD §4](docs/sdd.md#4-модель-даних) та [ADR-0001](docs/architecture/adr/0001-postgresql-redis-rabbitmq-storage.md).
 
-## Архітектура системи
+## Архітектура коротко
 
-```mermaid
-graph TD
-    subgraph Клієнти
-        Mobile[Мобільний застосунок клієнта]
-        Sensor[Бортовий IoT-модуль автомобіля]
-    end
+Браузер (SPA `/app`) → **nginx** → 3 репліки **FastAPI** → PostgreSQL / Redis; IoT-модулі авто → **RabbitMQ** →
+**telemetry-worker** → PostgreSQL / Redis. Повна C4-діаграма і опис компонентів — у [SDD](docs/sdd.md).
 
-    LB["Load Balancer / Reverse Proxy (nginx)"]
+## Середовища sandbox і production
 
-    subgraph Backend
-        API[FastAPI застосунок]
-        Worker[Telemetry Consumer Worker]
-    end
-
-    MQ[(RabbitMQ)]
-    Cache[(Redis Cache)]
-    DB[(PostgreSQL)]
-
-    Mobile -->|"HTTPS REST: бронювання, статус станцій"| LB
-    LB --> API
-
-    Sensor -->|"Публікація телеметрії"| MQ
-    MQ -->|"Споживання черги telemetry"| Worker
-    Worker -->|"Запис показників"| DB
-    Worker -->|"Оновлення статусу/локації авто"| Cache
-
-    API -->|"Читання доступності авто/станцій"| Cache
-    API -->|"CRUD: Renter, Rental, Station, Vehicle"| DB
-    API -.->|"Публікація подій бронювання (майбутнє)"| MQ
-```
-
-### Компоненти та потоки даних
-
-1. **Клієнти:**
-   - *Мобільний застосунок* — клієнт каршерінгу: пошук вільних авто на станціях, бронювання, оренда.
-   - *Бортовий IoT-модуль* — вбудований в кожен автомобіль пристрій, що постійно публікує телеметрію (координати, рівень пального/заряду, статус замка).
-
-2. **Load Balancer / Reverse Proxy** — розподіляє вхідні HTTP-запити між кількома інстансами FastAPI-застосунку, забезпечуючи горизонтальне масштабування бекенду під пікове навантаження (наприклад, ранкові години пік бронювань).
-
-3. **Backend (FastAPI застосунок)** — обробляє REST-запити клієнтів: реєстрація/автентифікація, пошук доступних авто, створення `Rental`. Створення оренди виконується в межах транзакції БД з блокуванням рядка (`SELECT ... FOR UPDATE`) на записі `Vehicle`/`Station`, щоб уникнути подвійного бронювання одного авто кількома клієнтами одночасно.
-
-4. **RabbitMQ (Message Broker)** — приймає безперервний потік повідомлень телеметрії від тисяч бортових модулів, згладжуючи пікові сплески запису і розв'язуючи публікацію даних (сенсори) зі споживанням (Worker) у часі.
-
-5. **Telemetry Consumer Worker** — окремий процес, що споживає чергу телеметрії з RabbitMQ, зберігає історичні показники в PostgreSQL та оновлює "гарячий" стан (поточна локація/статус авто) у Redis-кеші.
-
-6. **Redis Cache** — зберігає часто запитувані, швидкозмінні дані (поточна доступність авто на станції, останні координати), щоб API не звертався до PostgreSQL при кожному запиті пошуку авто.
-
-7. **PostgreSQL** — основне реляційне сховище сутностей `Vehicle`, `Station`, `Renter`, `Rental` та історії `TelemetryReading`.
-
-## Запуск у sandbox і production
-
-Застосунок має два оточення, які задаються змінною `APP_ENV` (`sandbox` або `production`). Налаштування (БД, паролі, ключі) беруться зі змінних оточення / файлу `.env.<APP_ENV>`; у коді та `docker-compose.yml` жодних секретів немає. Кожне оточення має власну БД (`fleet_sandbox`, `fleet_production`), власні контейнери, томи й порти, тому тестові дані не потрапляють у робоче середовище. Застосунок не стартує, якщо ім'я БД не відповідає оточенню, а у production — якщо `DEBUG=true` або слабкий `JWT_SECRET_KEY`.
+Застосунок має два оточення, які задаються змінною `APP_ENV` (`sandbox` або `production`). Налаштування беруться
+зі змінних оточення / файлу `.env.<APP_ENV>`; у коді та `docker-compose.yml` секретів немає. Кожне оточення має
+власну БД, контейнери, томи й порти. Застосунок не стартує, якщо ім'я БД не відповідає оточенню, а у production —
+якщо `DEBUG=true` або `JWT_SECRET_KEY` коротший за 32 символи.
 
 | | sandbox | production |
 |---|---|---|
@@ -83,38 +86,15 @@ graph TD
 | `/docs`, `/redoc`, `/openapi.json` | доступні | вимкнені (404) |
 | Помилка 500 | `{"detail":"Internal server error","request_id":"…"}`, traceback лише в логах | те саме |
 
-### 1. Підготовка
-
 ```powershell
-Copy-Item .env.sandbox.example .env.sandbox
-Copy-Item .env.production.example .env.production
-python -c "import secrets; print(secrets.token_urlsafe(48))"   # значення для JWT_SECRET_KEY (різне для кожного оточення)
+Copy-Item .env.production.example .env.production   # заповніть JWT_SECRET_KEY, POSTGRES_PASSWORD, RABBITMQ_DEFAULT_PASS
+docker compose -p fleet_production --env-file .env.production up -d --build   # можна одночасно зі sandbox
 ```
 
-Заповніть порожні поля в обох файлах (`JWT_SECRET_KEY`; у production також `POSTGRES_PASSWORD`, `RABBITMQ_DEFAULT_PASS`). Файли `.env.sandbox` та `.env.production` у git не потрапляють.
+Режим розробки з hot reload: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`.
+Kubernetes (Helm, Argo CD, canary-релізи), CI/CD і резервне копіювання — у [ISD](docs/isd.md).
 
-### 2. Запуск
-
-```powershell
-# sandbox
-docker compose -p fleet_sandbox --env-file .env.sandbox up -d --build
-
-# production (можна одночасно зі sandbox)
-docker compose -p fleet_production --env-file .env.production up -d --build
-```
-
-Міграції (`alembic upgrade head`) виконуються автоматично при старті контейнера `api`.
-
-### 3. Адміністратор, зупинка
-
-```powershell
-docker compose -p fleet_sandbox --env-file .env.sandbox exec -it api1 create-admin --email admin@example.com
-docker compose -p fleet_sandbox --env-file .env.sandbox down        # додайте -v, щоб видалити дані БД
-```
-
-Для production — ті самі команди з `-p fleet_production --env-file .env.production`.
-
-### 4. Тести та лінтер
+## Тести та лінтер
 
 ```powershell
 docker run -d --name test-pg -e POSTGRES_USER=test_user -e POSTGRES_PASSWORD=test_pass -e POSTGRES_DB=fleet_management_test -p 55432:5432 postgres:16
@@ -125,317 +105,27 @@ pytest tests -v
 ruff check . ; ruff format --check .
 ```
 
-CI (GitHub Actions) запускає лінтер і всі тести на кожен pull request та push у `main`. Покрокова демонстрація (перевірка ізоляції БД, `DEBUG=False`, помилки 500) — у [docs/lab3-web-env-cicd.md](docs/lab3-web-env-cicd.md).
+CI (GitHub Actions) запускає лінтер, тести, гейти складності, coverage + mutation score, SCA, gitleaks,
+SonarCloud і Trivy на кожен pull request і push у `main` — перелік гейтів у [ISD §5](docs/isd.md#isd-cicd).
 
-## Статичний аналіз якості коду (SonarQube)
+## Додаткові інструменти
 
-Локальний SonarQube Community Edition піднімається через Docker Compose:
-
-```powershell
-docker compose -f config/docker-compose.yml up -d sonarqube
-```
-
-Дашборд: http://localhost:9000 (проєкт `fleet-management`).
-
-Токен сканера генерується один раз у `http://localhost:9000/account/security`.
-
-Запуск сканування (вручну, коли потрібно перевірити поточний стан коду):
-
-```powershell
-docker run --rm `
-    -e SONAR_HOST_URL="http://host.docker.internal:9000" `
-    -e SONAR_TOKEN="<токен>" `
-    -v "${PWD}:/usr/src" `
-    -w /usr/src `
-    sonarsource/sonar-scanner-cli
-```
-
-Результат — у Quality Gate на дашборді проєкту.
-
-### Завд.1: Baseline Scan
-
-Перше сканування (коміт `b6dde1c`, до інтеграції SonarQube і Quality Gate) зафіксувало такий стан кодової бази:
-
-| Метрика | Значення |
+| Задача | Команда |
 |---|---|
-| Bugs | 0 |
-| Vulnerabilities | 0 |
-| Security Hotspots | 0 |
-| Code Smells | 6 |
-| Technical Debt (sqale_index) | 30 хв |
-| Duplicated Lines % | 0.0% |
-| Cyclomatic Complexity (проєкт) | 34 |
-| Cognitive Complexity (проєкт) | 10 |
-| Test Coverage | 0.0% (тестів ще немає) |
-| Lines of Code (ncloc) | 332 |
-| **Quality Gate** | **PASS** (стандартний профіль `Sonar way`) |
+| Розподіл запитів по репліках | `python scripts/lb_check.py -n 15` (поле `pod` у `GET /info`) |
+| Алгоритм балансування | `NGINX_CONF=./nginx/least_conn.conf docker compose up -d --force-recreate nginx` |
+| Навантажувальний тест k6 | `docker compose run --rm --no-deps k6 run /scripts/user_journey.js` (сценарій `loadtest/user_journey.js`) |
+| Збій Redis (toxiproxy) | `docker compose --profile fault up -d toxiproxy`, `python scripts/fault.py` |
+| Аудит актуальності документації | `python scripts/doc_audit.py --strict` |
 
-Повторне сканування (тривіальна зміна — форматування `config.py`) підтвердило, що аналізатор коректно перераховує метрики без ручного втручання: значення не змінились (немає нового коду), Quality Gate лишився PASS.
+## Документація
 
-### Quality Gate: критерії та обґрунтування
-
-Проєкту прив'язано кастомний профіль `Fleet Management Custom Gate` (відмінний від стандартного `Sonar way`), з 4 обов'язковими критеріями:
-
-| # | Критерій | Категорія | Поріг |
-|---|---|---|---|
-| 1 | New Bugs | New Code, Reliability | = 0 |
-| 2 | New Security Hotspots Reviewed | New Code, Security | = 100% |
-| 3 | Duplicated Lines % | Overall Code, Duplication | ≤ 3% |
-| 4 | Maintainability Rating | Overall Code, Maintainability | = A |
-
-Архітектурне обґрунтування (під стек FastAPI + async SQLAlchemy + PostgreSQL):
-
-1. **New Bugs = 0** — async I/O (await/coroutines, спільний стан по кількох воркерах) — типове джерело нових багів (unawaited coroutine, race condition). Блокує їх на вході, а не після мержу.
-2. **New Security Hotspots Reviewed = 100%** — застосунок ходить у PostgreSQL напряму (`text()` для raw SQL вже є в `main.py`) — SQL injection головний ризик. Кожен hotspot має пройти ручний рев'ю перед мержем.
-3. **Duplicated Lines % ≤ 3%** — шарова CRUD-архітектура (models/schemas/services/api на кожну сутність: Vehicle, Station, Renter, Rental) природньо тягне copy-paste між сутностями. Ліміт стримує це змасштабуванням проєкту.
-4. **Maintainability Rating = A** — бізнес-правила живуть у `services/` (розрахунок вартості оренди, перевірка доступності авто/місця, право на оренду). Саме такі функції найшвидше обростають вкладеними умовами під нові edge-cases. Первісно критерій був заданий як `Cognitive Complexity (Overall) ≤ 15`, але ця метрика — сира сума складності по всьому проєкту, тому механічно росте з кожним новим (навіть простим) методом і не відображає реальну якість. Замінено на `Maintainability Rating = A` — нормалізований показник (співвідношення технічного боргу до розміру коду), а per-method ліміт ≤15 і далі контролює правило аналізатора `S3776`.
-
-### Завд.3: симуляція деградації якості та відновлення
-
-Коміт `fe9cee2` навмисно вносить у робочу гілку **2 незалежні порушення**, кожне ціляє в окремий критерій Quality Gate:
-
-**Порушення 1 — дублювання (Overall Code, Duplicated Lines % ≤ 3%).** Файл `src/fleet_management/api/vehicles.py` (39 рядків) скопійовано без жодної зміни під назвою `api/fleet_vehicles.py`:
-
-```python
-# src/fleet_management/api/fleet_vehicles.py — точна копія vehicles.py
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from ..database import get_db
-from ..models import Vehicle
-from ..schemas import VehicleCreate, VehicleRead
-from ..services import station_service
-
-router = APIRouter(prefix="/vehicles", tags=["vehicles"])
-
-
-@router.post("", response_model=VehicleRead, status_code=201)
-async def create_vehicle(
-    payload: VehicleCreate, db: AsyncSession = Depends(get_db)
-): ...  # тіло функції ідентичне оригіналу
-```
-
-**Порушення 2 — критична Cognitive Complexity (Overall Code).** У `services/rental_service.py` додано `calculate_discount` з 4 рівнями вкладених `if/else` (без Guard Clauses):
-
-```python
-def calculate_discount(
-    rental_count, is_vip, vehicle_type, station_zones, has_coupon, is_weekend, is_holiday
-):
-    discount = 0.0
-    if is_vip:
-        if rental_count > 10:
-            if vehicle_type == "premium":
-                discount += 5
-            else:
-                discount += 10
-        else:
-            if vehicle_type == "premium":
-                discount += 2
-            else:
-                discount += 5
-    else:
-        if rental_count > 20:
-            discount += 3
-        elif rental_count > 5:
-            if has_coupon:
-                discount += 4
-            else:
-                discount += 1
-    if is_weekend:
-        for zone in station_zones:
-            if zone == "center":
-                discount += 1
-            elif zone == "suburb":
-                discount -= 1
-    if is_holiday:
-        if has_coupon:
-            discount += 2
-        else:
-            discount += 1
-    return discount
-```
-
-**Результат сканування — Quality Gate: FAIL.** Аналізатор чітко вказав 4 умови, що впали:
-
-| Метрика | Поріг | Факт |
+| Документ | Тип | Аудиторія |
 |---|---|---|
-| Duplicated Lines % (New Code) | ≤ 3% | 44.8% |
-| Duplicated Lines % (Overall) | ≤ 3% | 13.6% |
-| Cognitive Complexity `calculate_discount` | ≤ 15 | **31** (правило `python:S3776`) |
-| New Issues | = 0 | 2 нових issue |
-
-**Рефакторинг (коміт `b296f22`)** — не видалення, а виправлення:
-- `fleet_vehicles.py` видалено — файл ніде не підключався до застосунку, чистий copy-paste-сміттяр без функціональної цінності.
-- `calculate_discount` розкладено на `_vip_discount`, `_regular_discount`, `_weekend_zone_discount`, `_holiday_discount` (Extract Method) — кожна функція тривіальна, Cognitive Complexity кожної <5.
-
-Поведінка після рефакторингу верифікована на 1152 комбінаціях вхідних параметрів — 0 розбіжностей зі старою версією, перш ніж стару логіку видалено.
-
-**Фінальне сканування — Quality Gate: PASS.** Duplicated Lines % = 0.0%, 0 залишкових issues по складності.
-
-**Порівняльна таблиця (за формою методички):**
-
-| Показник якості | Baseline | Failed | Fixed |
-|---|---|---|---|
-| Bugs (кількість) | 0 | 0 | 0 |
-| Vulnerabilities / Hotspots | 0 / 0 | 0 / 0 | 0 / 0 |
-| Code Smells (кількість) | 6 | 8 | 6 |
-| Technical Debt (у хвилинах) | 30 | 56 | 30 |
-| Duplicated Lines % | 0.0% | 13.6% | 0.0% |
-| Cognitive Complexity (найгірший метод) | <15 (issues немає) | **31** (`calculate_discount`) | <15 (issues немає) |
-| Quality Gate Status | PASS | **FAIL** | PASS |
-
-### Завд.4: рефакторинг найгірших методів (Maintainability / Technical Debt)
-
-Ідентифіковано через звіт аналізатора (правило `S3776`, сортування по `sqale_index`) два методи з найгіршими показниками:
-
-| Метод | Файл | Cognitive Complexity (До → Після) | Technical Debt (До → Після) |
-|---|---|---|---|
-| `validate_rental_eligibility` | `services/rental_service.py` | **58 → 8** (критичний рівень) | 48 хв → 0 |
-| `rentals_summary` | `api/rentals.py` | **19 → ~4** | 9 хв → 0 |
-
-Після рефакторингу: 0 залишкових порушень `S3776`, `code_smells` та `sqale_index` (Technical Debt) проєкту повернулись до рівня Baseline.
-
-**Застосовані техніки:**
-- **Guard Clauses** — у `validate_rental_eligibility` прибрано 4 рівні вкладеного `if/else`, кожна умова виходу тепер на верхньому рівні.
-- **Extract Variable** — повторювана умова "потрібна застава на вихідних" рахувалась двічі в різних гілках; винесена в одну змінну `deposit_missing`.
-- **Делегування сервісу замість дублювання** — `rentals_summary` дублював формулу розрахунку вартості з `calculate_cost`; замінено прямим викликом сервісу (усунуто і складність, і порушення шарової архітектури).
-- **Extract Method через `Counter`** — ручний цикл з `if/elif` для підрахунку оренд за статусами замінено на `collections.Counter`.
-
-Всі рефакторинги верифіковано на еквівалентність поведінки: `validate_rental_eligibility` — 1152 комбінації вхідних параметрів, `calculate_cost`-делегування — 1000 значень тривалості, розбіжностей 0.
-
-**Git-історія кейсу (До/Після для Code Review):**
-- `1cb64a7` — навмисно нерефакторений код (До)
-- `b0063cf` — рефакторинг (Після)
-
-**Порівняльна таблиця станів проєкту (Завд.3 + Завд.4):**
-
-| Показник | Baseline | Failed (Завд.3) | Fixed (Завд.3) | Fixed (Завд.4) |
-|---|---|---|---|---|
-| Bugs | 0 | 0 | 0 | 0 |
-| Code Smells | 6 | 8 | 6 | 6 |
-| Duplicated Lines % | 0.0% | 13.6% | 0.0% | 0.0% |
-| Technical Debt (sqale_index) | 30 хв | 56 хв | 30 хв | 97 хв → 30 хв |
-| Quality Gate | PASS | **FAIL** | PASS | PASS |
-
-## Висновок: Cyclomatic vs Cognitive Complexity
-
-**Cyclomatic Complexity** рахує кількість незалежних шляхів виконання через код (кожен `if`, `for`, `while`, `case` додає +1 незалежно від рівня вкладеності). Вона добре відповідає на питання "скільки тестів потрібно для 100% покриття гілок", але не розрізняє плаский код (10 послідовних `if` на одному рівні) і глибоко вкладений (той самий `if` в `if` в `if`).
-
-**Cognitive Complexity** штрафує саме за вкладеність: кожен додатковий рівень вкладеної умови множить "вартість" наступної умови. У нашому кейсі це видно напряму на `validate_rental_eligibility` — Cyclomatic Complexity була відносно помірною (кожен `if` рахувався один раз), але Cognitive Complexity сягнула **58** через 7 рівнів вкладеності. Функція з тим самим набором умов, але без вкладеності (Guard Clauses), впала до Cognitive Complexity ~8 — при цьому Cyclomatic Complexity змінилась значно менше, бо кількість гілок рішень залишилась приблизно тією ж.
-
-Висновок: Cyclomatic Complexity важлива для тестування (скільки шляхів треба покрити), а Cognitive Complexity — для читабельності та супроводжуваності (наскільки важко людині утримати логіку в голові). Для code review і рефакторингу Cognitive Complexity інформативніша, бо саме вона прогнозує, скільки часу піде на розуміння і безпечну зміну коду.
-
-**Доцільність автоматичного контролю технічного боргу на комерційних проєктах:** ручний код-рев'ю фізично не встигає відстежувати деградацію якості на кожному PR, особливо коли команда велика і дедлайни тиснуть (як і сталось з `validate_rental_eligibility` та `rentals_summary` — реалістичний сценарій "написано під тиском, рефакторинг відклали"). Quality Gate з розділенням New Code / Overall Code дозволяє блокувати регрес нового коду негайно, не вимагаючи одноразового "великого рефакторингу" всього legacy — технічний борг контролюється інкрементально, на кожному коміті, автоматично і без суб'єктивності ручного рев'ю.
-## Розгортання в Kubernetes (minikube)
-
-Маніфести лежать у каталозі `k8s/` — по одному файлу на об'єкт. Числові префікси задають порядок застосування: спершу namespace, потім конфігурація, далі Postgres (`1x`), Redis (`2x`), RabbitMQ (`3x`), API (`4x`) і worker (`5x`). Усі об'єкти створюються в namespace `fleet-management`.
-
-### Порядок розгортання
-
-```powershell
-# 1. Кластер з драйвером docker та доповнення
-minikube start --driver=docker --cpus=4 --memory=6g
-minikube addons enable metrics-server
-minikube addons enable ingress
-
-# 2. Образи з конкретними тегами версій (latest не використовується)
-docker build -t fleet-management-api:1.0.0 --build-arg APP_VERSION=1.0.0 -f Dockerfile .
-docker build -t fleet-management-api:1.1.0 --build-arg APP_VERSION=1.1.0 -f Dockerfile .
-docker build -t fleet-management-worker:1.0.0 -f Dockerfile.worker .
-minikube image load fleet-management-api:1.0.0
-minikube image load fleet-management-api:1.1.0
-minikube image load fleet-management-worker:1.0.0
-
-# 3. Увесь застосунок однією командою
-kubectl apply -f k8s/
-kubectl rollout status deployment/api -n fleet-management
-```
-
-Доступ з хоста:
-
-- **Ingress:** у терміналі адміністратора запустити `minikube tunnel`, додати рядок `127.0.0.1 fleet.local` у `C:\Windows\System32\drivers\etc\hosts` і відкрити http://fleet.local/docs.
-- **NodePort (запасний варіант):** `minikube service api -n fleet-management --url`.
-
-Службові ендпоінти API: `/livez` — liveness-проба (без залежностей), `/health` — readiness-проба (перевіряє БД), `/info` — назва застосунку, версія образу та ім'я пода.
-
-### Параметри ConfigMap `fleet-config`
-
-| Ключ | Призначення |
-|---|---|
-| `APP_ENV` | Оточення (`sandbox`); ім'я БД `POSTGRES_DB` має закінчуватися на `_sandbox` |
-| `APP_NAME` | Назва застосунку (у `/info` та заголовку OpenAPI) |
-| `REDIS_URL` | Підключення до кешу Redis |
-| `TELEMETRY_QUEUE` | Черга RabbitMQ, яку обробляє worker |
-| `RESILIENCE_ENABLED` | Таймаути та повтори запитів до Redis |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Час життя JWT-токена |
-| `POSTGRES_DB`, `POSTGRES_USER` | Назва БД та користувач |
-
-### Параметри Secret `fleet-secret`
-
-Значення використовуються лише для лабораторної роботи й не пов'язані з жодною робочою системою.
-
-| Ключ | Призначення |
-|---|---|
-| `POSTGRES_PASSWORD` | Пароль БД; з нього складається `DATABASE_URL` |
-| `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` | Облікові дані брокера; з них складається `RABBITMQ_URL` |
-| `JWT_SECRET_KEY` | Ключ підпису access-токенів |
-
-## Розгортання через Helm (лабораторна №4)
-
-Ті самі об'єкти, що й у `k8s/`, запаковані в чарт [`charts/fleet-management`](charts/fleet-management/README.md): шаблони з іменами від імені релізу, значення в `values.yaml`, окремі `values-dev.yaml` та `values-prod.yaml`, `pre-upgrade` хук і `helm test`. Namespace створює Helm (`--create-namespace`), тому окремого маніфесту Namespace немає.
-
-```powershell
-# dev
-helm install fleet charts/fleet-management -n fleet-management --create-namespace -f charts/fleet-management/values-dev.yaml
-# prod (3 репліки, образ 1.1.0, Ingress)
-helm install fleet charts/fleet-management -n fleet-management --create-namespace -f charts/fleet-management/values-prod.yaml
-
-helm upgrade fleet charts/fleet-management -n fleet-management --set image.tag=1.1.0
-helm history fleet -n fleet-management
-helm rollback fleet 1 -n fleet-management
-helm test fleet -n fleet-management
-helm uninstall fleet -n fleet-management
-```
-
-Паролі у файлах значень не зберігаються: порожні `secret.*` означають «взяти наявне значення з кластера або згенерувати випадкове». Таблиця всіх параметрів — у [README чарта](charts/fleet-management/README.md#параметри-valuesyaml), звіт з виводом команд — у [`docs/lab4-helm/REPORT.md`](docs/lab4-helm/REPORT.md).
-
-
-## Privacy Engineering / GDPR (Лабораторна робота №4)
-
-Безпечне логування, експорт персональних даних, анонімізація та керування згодами — інструкція запуску,
-демо-сценарій, PII inventory, політика erasure та висновок: [`docs/lab4-privacy-gdpr.md`](docs/lab4-privacy-gdpr.md).
-
-## Контейнеризація: запуск однією командою (лабораторна №5)
-
-```powershell
-Copy-Item .env.example .env     # розкоментуйте блок "one-command start" і заповніть паролі та JWT_SECRET_KEY
-docker compose up --build       # db, redis, rabbitmq → api (міграції) → worker
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # режим розробки з hot-reload
-```
-
-БД, Redis і worker працюють лише у внутрішній мережі `backend` (`internal: true`), назовні опубліковано тільки api та UI RabbitMQ. Дані PostgreSQL і RabbitMQ зберігаються в іменованих томах. Звіт з виводом команд: [`docs/lab5-docker/REPORT.md`](docs/lab5-docker/REPORT.md).
-
-## Балансування навантаження: Nginx + 3 репліки API (лабораторна №6)
-
-`docker compose up -d --build` піднімає три репліки `api1..api3` і Nginx на порту `${API_PORT:-8000}` (репліки назовні не опубліковані). Міграції виконує одноразовий сервіс `migrate`. Алгоритм балансування задається змінною `NGINX_CONF` (`nginx/round_robin.conf` за замовчуванням, також `weighted`, `ip_hash`, `least_conn`, `single`).
-
-```powershell
-python scripts/lb_check.py -n 15     # розподіл запитів по репліках (поле "pod" у GET /info)
-```
-
-Інструкції демонстрації, перевірка відмовостійкості та порівняння 1 репліки з 3: [`docs/lab6-nginx/REPORT.md`](docs/lab6-nginx/REPORT.md).
-
-## Навантажувальне тестування (лабораторна №4, Web)
-
-Інструмент — k6. Сценарій [`loadtest/user_journey.js`](loadtest/user_journey.js): логін → профіль → станції → авто → стан авто, ступінчасте навантаження 10 → 25 → 50 → 100 VUs.
-
-```powershell
-python scripts/seed_loadtest.py --vehicles 50              # потрібні RABBITMQ_DEFAULT_USER/PASS з .env
-docker compose run --rm --no-deps -e PROFILE=smoke k6 run /scripts/user_journey.js   # контрольний запуск
-python scripts/docker_stats.py --out loadtest/results/lab4/resources.csv --duration 440   # паралельно з тестом
-docker compose run --rm --no-deps k6 run --out csv=/scripts/results/lab4/k6.csv /scripts/user_journey.js
-python loadtest/report.py --k6 loadtest/results/lab4/k6.csv --resources loadtest/results/lab4/resources.csv --out loadtest/results/lab4
-```
-
-Метрики, графіки й виявлені вузькі місця: [`docs/lab4-loadtest/REPORT.md`](docs/lab4-loadtest/REPORT.md).
+| [docs/sdd.md](docs/sdd.md) | продукт, архітектурна | розробники, QA |
+| [docs/isd.md](docs/isd.md) | продукт, експлуатаційна | DevOps |
+| [docs/architecture/adr/](docs/architecture/adr/README.md) | продукт, архітектурна (рішення) | розробники, архітектор |
+| [docs/maintenance.md](docs/maintenance.md) | процес (регламент) | уся команда |
+| [charts/fleet-management/README.md](charts/fleet-management/README.md) | продукт, експлуатаційна | DevOps |
+| [CHANGELOG.md](CHANGELOG.md) | процес (історія змін) | бізнес, усі |
+| [docs/history/](docs/history/sonarqube-quality-gate-lab.md), [k8s/README.md](k8s/README.md) | deprecated | — |
