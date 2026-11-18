@@ -44,7 +44,7 @@ helm uninstall fleet -n fleet-management
 
 ### Пріоритет значень
 
-`values.yaml` чарта < файли `-f` (кожен наступний перекриває попередній) < `--set` / `--set-string` (найвищий). Актуальні значення для кожного середовища — у [ISD §1–2](../../docs/isd.md).
+`values.yaml` чарта < файли `-f` (кожен наступний перекриває попередній) < `--set` / `--set-string` (найвищий). Значення для середовищ — у `values-dev.yaml`, `values-prod.yaml`, `values-minikube.yaml`.
 
 ## Параметри `values.yaml`
 

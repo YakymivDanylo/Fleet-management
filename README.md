@@ -11,9 +11,9 @@ GDPR (експорт, анонімізація, згоди).
 |---|---|
 | Бізнес / замовник | цей розділ і [«Предметна область»](#предметна-область) |
 | Новачок-розробник | [Швидкий старт](#швидкий-старт-5-хвилин) → [Шлях онбордингу](#шлях-онбордингу) |
-| Розробник | [SDD](docs/sdd.md) — компоненти, модель даних, API-контракти |
-| QA | [SDD §5 — контракти API](docs/sdd.md#5-api-контракти), `/docs` (OpenAPI), `tests/` |
-| DevOps | [ISD](docs/isd.md) — середовища, розгортання, CI/CD, моніторинг, бекап (RTO/RPO) |
+| Розробник | [«Архітектура коротко»](#архітектура-коротко), код `src/fleet_management/` (`api/ → services/ → models/`) |
+| QA | `/docs` (OpenAPI), `tests/integration/test_api.py` |
+| DevOps | [«Середовища»](#середовища-sandbox-і-production), [Helm-чарт](charts/fleet-management/README.md), `.github/workflows/ci.yml` |
 
 ## Швидкий старт (5 хвилин)
 
@@ -42,11 +42,9 @@ docker compose -p fleet_sandbox --env-file .env.sandbox down        # додай
 ## Шлях онбордингу
 
 1. **README** (цей файл) — призначення, швидкий старт, запуск тестів.
-2. **[SDD](docs/sdd.md)** — C4-діаграма контейнерів, відповідальність кожного компонента, модель даних, API.
-3. **[ISD](docs/isd.md)** — де що працює, змінні оточення, порядок старту, CI/CD-гейти, моніторинг, бекап.
-4. **[ADR](docs/architecture/adr/README.md)** — чому обрано PostgreSQL+Redis+RabbitMQ і GitOps/canary.
-5. **[Handover](docs/handover.md)** і **[регламент документації](docs/maintenance.md)** — власники, Bus Factor,
-   правило «зміна коду = зміна документації».
+2. **OpenAPI** (`/docs` після запуску) — усі HTTP-контракти.
+3. **[Helm-чарт](charts/fleet-management/README.md)** — розгортання в Kubernetes.
+4. **`.github/workflows/ci.yml`** — CI/CD-гейти; правило: «зміна коду = зміна документації» (PR-шаблон).
 
 ## Предметна область
 
@@ -65,12 +63,12 @@ docker compose -p fleet_sandbox --env-file .env.sandbox down        # додай
    пікові записи не блокували API; останній стан авто кешується в **Redis**.
 2. **Конкурентний доступ:** у пікові години кілька клієнтів можуть одночасно бронювати останнє авто на станції.
    Зараз старт оренди перевіряє статус авто без блокування рядка (`SELECT … FOR UPDATE` не застосовується) —
-   це відоме обмеження, описане в [SDD §4](docs/sdd.md#4-модель-даних) та [ADR-0001](docs/architecture/adr/0001-postgresql-redis-rabbitmq-storage.md).
+   це відоме обмеження.
 
 ## Архітектура коротко
 
 Браузер (SPA `/app`) → **nginx** → 3 репліки **FastAPI** → PostgreSQL / Redis; IoT-модулі авто → **RabbitMQ** →
-**telemetry-worker** → PostgreSQL / Redis. Повна C4-діаграма і опис компонентів — у [SDD](docs/sdd.md).
+**telemetry-worker** → PostgreSQL / Redis.
 
 ## Середовища sandbox і production
 
@@ -94,7 +92,7 @@ docker compose -p fleet_production --env-file .env.production up -d --build   # 
 ```
 
 Режим розробки з hot reload: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`.
-Kubernetes (Helm, Argo CD, canary-релізи), CI/CD і резервне копіювання — у [ISD](docs/isd.md).
+Kubernetes (Helm, Argo CD, canary-релізи) — у [README чарта](charts/fleet-management/README.md).
 
 ## Тести та лінтер
 
@@ -108,7 +106,7 @@ ruff check . ; ruff format --check .
 ```
 
 CI (GitHub Actions) запускає лінтер, тести, гейти складності, coverage + mutation score, SCA, gitleaks,
-SonarCloud і Trivy на кожен pull request і push у `main` — перелік гейтів у [ISD §5](docs/isd.md#isd-cicd).
+SonarCloud і Trivy на кожен pull request і push у `main` (`.github/workflows/ci.yml`).
 
 ## Додаткові інструменти
 
@@ -124,11 +122,6 @@ SonarCloud і Trivy на кожен pull request і push у `main` — пере�
 
 | Документ | Тип | Аудиторія |
 |---|---|---|
-| [docs/sdd.md](docs/sdd.md) | продукт, архітектурна | розробники, QA |
-| [docs/isd.md](docs/isd.md) | продукт, експлуатаційна | DevOps |
-| [docs/architecture/adr/](docs/architecture/adr/README.md) | продукт, архітектурна (рішення) | розробники, архітектор |
-| [docs/maintenance.md](docs/maintenance.md) | процес (регламент) | уся команда |
-| [docs/handover.md](docs/handover.md) | продукт, експлуатаційна (передача знань) | команда супроводу |
 | [charts/fleet-management/README.md](charts/fleet-management/README.md) | продукт, експлуатаційна | DevOps |
 | [CHANGELOG.md](CHANGELOG.md) | процес (історія змін) | бізнес, усі |
-| [docs/history/](docs/history/sonarqube-quality-gate-lab.md), [k8s/README.md](k8s/README.md) | deprecated | — |
+| [k8s/README.md](k8s/README.md) | deprecated | — |

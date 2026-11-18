@@ -32,28 +32,7 @@ SUSPICIOUS_DAYS, STALE_DAYS, DRIFT_LIMIT = 90, 180, 20
 # doc path -> (code paths it describes, check API routes?)
 DOCS: dict[str, tuple[list[str], bool]] = {
     "README.md": (["src", "docker-compose.yml", "charts", "Dockerfile"], False),
-    "docs/sdd.md": (["src/fleet_management"], True),
-    "docs/isd.md": (
-        [
-            "docker-compose.yml",
-            "docker-compose.dev.yml",
-            "Dockerfile",
-            "Dockerfile.worker",
-            "nginx",
-            "charts",
-            "k8s",
-            "argocd-apps",
-            ".github/workflows",
-        ],
-        False,
-    ),
-    "docs/architecture/adr/0001-postgresql-redis-rabbitmq-storage.md": (
-        ["src/fleet_management/models", "src/fleet_management/telemetry"],
-        False,
-    ),  # noqa: E501
-    "docs/architecture/adr/0002-gitops-argo-canary-delivery.md": (["charts", "argocd-apps"], False),
-    "docs/maintenance.md": ([".github/workflows", "scripts/doc_audit.py"], False),
-    "docs/handover.md": (["src", "charts", "argocd-apps", ".github/workflows"], False),
+    "k8s/README.md": (["k8s"], False),
     "charts/fleet-management/README.md": (["charts/fleet-management"], False),
     "CHANGELOG.md": (["src", "charts"], False),
     ".env.example": (["src/fleet_management/config.py", "docker-compose.yml"], False),

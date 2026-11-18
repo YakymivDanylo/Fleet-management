@@ -1,9 +1,9 @@
 # `k8s/` — DEPRECATED
 
-> **Статус: deprecated з 2026-11-14** (аудит документації ЛР№10, [ADR-0002](../docs/architecture/adr/0002-gitops-argo-canary-delivery.md)).
+> **Статус: deprecated з 2026-11-14** (аудит документації ЛР№10).
 > Ці «сирі» маніфести (ЛР№3 DevOps) замінені Helm-чартом [`charts/fleet-management`](../charts/fleet-management/README.md),
 > який розгортає Argo CD. Вони не містять canary-Rollout, моніторингу та `existingSecret` і не оновлюються.
-> Актуальна топологія — [ISD §2.2](../docs/isd.md#isd-k8s). Каталог буде видалено після захисту курсу.
+> Актуальне розгортання — Helm-чарт і `argocd-apps/`. Каталог буде видалено після захисту курсу.
 
 Нижче — опис у тому вигляді, в якому він був у кореневому README.
 
