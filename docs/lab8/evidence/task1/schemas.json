@@ -1,0 +1,63 @@
+{
+  "component": {
+    "key": "fleet-management:src/fleet_management/schemas.py",
+    "path": "src/fleet_management/schemas.py",
+    "qualifier": "FIL",
+    "measures": [
+      {
+        "metric": "class_complexity",
+        "value": "0"
+      },
+      {
+        "metric": "coupling_between_objects",
+        "value": "3"
+      },
+      {
+        "metric": "lcom4",
+        "value": "0"
+      },
+      {
+        "metric": "lcom",
+        "value": "0"
+      },
+      {
+        "metric": "rfc",
+        "value": "0"
+      },
+      {
+        "metric": "dit",
+        "value": "2"
+      },
+      {
+        "metric": "public_interface_size",
+        "value": "0"
+      },
+      {
+        "metric": "overridden_methods",
+        "value": "0"
+      },
+      {
+        "metric": "new_methods",
+        "value": "0"
+      }
+    ],
+    "classes": [
+      "StationCreate",
+      "StationRead",
+      "RenterCreate",
+      "RenterRead",
+      "VehicleCreate",
+      "VehicleRead",
+      "RentalStart",
+      "RentalEnd",
+      "RentalRead",
+      "VehicleStateRead",
+      "VehiclePositionRead",
+      "FleetPositionsRead",
+      "UserRegister",
+      "UserRead",
+      "Token"
+    ]
+  },
+  "source": "scripts/ck_metrics.py (AST analyser; values are max over classes, WMC is a sum)"
+}

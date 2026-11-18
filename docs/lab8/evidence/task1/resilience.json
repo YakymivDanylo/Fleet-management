@@ -1,0 +1,51 @@
+{
+  "component": {
+    "key": "fleet-management:src/fleet_management/resilience.py",
+    "path": "src/fleet_management/resilience.py",
+    "qualifier": "FIL",
+    "measures": [
+      {
+        "metric": "class_complexity",
+        "value": "11"
+      },
+      {
+        "metric": "coupling_between_objects",
+        "value": "5"
+      },
+      {
+        "metric": "lcom4",
+        "value": "1"
+      },
+      {
+        "metric": "lcom",
+        "value": "0.5"
+      },
+      {
+        "metric": "rfc",
+        "value": "9"
+      },
+      {
+        "metric": "dit",
+        "value": "2"
+      },
+      {
+        "metric": "public_interface_size",
+        "value": "2"
+      },
+      {
+        "metric": "overridden_methods",
+        "value": "0"
+      },
+      {
+        "metric": "new_methods",
+        "value": "2"
+      }
+    ],
+    "classes": [
+      "RetryPolicy",
+      "RetryExhaustedError",
+      "<module resilience>"
+    ]
+  },
+  "source": "scripts/ck_metrics.py (AST analyser; values are max over classes, WMC is a sum)"
+}

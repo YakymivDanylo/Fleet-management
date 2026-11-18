@@ -1,0 +1,19 @@
+...FFF.F.F                                                               [100%]
+================================== FAILURES ===================================
+E   TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\rental_manager.py:54: TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+E   TypeError: TariffCalculator.price() missing 1 required positional argument: 'zone'
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\rental_manager.py:68: TypeError: TariffCalculator.price() missing 1 required positional argument: 'zone'
+E   TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\rental_manager.py:54: TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+E   TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\rental_manager.py:54: TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+E   TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+C:\Users\dryak\Uni\Web_Python\src\fleet_management\lab8\rental_manager.py:54: TypeError: StationRegistry.has_free_slot() missing 1 required positional argument: 'vehicle_type'
+=========================== short test summary info ===========================
+FAILED tests/unit/test_lab8_rental_manager.py::test_end_rental_rejects_full_station
+FAILED tests/unit/test_lab8_rental_manager.py::test_quote_applies_vip_discount
+FAILED tests/unit/test_lab8_rental_manager.py::test_invoice_uses_billable_hours_and_vehicle_rate
+FAILED tests/unit/test_lab8_rental_manager.py::test_notifications_reach_the_renter
+FAILED tests/unit/test_lab8_rental_manager.py::test_reports_aggregate_finished_rentals
+5 failed, 5 passed in 0.04s
