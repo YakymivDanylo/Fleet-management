@@ -160,9 +160,10 @@ services:
       RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/
       REDIS_URL: redis://redis:6379/0
     networks: [backend]
+    # The worker needs only the schema, not the API: start it right after the migrations.
     depends_on:
-      api1:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
       redis:

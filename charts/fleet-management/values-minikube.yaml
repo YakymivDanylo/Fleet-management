@@ -1,6 +1,6 @@
 # Minikube environment deployed by Argo CD (Application argocd-apps/fleet-management.yaml).
 # The only thing that changes on a release is the image tag - Argo CD picks it up from Git.
-# No secrets here: the Secret "fleet-secret" is created by hand once (see docs/lab5-gitops/DEMO.md).
+# No secrets here: the Secret "fleet-secret" is created by hand once (kubectl create secret generic fleet-secret -n fleet ...).
 replicaCount: 5
 
 # Progressive delivery with Argo Rollouts (lab 6) + automatic rollback by metrics (lab 7).

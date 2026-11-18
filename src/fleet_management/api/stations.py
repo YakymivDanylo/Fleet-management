@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..cache import STATIONS_LIST_KEY, get_redis, invalidate, read_through_json
 from ..database import get_db
 from ..models import Station
-from ..schemas import StationCreate, StationRead
+from ..schemas import StationAvailability, StationCreate, StationRead
+from ..services import station_service
 
 router = APIRouter(prefix="/stations", tags=["stations"])
 
@@ -44,3 +45,8 @@ async def get_station(station_id: int, db: AsyncSession = Depends(get_db)):
     if station is None:
         raise HTTPException(status_code=404, detail="Station not found")
     return station
+
+
+@router.get("/{station_id}/availability", response_model=StationAvailability)
+async def get_station_availability(station_id: int, db: AsyncSession = Depends(get_db)):
+    return await station_service.get_availability(db, station_id)

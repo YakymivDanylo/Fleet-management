@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" font-family="sans-serif" font-size="12">
+<rect width="900" height="380" fill="white"/>
+<text x="450.0" y="22" text-anchor="middle" font-size="15" font-weight="bold">Error rate (%)</text>
+<line x1="70" y1="330.0" x2="830" y2="330.0" stroke="#e5e7eb"/>
+<text x="64" y="334.0" text-anchor="end">0</text>
+<line x1="70" y1="272.0" x2="830" y2="272.0" stroke="#e5e7eb"/>
+<text x="64" y="276.0" text-anchor="end">0</text>
+<line x1="70" y1="214.0" x2="830" y2="214.0" stroke="#e5e7eb"/>
+<text x="64" y="218.0" text-anchor="end">0</text>
+<line x1="70" y1="156.0" x2="830" y2="156.0" stroke="#e5e7eb"/>
+<text x="64" y="160.0" text-anchor="end">1</text>
+<line x1="70" y1="98.0" x2="830" y2="98.0" stroke="#e5e7eb"/>
+<text x="64" y="102.0" text-anchor="end">1</text>
+<line x1="70" y1="40.0" x2="830" y2="40.0" stroke="#e5e7eb"/>
+<text x="64" y="44.0" text-anchor="end">1</text>
+<text x="70.0" y="348" text-anchor="middle">0</text>
+<text x="196.66666666666669" y="348" text-anchor="middle">2</text>
+<text x="323.33333333333337" y="348" text-anchor="middle">4</text>
+<text x="450.0" y="348" text-anchor="middle">6</text>
+<text x="576.6666666666667" y="348" text-anchor="middle">8</text>
+<text x="703.3333333333334" y="348" text-anchor="middle">10</text>
+<text x="830.0" y="348" text-anchor="middle">12</text>
+<text x="450.0" y="370" text-anchor="middle">minutes</text>
+<text transform="translate(16 185.0) rotate(-90)" text-anchor="middle">%</text>
+<polyline points="85.8,330.0 101.7,330.0 117.5,330.0 133.3,330.0 149.2,330.0 165.0,330.0 180.8,330.0 196.7,330.0 212.5,330.0 228.3,330.0 244.2,330.0 260.0,330.0 275.8,330.0 291.7,330.0 307.5,330.0 323.3,330.0 339.2,330.0 355.0,330.0 370.8,330.0 386.7,330.0 402.5,330.0 418.3,330.0 434.2,330.0 450.0,330.0 465.8,330.0 481.7,330.0 497.5,330.0 513.3,330.0 529.2,330.0 545.0,330.0 560.8,330.0 576.7,330.0 592.5,330.0 608.3,330.0 624.2,330.0 640.0,330.0 655.8,330.0 671.7,330.0 687.5,330.0 703.3,330.0 719.2,330.0 735.0,330.0 750.8,330.0 766.7,330.0 782.5,330.0 798.3,330.0 814.2,330.0 830.0,330.0" fill="none" stroke="#2563eb" stroke-width="2"/>
+<line x1="80" y1="48" x2="104" y2="48" stroke="#2563eb" stroke-width="2"/><text x="110" y="52">failed requests</text>
+</svg>

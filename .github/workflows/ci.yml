@@ -179,6 +179,22 @@ jobs:
           fetch-depth: 0
       - name: Gitleaks (full git history)
         run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git --redact -v /repo
+  # Lab 10: "code change = documentation change". Fails when a relative doc link is broken or a
+  # registered document is missing, stale or drifted > 20 code commits behind its code.
+  docs-currency:
+    name: Documentation currency (doc_audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history for doc age and drift)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Documentation Decay audit
+        run: python scripts/doc_audit.py --strict
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
