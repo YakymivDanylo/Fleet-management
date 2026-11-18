@@ -1,0 +1,5 @@
+## PromQL: 5xx per pod, last 6 min (max over time)
+fleet-management-api-5f6f6c48fc-s4lgz 2.556 req/s
+
+## LogQL: {namespace="fleet"} | json | status >= 500  -> count by pod and version
+('fleet-management-api-5f6f6c48fc-s4lgz', '1.5.0', '500') 214
