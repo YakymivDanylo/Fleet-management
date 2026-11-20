@@ -123,11 +123,11 @@ Error Budget = (100 % − SLO) × 43 200 хв: **SLI-1 — 216 хв/міс**, **
 |---|---|
 | Вимога | інваріант SDD §4 «авто в статусі `rented` має рівно одну активну оренду»; сценарій навантаження README |
 | RFC | RFC-001, [issue #53](https://github.com/YakymivDanylo/Fleet-management/issues/53), ADR-0005 Accepted |
-| Коміт | `b26c453` fix(core): lock vehicle row on rental start (RFC-001) |
+| Коміт | `b26c453` fix(core): lock vehicle row on rental start (RFC-001) — у гілці; у `main` — squash-merge `6b2638c` ([PR #57](https://github.com/YakymivDanylo/Fleet-management/pull/57)) |
 | Тести | `tests/integration/test_rental_concurrency.py` (FAIL → PASS), `tests/unit/test_goodhart_rentals.py`; 1505 passed |
 | CHANGELOG | «Prevent double rental of the same car — 12:07 UTC» |
-| Тег Git | `v1.6.0` → `b26c453` (створено локально; публікується push-ем після merge у `main` — тег `v*` запускає `publish` у CI) |
-| Артефакт | локальна збірка `fleet-management-api:1.6.0`, `sha256:de82dc82a1d88f79f2d590dccf9414a8a7fc379e04bbfb02e22b842d136e4cb1`; у CI — `ghcr.io/yakymivdanylo/fleet-management-api:1.6.0` |
+| Тег Git | `v1.6.0` → `6b2638c` (коміт `main`; push тегу запускає `publish` з тегом образу `1.6.0`) |
+| Артефакт | CI [run 44739935356](https://github.com/YakymivDanylo/Fleet-management/actions/runs/44739935356) на `main`: `ghcr.io/yakymivdanylo/fleet-management-api:6b2638c…` (= `latest`), `sha256:e485247fd036379fd0e2ef7f7546ffdc2a0e78b7d08b05650bd4e31b2b9550d0`; тег образу `1.6.0` — після push `v1.6.0` |
 
 ---
 
