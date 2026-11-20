@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Path, Response
 from pydantic import TypeAdapter
 from redis.asyncio import Redis
 from sqlalchemy import select
@@ -7,8 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..cache import STATIONS_LIST_KEY, get_redis, invalidate, read_through_json
 from ..database import get_db
 from ..models import Station
-from ..schemas import StationAvailability, StationCreate, StationRead
+from ..schemas import DB_ID_MAX, StationAvailability, StationCreate, StationRead
 from ..services import station_service
+
+PathId = Annotated[int, Path(ge=1, le=DB_ID_MAX)]
 
 router = APIRouter(prefix="/stations", tags=["stations"])
 
@@ -40,7 +44,7 @@ async def list_stations(db: AsyncSession = Depends(get_db), redis: Redis = Depen
 
 
 @router.get("/{station_id}", response_model=StationRead)
-async def get_station(station_id: int, db: AsyncSession = Depends(get_db)):
+async def get_station(station_id: PathId, db: AsyncSession = Depends(get_db)):
     station = await db.get(Station, station_id)
     if station is None:
         raise HTTPException(status_code=404, detail="Station not found")
@@ -48,5 +52,5 @@ async def get_station(station_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{station_id}/availability", response_model=StationAvailability)
-async def get_station_availability(station_id: int, db: AsyncSession = Depends(get_db)):
+async def get_station_availability(station_id: PathId, db: AsyncSession = Depends(get_db)):
     return await station_service.get_availability(db, station_id)

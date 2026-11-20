@@ -1,9 +1,15 @@
-from datetime import datetime
-from typing import Literal
+from datetime import UTC, datetime
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_serializer
 
 from .models import RentalStatus, UserRole, VehicleStatus
+
+# Primary keys are PostgreSQL INTEGER (int4). Larger ids made asyncpg raise OverflowError, i.e.
+# HTTP 500; the API contract (docs/api/openapi.yaml) bounds them to 1..2^31-1 and answers 422
+# (drift found by the Schemathesis contract test, Lab 11).
+DB_ID_MAX = 2_147_483_647
+DbId = Annotated[int, Field(ge=1, le=DB_ID_MAX)]
 
 
 class StationCreate(BaseModel):
@@ -43,7 +49,7 @@ class RenterRead(BaseModel):
 class VehicleCreate(BaseModel):
     license_plate: str
     model: str
-    station_id: int
+    station_id: DbId
 
 
 class VehicleRead(BaseModel):
@@ -57,12 +63,12 @@ class VehicleRead(BaseModel):
 
 
 class RentalStart(BaseModel):
-    renter_id: int
-    vehicle_id: int
+    renter_id: DbId
+    vehicle_id: DbId
 
 
 class RentalEnd(BaseModel):
-    end_station_id: int
+    end_station_id: DbId
 
 
 class RentalRead(BaseModel):
@@ -77,6 +83,15 @@ class RentalRead(BaseModel):
     ended_at: datetime | None
     status: RentalStatus
     cost: float | None = None
+
+    # Rental timestamps are stored as naive UTC (`DateTime` without time zone). The API contract
+    # (docs/api/openapi.yaml, format: date-time) requires RFC 3339 with an offset, so naive values
+    # are emitted as UTC instead of leaving the client to guess the zone (found by Schemathesis).
+    @field_serializer("started_at", "ended_at")
+    def _as_utc(self, value: datetime | None) -> datetime | None:
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=UTC)
+        return value
 
 
 class VehicleStateRead(BaseModel):

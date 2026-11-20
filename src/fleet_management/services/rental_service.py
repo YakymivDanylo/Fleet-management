@@ -8,7 +8,7 @@ from operator import attrgetter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..exceptions import NotFoundError, StationFullError, VehicleNotAvailableError
-from ..models import Rental, RentalStatus, Vehicle, VehicleStatus
+from ..models import Rental, RentalStatus, Renter, Vehicle, VehicleStatus
 from . import station_service
 
 RATE_PER_HOUR = 5.0
@@ -18,12 +18,34 @@ MIN_BILLABLE_HOURS = 1
 def calculate_cost(
     started_at: datetime, ended_at: datetime, rate_per_hour: float = RATE_PER_HOUR
 ) -> float:
+    """Price of a trip: every started hour is billed, at least ``MIN_BILLABLE_HOURS``.
+
+    Example: 1 h 47 min at the default rate 5.0 -> 2 billable hours -> ``10.0``.
+    """
     duration_hours = (ended_at - started_at).total_seconds() / 3600
     billable_hours = max(math.ceil(duration_hours), MIN_BILLABLE_HOURS)
     return round(billable_hours * rate_per_hour, 2)
 
 
 async def start_rental(db: AsyncSession, renter_id: int, vehicle_id: int) -> Rental:
+    """Start an active rental: the vehicle must be ``available`` and becomes ``rented``.
+
+    Args:
+        db: Open database session; committed on success.
+        renter_id: Renter who takes the car.
+        vehicle_id: Vehicle to rent; its current station becomes the start station.
+
+    Returns:
+        The new ``active`` rental.
+
+    Raises:
+        NotFoundError: The renter or the vehicle does not exist (HTTP 404).
+        VehicleNotAvailableError: The vehicle is not ``available`` (HTTP 409).
+    """
+    # Checked explicitly: an unknown renter used to surface as a foreign-key IntegrityError,
+    # i.e. HTTP 500 instead of the documented 404 (found by the Schemathesis contract test).
+    if await db.get(Renter, renter_id) is None:
+        raise NotFoundError(f"Renter {renter_id} not found")
     vehicle = await db.get(Vehicle, vehicle_id)
     if vehicle is None:
         raise NotFoundError(f"Vehicle {vehicle_id} not found")
@@ -45,6 +67,15 @@ async def start_rental(db: AsyncSession, renter_id: int, vehicle_id: int) -> Ren
 
 
 async def end_rental(db: AsyncSession, rental_id: int, end_station_id: int) -> Rental:
+    """Complete an active rental at a station that has a free slot.
+
+    The vehicle becomes ``available`` and is moved to ``end_station_id``.
+
+    Raises:
+        NotFoundError: The rental or the end station does not exist (HTTP 404).
+        VehicleNotAvailableError: The rental is not ``active`` (HTTP 409).
+        StationFullError: The end station has no free slot (HTTP 409).
+    """
     rental = await db.get(Rental, rental_id)
     if rental is None:
         raise NotFoundError(f"Rental {rental_id} not found")

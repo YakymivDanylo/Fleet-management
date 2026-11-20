@@ -4,6 +4,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -132,6 +133,13 @@ def create_app(cfg: Settings = settings) -> FastAPI:
     )
     app.state.settings = cfg
     app.add_middleware(CorrelationIdMiddleware)
+    if cfg.cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=cfg.cors_origins,
+            allow_methods=["GET", "POST"],
+            allow_headers=["Content-Type", "Authorization"],
+        )
     app.add_middleware(MetricsMiddleware)  # outermost: also counts what the other layers do
     app.include_router(api_router)
     _register_error_handlers(app)

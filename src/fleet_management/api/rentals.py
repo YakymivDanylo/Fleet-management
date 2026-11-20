@@ -1,7 +1,8 @@
 from collections import Counter
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,8 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..cache import VEHICLES_LIST_KEY, get_redis, invalidate
 from ..database import get_db
 from ..models import Rental, RentalStatus
-from ..schemas import RentalEnd, RentalRead, RentalStart
+from ..schemas import DB_ID_MAX, RentalEnd, RentalRead, RentalStart
 from ..services import rental_service
+
+PathId = Annotated[int, Path(ge=1, le=DB_ID_MAX)]
 
 router = APIRouter(prefix="/rentals", tags=["rentals"])
 
@@ -39,7 +42,7 @@ async def start_rental(
 
 @router.post("/{rental_id}/end", response_model=RentalRead)
 async def end_rental(
-    rental_id: int,
+    rental_id: PathId,
     payload: RentalEnd,
     db: AsyncSession = Depends(get_db),
     redis: Redis = Depends(get_redis),
@@ -83,7 +86,7 @@ async def rentals_summary(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{rental_id}", response_model=RentalRead)
-async def get_rental(rental_id: int, db: AsyncSession = Depends(get_db)):
+async def get_rental(rental_id: PathId, db: AsyncSession = Depends(get_db)):
     rental = await db.get(Rental, rental_id)
     if rental is None:
         raise HTTPException(status_code=404, detail="Rental not found")

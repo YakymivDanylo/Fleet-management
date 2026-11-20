@@ -93,6 +93,18 @@ async def test_start_rental_marks_vehicle_rented(client: AsyncClient):
     assert (await get_vehicle(client, vehicle["id"]))["status"] == "rented"
 
 
+async def test_start_rental_for_unknown_renter_is_404(client: AsyncClient):
+    # Lab 11 contract drift: an unknown renter used to raise a foreign-key error -> HTTP 500.
+    station = await create_station(client)
+    vehicle = await create_vehicle(client, station["id"])
+
+    response = await start_rental(client, 2_147_483_646, vehicle["id"])
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Renter 2147483646 not found"}
+    assert (await get_vehicle(client, vehicle["id"]))["status"] == "available"
+
+
 async def test_cannot_rent_already_rented_vehicle(client: AsyncClient):
     station = await create_station(client)
     first = await create_renter(client, "LV-0001")

@@ -94,6 +94,8 @@ services:
       LIST_CACHE_ENABLED: ${LIST_CACHE_ENABLED:-true}
       PASSWORD_HASH_WORKERS: ${PASSWORD_HASH_WORKERS:-1}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?set JWT_SECRET_KEY in the env file}
+      # Lab 11: origins of the documentation site allowed to call the API ("Try it out").
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-}
     # backend is internal, so the replicas are reachable only from nginx and other services.
     networks: [backend]
     # Fixed resource quota (Lab 5): latency numbers are only comparable between runs when

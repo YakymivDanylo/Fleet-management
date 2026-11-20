@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     # Lab 7: share of requests answered with HTTP 500 (0..1) - simulates a bad release.
     fail_rate: float = Field(default=0.0, ge=0.0, le=1.0)
 
+    # Lab 11: comma-separated browser origins allowed to call the API (Swagger UI "Try it out" on
+    # the documentation site). Empty = no CORS headers at all (the SPA is same-origin).
+    cors_allow_origins: str = ""
+
     jwt_secret_key: str | None = None
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
@@ -62,6 +66,10 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.cors_allow_origins.split(",") if o.strip()]
 
     @property
     def is_production(self) -> bool:
