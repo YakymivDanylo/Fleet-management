@@ -4,6 +4,10 @@ All notable changes to this project, newest first. Entries are grouped by UTC da
 
 ## 2026-11-20
 
+### Keep car telemetry flowing when the cache is down — 12:24 UTC
+**Summary:** Live car positions keep updating even if the fast cache server fails; such a failure is now detected automatically and has a step-by-step guide.
+**Details:** A simulated cache outage showed that car readings stopped being saved until the cache came back. Readings are now saved regardless and the cache is refreshed later. Added a pipeline health check and alert, an operations guide, a post-incident analysis with corrective actions, a backup and restore drill procedure, service level targets and the final support plan with escalation rules.
+
 ### Prevent double rental of the same car — 12:07 UTC
 **Summary:** Two customers can no longer rent the same last car at the same moment; one gets it, the other is told it is taken.
 **Details:** Starting a rental now reserves the car in the database until the booking is saved, so a simultaneous second request waits and is rejected as "not available". Approved through change request RFC-001 by the change board, with a race test, contract check and backup before release. No data changes; rollback is a plain revert.

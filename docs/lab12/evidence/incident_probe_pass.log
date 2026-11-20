@@ -1,0 +1,17 @@
+utc queue_ready queue_unacked db_rows db_lag_s api_status source degraded age containers
+12:17:53 0 0 19070 2 200 cache degraded=false age=1s redis=running worker=running
+12:18:08 0 0 19150 1 200 cache degraded=false age=0s redis=running worker=running
+12:18:23 0 0 19226 0 200 cache degraded=false age=0s redis=running worker=running
+12:18:39 0 0 19300 1 200 database degraded=true age=1s redis=exited worker=running
+12:18:55 0 0 19380 1 200 database degraded=true age=1s redis=exited worker=running
+12:19:11 0 0 19450 2 200 database degraded=true age=0s redis=exited worker=running
+12:19:27 0 0 19530 1 200 database degraded=true age=2s redis=exited worker=running
+12:19:43 0 0 19610 1 200 database degraded=true age=1s redis=exited worker=running
+12:19:59 0 0 19680 2 200 database degraded=true age=0s redis=exited worker=running
+12:20:15 0 0 19760 1 200 database degraded=true age=0s redis=exited worker=running
+12:20:31 0 0 19840 1 200 database degraded=true age=1s redis=exited worker=running
+12:20:48 0 0 19920 0 200 cache degraded=false age=0s redis=running worker=running
+12:21:03 0 0 19990 2 200 cache degraded=false age=1s redis=running worker=running
+12:21:19 0 0 20070 1 200 cache degraded=false age=1s redis=running worker=running
+12:21:34 0 0 20150 0 200 cache degraded=false age=0s redis=running worker=running
+12:21:49 0 0 20220 2 200 cache degraded=false age=1s redis=running worker=running

@@ -20,9 +20,10 @@ tags: [ops]
 | ALR-02 | `FleetDatabaseDown` | `GET /health` ≠ 200 на всіх репліках **або** `pg_isready` неуспішний ≥ 2 хв (у compose — healthcheck `db` = `unhealthy`) | SEV-1 | SRE on-call (L2) → власник БД (L3) | [[RB-001]] §Б | compose healthcheck `db`; правило Prometheus `probe_success{job="fleet-health"} == 0` — у плані супроводу |
 | ALR-03 | `FleetBackupStale` | `python scripts/db_backup.py check --max-age-hours 26` повертає 1 (немає копії, SHA-256 не збігається або копія старша за 26 год) | SEV-3 | DevOps (L2) | [[RB-001]] §А | скрипт + cron хоста бекапів (щогодини) |
 | ALR-04 | `FleetRestoreDrillFailed` | щомісячний `python scripts/db_backup.py drill` завершився `restore drill: FAIL` | SEV-2 | DevOps (L2) → власник БД (L3) | [[RB-001]] §В | скрипт; запуск — 1-й робочий день місяця |
+| ALR-05 | `TelemetryQueueBacklog` | `python scripts/telemetry_check.py` повертає 1 двічі поспіль (2 хв): `messages_ready` черги `telemetry` > 500 **або** найновіший показник у PostgreSQL старший за 60 с (SLI-3) | SEV-2 | SRE on-call (L2) → власник worker'а (L3) | [[RB-002]] | скрипт + щохвилинний запуск (CAPA-2, [[INC-001]]) |
 
 **Порогові значення.** 5 % 5xx за 1 хв — той самий поріг, що й canary-аналіз Argo Rollouts (успішних ≥ 95 %),
 щоб реліз і моніторинг мали одне визначення «погано». 26 год для копії = добовий розклад + 2 год запасу на тривалий
 дамп. 2 хв для БД — щоб не будити людину через рестарт контейнера (≈ 10–20 с).
 
-Пов'язано: [[RB-001]] · [[slo-policy]] · [[isd]] · #ops
+Пов'язано: [[RB-001]] · [[RB-002]] · [[slo-policy]] · [[isd]] · #ops

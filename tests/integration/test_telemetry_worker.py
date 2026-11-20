@@ -115,15 +115,28 @@ async def test_older_message_does_not_overwrite_cached_state(
     assert state["fuel_level"] == "70.0"
 
 
-async def test_infrastructure_failure_requeues_message(session_factory, vehicle_id, monkeypatch):
+async def test_database_outage_requeues_message(vehicle_id, redis_client, monkeypatch):
+    """PostgreSQL is the source of truth: if the reading cannot be stored, the message is retried.
+    (Before INC-001 this test used an unreachable *Redis* and so locked in the defect.)"""
     monkeypatch.setattr(worker, "NACK_DELAY_SECONDS", 0)
-    unreachable_redis = Redis.from_url("redis://localhost:1/0", decode_responses=True)
+
+    async def db_down(*_args, **_kwargs):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(worker, "save_reading", db_down)
     message = FakeMessage(telemetry_body(vehicle_id))
 
-    await worker.handle_message(message, session_factory, unreachable_redis)
+    await worker.handle_message(message, lambda: _NullSession(), redis_client)
 
     assert message.outcome == ("nack", True)
-    await unreachable_redis.aclose()
+
+
+class _NullSession:
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        return False
 
 
 async def test_cache_outage_does_not_block_ingestion(session_factory, vehicle_id, monkeypatch):

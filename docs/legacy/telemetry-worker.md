@@ -95,4 +95,4 @@ flowchart LR
 
 Пріоритети вдосконалення — у [[maintenance-plan]].
 
-Пов'язано: [[INC-001]] · [[sdd#c-worker|SDD §3.4]] · [[adr-0001-postgresql-redis-rabbitmq-storage|ADR-0001]] · #architecture #ops
+Пов'язано: [[INC-001]] · [[PM-001]] · [[sdd#c-worker|SDD §3.4]] · [[adr-0001-postgresql-redis-rabbitmq-storage|ADR-0001]] · #architecture #ops

@@ -1,0 +1,12 @@
+# INC-001 PASS state: tests after CAPA-1, 2026-11-20T12:22:04Z
+$ pytest tests/integration/test_telemetry_worker.py -v
+tests/integration/test_telemetry_worker.py::test_valid_message_is_stored_cached_and_acked PASSED [ 14%]
+tests/integration/test_telemetry_worker.py::test_invalid_message_is_rejected_without_requeue PASSED [ 28%]
+tests/integration/test_telemetry_worker.py::test_unknown_vehicle_is_rejected_without_requeue PASSED [ 42%]
+tests/integration/test_telemetry_worker.py::test_duplicate_message_is_stored_once PASSED [ 57%]
+tests/integration/test_telemetry_worker.py::test_older_message_does_not_overwrite_cached_state PASSED [ 71%]
+tests/integration/test_telemetry_worker.py::test_database_outage_requeues_message PASSED [ 85%]
+tests/integration/test_telemetry_worker.py::test_cache_outage_does_not_block_ingestion PASSED [100%]
+============================= 7 passed in 11.34s ==============================
+$ pytest tests -q
+1515 passed in 100.19s (0:01:40)

@@ -70,6 +70,7 @@ nav:
       - "SRE":
           - operations/slo-policy.md
           - runbooks/RB-001.md
+          - runbooks/RB-002.md
           - runbooks/alert-catalog.md
       - "Управління змінами":
           - changes/RFC-001.md
@@ -78,6 +79,8 @@ nav:
       - "Legacy та інциденти":
           - legacy/telemetry-worker.md
           - incidents/INC-001.md
+          - incidents/PM-001.md
+          - incidents/CAPA-001.md
   - "Звіти":
       - lab11/REPORT.md
       - lab12/REPORT.md
