@@ -143,7 +143,11 @@ wikilink-ціль (`evidence/mkdocs_preview_warnings.txt`):
 
 --8<-- "docs/lab11/evidence/kb_graph.mmd"
 
-> Скріншот графа з самого Obsidian (вікно *Graph view*) додається вручну як `screenshots/obsidian_graph.png`.
+Граф у самому Obsidian (*Graph view*, сховище — корінь репозиторію, увімкнено мітки і показ ізольованих вузлів):
+усі документи бази знань і кущ ADR пов'язані між собою та з тегами `#architecture`, `#api`, `#ops`, `#adr`; поза
+основним кластером лише `README`/`CHANGELOG` (поза `docs/`, пов'язані посиланнями) — островів серед документів немає.
+
+![Граф знань Obsidian](screenshots/obsidian_graph.png)
 
 ---
 
