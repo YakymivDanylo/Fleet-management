@@ -34,9 +34,12 @@ rules:
     resolved: false
     given: "$.paths[*][get,put,post,patch,delete].responses[?(@property.match(/^[45]/))]"
     then:
-      field: $ref
-      function: pattern
-      functionOptions: {match: "^#/components/responses/"}
+      # `pattern` ignores a missing field, so presence is asserted separately.
+      - field: $ref
+        function: truthy
+      - field: $ref
+        function: pattern
+        functionOptions: {match: "^#/components/responses/"}
 
   fm-shared-error-responses-use-error-schema:
     description: Every shared error response returns the common Error schema.
@@ -44,9 +47,12 @@ rules:
     resolved: false
     given: "$.components.responses[*].content.application/json.schema"
     then:
-      field: $ref
-      function: pattern
-      functionOptions: {match: "^#/components/schemas/Error$"}
+      # `pattern` ignores a missing field, so presence is asserted separately.
+      - field: $ref
+        function: truthy
+      - field: $ref
+        function: pattern
+        functionOptions: {match: "^#/components/schemas/Error$"}
 
   fm-operation-declares-500:
     description: Every operation documents the 500 response (unexpected server error).

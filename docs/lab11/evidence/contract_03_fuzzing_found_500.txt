@@ -1,0 +1,182 @@
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from docs/api/openapi.yaml (in 0.48s)
+
+     Base URL:         http://localhost:8000
+     Specification:    Open API 3.0.3
+     Operations:       5 selected / 5 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ✅  Examples (in 0.52s)
+
+     ✅ 4 passed  ⏭  1 skipped
+
+ ❌  Coverage (in 0.92s)
+
+     ❌ 5 failed
+
+ ✅  Fuzzing (in 8.25s)
+
+     ✅ 5 passed
+
+ ✅  Stateful (in 3.65s)
+
+     Scenarios:    111
+     API Links:    1 covered / 2 selected / 2 total (2 inferred)
+
+     ✅ 111 passed
+
+=================================== FAILURES ===================================
+___________________ GET /stations/{station_id}/availability ____________________
+1. Test Case ID: 7FbICr
+
+- ST101 Server error
+
+- ST105 Undocumented Content-Type
+
+    Received: text/plain; charset=utf-8
+    Documented: application/json
+
+[500] Internal Server Error:
+
+    `Traceback (most recent call last):
+      File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+      File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+        return self.encoder(self, settings, buf, obj)
+      File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+        self.c_encoder(settings, buf, obj)
+      File "asyncpg/pgproto/codecs/int.pyx", line 60, in asyncpg.pgprot // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET http://localhost:8000/stations/2147483648/availability
+
+    st replay 7FbICr
+
+_______________________ GET /vehicles/{vehicle_id}/state _______________________
+1. Test Case ID: hzeCzw
+
+- ST101 Server error
+
+- ST105 Undocumented Content-Type
+
+    Received: text/plain; charset=utf-8
+    Documented: application/json
+
+[500] Internal Server Error:
+
+    `Traceback (most recent call last):
+      File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+      File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+        return self.encoder(self, settings, buf, obj)
+      File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+        self.c_encoder(settings, buf, obj)
+      File "asyncpg/pgproto/codecs/int.pyx", line 60, in asyncpg.pgprot // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET http://localhost:8000/vehicles/2147483648/state
+
+    st replay hzeCzw
+
+______________________________ OPTIONS /stations _______________________________
+1. Test Case ID: emT9UK
+
+- ST205 Allow header mismatch
+
+    `Allow: POST` does not match the schema. Missing documented methods: GET. Undocumented methods advertised: POST
+
+    List exactly the methods this resource supports in `Allow`
+
+[405] Method Not Allowed:
+
+    `{"detail":"Method Not Allowed"}`
+
+Reproduce with:
+
+    curl -X OPTIONS http://localhost:8000/stations
+
+    st replay emT9UK
+
+_____________________________ POST /rentals/start ______________________________
+1. Test Case ID: Os2mDa
+
+- ST101 Server error
+
+- ST105 Undocumented Content-Type
+
+    Received: text/plain; charset=utf-8
+    Documented: application/json
+
+[500] Internal Server Error:
+
+    `Traceback (most recent call last):
+      File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+      File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+      File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+        self.c_encoder(settings, buf, obj)
+      File "asyncpg/pgproto/codecs/int.pyx", line 60, in asyncpg.pgproto.pgproto.int4_encode
+    OverflowError: value out of  // Output truncated...`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"renter_id": 3, "vehicle_id": 2147483648}' http://localhost:8000/rentals/start
+
+    st replay Os2mDa
+
+________________________ POST /rentals/{rental_id}/end _________________________
+1. Test Case ID: L6RGvn
+
+- ST101 Server error
+
+- ST105 Undocumented Content-Type
+
+    Received: text/plain; charset=utf-8
+    Documented: application/json
+
+[500] Internal Server Error:
+
+    `Traceback (most recent call last):
+      File "asyncpg/protocol/prepared_stmt.pyx", line 175, in asyncpg.protocol.protocol.PreparedStatementState._encode_bind_msg
+      File "asyncpg/protocol/codecs/base.pyx", line 251, in asyncpg.protocol.protocol.Codec.encode
+      File "asyncpg/protocol/codecs/base.pyx", line 153, in asyncpg.protocol.protocol.Codec.encode_scalar
+        self.c_encoder(settings, buf, obj)
+      File "asyncpg/pgproto/codecs/int.pyx", line 60, in asyncpg.pgproto.pgproto.int4_encode
+    OverflowError: value out of  // Output truncated...`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"end_station_id": 2}' http://localhost:8000/rentals/2147483648/end
+
+    st replay L6RGvn
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ✅ Examples
+  ❌ Coverage
+  ✅ Fuzzing
+  ✅ Stateful
+
+Failures:
+  ❌ ST101 Server error: 4
+  ❌ ST205 Allow header mismatch: 1
+  ❌ ST105 Undocumented Content-Type: 4
+
+For more information, run `st explain <code>` for ST101, ST105, ST205.
+
+Test cases:
+  938 generated, 5 found 9 unique failures
+
+Seed: 42
+
+============================= 9 failures in 13.45s =============================

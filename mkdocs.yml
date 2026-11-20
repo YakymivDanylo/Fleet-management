@@ -110,9 +110,16 @@ markdown_extensions:
   - tables
   - footnotes
   - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
+  # Reports include listings straight from the repository files (no copies to go stale);
+  # a missing file is a build error.
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
   - pymdownx.superfences:
       # mermaid2 renders ```mermaid blocks (C4 and flowcharts from Lab 10).
       custom_fences:

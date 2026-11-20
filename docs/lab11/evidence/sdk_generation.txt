@@ -1,0 +1,153 @@
+$ npx @openapitools/openapi-generator-cli@2.42.2 generate -i docs/api/openapi.yaml -g python -o sdkclient --additional-properties=packageName=fleet_client,projectName=fleet-client,packageVersion=1.0.0
+# generator version: 7.27.0
+[main] INFO  o.o.codegen.DefaultGenerator - Generating with dryRun=false
+[main] INFO  o.o.c.ignore.CodegenIgnoreProcessor - Output directory (C:\Users\dryak\Uni\Web_Python\sdkclient) does not exist, or is inaccessible. No file (.openapi-generator-ignore) will be evaluated.
+[main] INFO  o.o.codegen.DefaultGenerator - OpenAPI Generator: python (client)
+[main] INFO  o.o.codegen.DefaultGenerator - Generator 'python' is considered stable.
+[main] INFO  o.o.c.l.AbstractPythonCodegen - Environment variable PYTHON_POST_PROCESS_FILE not defined so the Python code may not be properly formatted. To define it, try 'export PYTHON_POST_PROCESS_FILE="/usr/local/bin/yapf -i"' (Linux/Mac)
+[main] INFO  o.o.c.l.AbstractPythonCodegen - NOTE: To enable file post-processing, 'enablePostProcessFile' must be set to `true` (--enable-post-process-file for CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as Error_detail. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings Error_detail=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings Error_detail=NewModel,ModelA=NewModelA in CLI).
+[main] INFO  o.o.codegen.InlineModelResolver - Inline schema created as ValidationIssue_loc_inner. To have complete control of the model name, set the `title` field or use the modelNameMapping option (e.g. --model-name-mappings ValidationIssue_loc_inner=NewModel,ModelA=NewModelA in CLI) or inlineSchemaNameMapping option (--inline-schema-name-mappings ValidationIssue_loc_inner=NewModel,ModelA=NewModelA in CLI).
+[main] WARN  o.o.codegen.utils.ModelUtils - Failed to get the schema name: null
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\error.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_error.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\Error.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\error_detail.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_error_detail.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\ErrorDetail.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\rental.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_rental.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\Rental.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\rental_end.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_rental_end.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\RentalEnd.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\rental_start.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_rental_start.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\RentalStart.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\rental_status.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_rental_status.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\RentalStatus.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\station.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_station.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\Station.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\station_availability.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_station_availability.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\StationAvailability.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\validation_issue.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_validation_issue.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\ValidationIssue.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\validation_issue_loc_inner.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_validation_issue_loc_inner.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\ValidationIssueLocInner.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\vehicle_state.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_vehicle_state.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\VehicleState.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api\rentals_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_rentals_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\RentalsApi.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api\stations_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_stations_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\StationsApi.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api\vehicles_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\test_vehicles_api.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\docs\VehiclesApi.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\README.md
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\tox.ini
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test-requirements.txt
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\requirements.txt
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\setup.cfg
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\git_push.sh
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.gitignore
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.travis.yml
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.github\workflows\python.yml
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.gitlab-ci.yml
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\setup.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\pyproject.toml
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\py.typed
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\configuration.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\__init__.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\models\__init__.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api\__init__.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\exceptions.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\test\__init__.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api_client.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\api_response.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\fleet_client\rest.py
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.openapi-generator-ignore
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.openapi-generator\VERSION
+[main] INFO  o.o.codegen.TemplateManager - writing file C:\Users\dryak\Uni\Web_Python\sdkclient\.openapi-generator\FILES
+
+$ cat sdkclient/.openapi-generator/FILES
+.github/workflows/python.yml
+.gitignore
+.gitlab-ci.yml
+.openapi-generator-ignore
+.travis.yml
+README.md
+docs/Error.md
+docs/ErrorDetail.md
+docs/Rental.md
+docs/RentalEnd.md
+docs/RentalStart.md
+docs/RentalStatus.md
+docs/RentalsApi.md
+docs/Station.md
+docs/StationAvailability.md
+docs/StationsApi.md
+docs/ValidationIssue.md
+docs/ValidationIssueLocInner.md
+docs/VehicleState.md
+docs/VehiclesApi.md
+fleet_client/__init__.py
+fleet_client/api/__init__.py
+fleet_client/api/rentals_api.py
+fleet_client/api/stations_api.py
+fleet_client/api/vehicles_api.py
+fleet_client/api_client.py
+fleet_client/api_response.py
+fleet_client/configuration.py
+fleet_client/exceptions.py
+fleet_client/models/__init__.py
+fleet_client/models/error.py
+fleet_client/models/error_detail.py
+fleet_client/models/rental.py
+fleet_client/models/rental_end.py
+fleet_client/models/rental_start.py
+fleet_client/models/rental_status.py
+fleet_client/models/station.py
+fleet_client/models/station_availability.py
+fleet_client/models/validation_issue.py
+fleet_client/models/validation_issue_loc_inner.py
+fleet_client/models/vehicle_state.py
+fleet_client/py.typed
+fleet_client/rest.py
+git_push.sh
+pyproject.toml
+requirements.txt
+setup.cfg
+setup.py
+test-requirements.txt
+test/__init__.py
+test/test_error.py
+test/test_error_detail.py
+test/test_rental.py
+test/test_rental_end.py
+test/test_rental_start.py
+test/test_rental_status.py
+test/test_rentals_api.py
+test/test_station.py
+test/test_station_availability.py
+test/test_stations_api.py
+test/test_validation_issue.py
+test/test_validation_issue_loc_inner.py
+test/test_vehicle_state.py
+test/test_vehicles_api.py
+tox.ini
+
+$ pip install ./sdkclient && python scripts/sdk_smoke.py
+listStations -> 5 x Station
+getStationAvailability -> StationAvailability(station_id=1, capacity=8, parked_vehicles=1, free_slots=7, available_vehicles=1)
+getVehicleState -> source=cache recorded_at=2026-11-20 11:27:01.883923+00:00
+getStationAvailability(unknown) -> HTTP 404, detail='Station 2147483647 not found'
+startRental -> id=18 RentalStatus.ACTIVE started_at=2026-11-20 11:27:03.809580+00:00
+endRental -> status=RentalStatus.COMPLETED cost=5.0 ended_at=2026-11-20 11:27:03.878838+00:00

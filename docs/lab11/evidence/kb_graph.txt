@@ -1,0 +1,27 @@
+pages=24 links=101 components=1
+component 1 (24 pages): api/api-overview.md, api/contract-testing.md, api/openapi-reference.md, api/python-reference.md, api/sdk.md, architecture/adr/adr-0001-postgresql-redis-rabbitmq-storage.md, architecture/adr/adr-0002-gitops-argo-canary-delivery.md, architecture/adr/adr-0003-plain-markdown-doc-passport.md, architecture/adr/adr-0004-documentation-as-code-mkdocs.md, architecture/adr/adr-0005-row-lock-on-rental-start.md, architecture/adr/index.md, architecture/architecture-index.md, architecture/isd.md, architecture/k8s-raw-manifests.md, architecture/sdd.md, developer/CONTRIBUTING.md, developer/code-standards.md, developer/developer-index.md, developer/documentation-regime.md, developer/handover.md, developer/local-setup.md, index.md, lab11/REPORT.md, tags.md
+  api/api-overview.md: out=6 in=10
+  api/contract-testing.md: out=5 in=5
+  api/openapi-reference.md: out=2 in=3
+  api/python-reference.md: out=2 in=2
+  api/sdk.md: out=2 in=2
+  architecture/adr/adr-0001-postgresql-redis-rabbitmq-storage.md: out=2 in=5
+  architecture/adr/adr-0002-gitops-argo-canary-delivery.md: out=2 in=5
+  architecture/adr/adr-0003-plain-markdown-doc-passport.md: out=4 in=2
+  architecture/adr/adr-0004-documentation-as-code-mkdocs.md: out=4 in=3
+  architecture/adr/adr-0005-row-lock-on-rental-start.md: out=3 in=1
+  architecture/adr/index.md: out=8 in=4
+  architecture/architecture-index.md: out=3 in=2
+  architecture/isd.md: out=9 in=11
+  architecture/k8s-raw-manifests.md: out=2 in=2
+  architecture/sdd.md: out=9 in=12
+  developer/CONTRIBUTING.md: out=7 in=11
+  developer/code-standards.md: out=4 in=3
+  developer/developer-index.md: out=6 in=1
+  developer/documentation-regime.md: out=2 in=2
+  developer/handover.md: out=7 in=6
+  developer/local-setup.md: out=4 in=6
+  index.md: out=7 in=0  <- no inbound links
+  lab11/REPORT.md: out=1 in=2
+  tags.md: out=0 in=1
+knowledge graph: CONNECTED

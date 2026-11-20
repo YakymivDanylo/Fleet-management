@@ -1,0 +1,85 @@
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from docs/api/openapi.yaml (in 0.50s)
+
+     Base URL:         http://localhost:8000
+     Specification:    Open API 3.0.3
+     Operations:       5 selected / 5 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ✅  Examples (in 0.58s)
+
+     ✅ 4 passed  ⏭  1 skipped
+
+ ❌  Coverage (in 3.90s)
+
+     ✅ 4 passed  ❌ 1 failed
+
+ ✅  Fuzzing (in 8.43s)
+
+     ✅ 5 passed
+
+ ✅  Stateful (in 3.81s)
+
+     Scenarios:    111
+     API Links:    1 covered / 2 selected / 2 total (2 inferred)
+
+     ✅ 111 passed
+
+=================================== FAILURES ===================================
+_____________________________ POST /rentals/start ______________________________
+1. Test Case ID: ZgJ8MP
+
+- ST101 Server error
+
+- ST105 Undocumented Content-Type
+
+    Received: text/plain; charset=utf-8
+    Documented: application/json
+
+[500] Internal Server Error:
+
+    `Traceback (most recent call last):
+      File "/opt/venv/lib/python3.13/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 550, in _prepare_and_execute
+        self._rows = deque(await prepared_stmt.fetch(*parameters))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/opt/venv/lib/python3.13/site-packages/asyncpg/prepared_stmt.py", line 177, in fetch
+        data = await self.__bind_execute(args, 0, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/opt/venv/lib/py // Output truncated...`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"renter_id": 2147483646, "vehicle_id": 7}' http://localhost:8000/rentals/start
+
+    st replay ZgJ8MP
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ✅ Examples
+  ❌ Coverage
+  ✅ Fuzzing
+  ✅ Stateful
+
+Failures:
+  ❌ ST101 Server error: 1
+  ❌ ST105 Undocumented Content-Type: 1
+
+For more information, run `st explain <code>` for ST101, ST105.
+
+Test cases:
+  1024 generated, 1 found 2 unique failures
+
+Seed: 42
+
+============================= 2 failures in 16.80s =============================

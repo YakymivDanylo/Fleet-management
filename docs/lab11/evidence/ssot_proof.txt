@@ -1,0 +1,10 @@
+$ sha256sum docs/api/openapi.yaml site/api/openapi.yaml <published>/api/openapi.yaml
+500ae96e8037c5af5495198722b656982db0f159baebdc714b3e914d0d110ea5 *docs/api/openapi.yaml
+500ae96e8037c5af5495198722b656982db0f159baebdc714b3e914d0d110ea5 *site/api/openapi.yaml
+500ae96e8037c5af5495198722b656982db0f159baebdc714b3e914d0d110ea5 *https://yakymivdanylo.github.io/Fleet-management/api/openapi.yaml
+
+$ grep -o "url = .*;" site/api/openapi-reference/swagger-*.html
+url = "../openapi.yaml";
+
+$ grep -c "station_id" docs/api/openapi-reference.md   # the reference page itself contains no contract text
+0

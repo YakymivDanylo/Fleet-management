@@ -1,0 +1,68 @@
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from docs/api/openapi.yaml (in 0.48s)
+
+     Base URL:         http://localhost:8000
+     Specification:    Open API 3.0.3
+     Operations:       5 selected / 5 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ✅  Examples (in 0.46s)
+
+     ✅ 4 passed  ⏭  1 skipped
+
+ ✅  Coverage (in 4.21s)
+
+     ✅ 5 passed
+
+ ✅  Fuzzing (in 13.78s)
+
+     ✅ 5 passed
+
+ ✅  Stateful (in 3.77s)
+
+     Scenarios:    111
+     API Links:    1 covered / 2 selected / 2 total (2 inferred)
+
+     ✅ 111 passed
+
+=================================== WARNINGS ===================================
+
+Missing test data: 2 operations repeatedly returned 404 Not Found, preventing tests from reaching your API's core logic
+
+No links point to this operation - POST /rentals/start appears to supply the data it needs:
+  - POST /rentals/{rental_id}/end
+
+💡 Add a link from POST /rentals/start, or supply the identifiers it returns in your config file
+
+No links point to this operation - nothing in the schema appears to supply the data it needs:
+  - POST /rentals/start
+
+💡 Schemathesis found no operation that creates this data - create it outside the test run and supply the identifiers in your config file
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ✅ Examples
+  ✅ Coverage
+  ✅ Fuzzing
+  ✅ Stateful
+
+Warnings:
+  ⚠️ Missing test data: 2 operations repeatedly returned 404 responses
+
+Test cases:
+  1124 generated, 1124 passed
+
+Seed: 42
+
+============================= 1 warning in 22.29s ==============================

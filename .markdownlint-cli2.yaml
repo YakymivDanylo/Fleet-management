@@ -14,6 +14,8 @@ config:
   MD025:
     front_matter_title: ""
   MD041: false
+  # Material content tabs (=== "…") and collapsible admonitions (???) indent their fenced blocks.
+  MD046: false
   # Tables are aligned by content, not by pipes.
   MD060: false
 

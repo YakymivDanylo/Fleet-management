@@ -1,0 +1,128 @@
+```mermaid
+flowchart LR
+  n0["api-overview"]
+  n1["contract-testing"]
+  n2["openapi-reference"]
+  n3["python-reference"]
+  n4["sdk"]
+  n5["adr-0001-postgresql-redis-rabbitmq-storage"]
+  n6["adr-0002-gitops-argo-canary-delivery"]
+  n7["adr-0003-plain-markdown-doc-passport"]
+  n8["adr-0004-documentation-as-code-mkdocs"]
+  n9["adr-0005-row-lock-on-rental-start"]
+  n10["index"]
+  n11["architecture-index"]
+  n12["isd"]
+  n13["k8s-raw-manifests"]
+  n14["sdd"]
+  n15["CONTRIBUTING"]
+  n16["code-standards"]
+  n17["developer-index"]
+  n18["documentation-regime"]
+  n19["handover"]
+  n20["local-setup"]
+  n21["index"]
+  n22["REPORT"]
+  n23["tags"]
+  n0 --> n1
+  n0 --> n2
+  n0 --> n3
+  n0 --> n4
+  n0 --> n14
+  n0 --> n22
+  n1 --> n0
+  n1 --> n2
+  n1 --> n4
+  n1 --> n15
+  n1 --> n22
+  n2 --> n0
+  n2 --> n1
+  n3 --> n0
+  n3 --> n14
+  n4 --> n0
+  n4 --> n1
+  n5 --> n12
+  n5 --> n14
+  n6 --> n12
+  n6 --> n19
+  n7 --> n8
+  n7 --> n12
+  n7 --> n14
+  n7 --> n18
+  n8 --> n0
+  n8 --> n7
+  n8 --> n12
+  n8 --> n15
+  n9 --> n5
+  n9 --> n14
+  n9 --> n19
+  n10 --> n5
+  n10 --> n6
+  n10 --> n7
+  n10 --> n8
+  n10 --> n9
+  n10 --> n12
+  n10 --> n14
+  n10 --> n15
+  n11 --> n10
+  n11 --> n12
+  n11 --> n14
+  n12 --> n5
+  n12 --> n6
+  n12 --> n8
+  n12 --> n10
+  n12 --> n13
+  n12 --> n14
+  n12 --> n15
+  n12 --> n19
+  n12 --> n20
+  n13 --> n6
+  n13 --> n12
+  n14 --> n0
+  n14 --> n1
+  n14 --> n2
+  n14 --> n5
+  n14 --> n6
+  n14 --> n10
+  n14 --> n12
+  n14 --> n15
+  n14 --> n20
+  n15 --> n0
+  n15 --> n1
+  n15 --> n10
+  n15 --> n16
+  n15 --> n18
+  n15 --> n19
+  n15 --> n20
+  n16 --> n3
+  n16 --> n14
+  n16 --> n15
+  n16 --> n20
+  n17 --> n0
+  n17 --> n11
+  n17 --> n15
+  n17 --> n16
+  n17 --> n19
+  n17 --> n20
+  n18 --> n15
+  n18 --> n19
+  n19 --> n5
+  n19 --> n6
+  n19 --> n12
+  n19 --> n13
+  n19 --> n14
+  n19 --> n15
+  n19 --> n20
+  n20 --> n12
+  n20 --> n14
+  n20 --> n15
+  n20 --> n16
+  n21 --> n0
+  n21 --> n11
+  n21 --> n12
+  n21 --> n14
+  n21 --> n15
+  n21 --> n17
+  n21 --> n23
+  n22 --> n0
+```
