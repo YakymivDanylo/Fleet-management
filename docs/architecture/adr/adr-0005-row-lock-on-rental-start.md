@@ -1,17 +1,17 @@
 ---
 title: ADR-0005
 owner: "@YakymivDanylo"
-status: in-review
-adr_status: Proposed
+status: published
+adr_status: Accepted
 decision_date: 2026-11-20
-review_date: 2026-12-04
-review_cycle_days: 14
+review_date: 2027-05-19
+review_cycle_days: 180
 tags: [architecture, adr]
 ---
 
 # ADR-0005: Песимістичне блокування рядка авто (`SELECT … FOR UPDATE`) при старті оренди
 
-- **Статус:** Proposed
+- **Статус:** Accepted — 2026-11-20, рішення [[CCB-2026-11-20|CCB]] за [[RFC-001]] (Proposed — 2026-11-20)
 - **Дата пропозиції:** 2026-11-20
 - **Автор / власник:** Danylo Yakymiv
 - **Пов'язані документи:** [[sdd#4-модель-даних|SDD §4]] (відоме обмеження),

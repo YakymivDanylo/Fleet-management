@@ -25,11 +25,11 @@ tags: [architecture, adr]
 | [0002](adr-0002-gitops-argo-canary-delivery.md) | GitOps (Argo CD) + canary Argo Rollouts з авто-відкатом | Accepted | 2026-10-26 | — |
 | [0003](adr-0003-plain-markdown-doc-passport.md) | Паспорт документації — Markdown у `docs/` + `doc_audit.py` | **Superseded by 0004** | 2026-11-14 | → 0004 |
 | [0004](adr-0004-documentation-as-code-mkdocs.md) | Documentation as Code: MkDocs Material, API-first OpenAPI, strict CI, Pages | Accepted | 2026-11-20 | замінює 0003 |
-| [0005](adr-0005-row-lock-on-rental-start.md) | `SELECT … FOR UPDATE` при старті оренди | Proposed | 2026-11-20 | RFC-001 (ЛР№12) |
+| [0005](adr-0005-row-lock-on-rental-start.md) | `SELECT … FOR UPDATE` при старті оренди | Accepted (Proposed → Accepted за рішенням CCB) | 2026-11-20 | RFC-001 (ЛР№12) |
 
 ```mermaid
 flowchart LR
-  A1[ADR-0001 Accepted] -->|наслідок: гонка оренди| A5[ADR-0005 Proposed]
+  A1[ADR-0001 Accepted] -->|наслідок: гонка оренди| A5[ADR-0005 Accepted]
   A3[ADR-0003 Superseded] -->|superseded by| A4[ADR-0004 Accepted]
   A2[ADR-0002 Accepted]
 ```

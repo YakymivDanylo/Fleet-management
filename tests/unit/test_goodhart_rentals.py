@@ -28,6 +28,7 @@ async def test_start_rental_marks_vehicle_rented():
     assert vehicle.status == VehicleStatus.RENTED
     assert db.get.await_args_list[0].args == (rental_service.Renter, 3)
     assert db.get.await_args_list[1].args == (rental_service.Vehicle, 5)
+    assert db.get.await_args_list[1].kwargs == {"with_for_update": True}  # RFC-001 row lock
     db.add.assert_called_once_with(rental)
     db.commit.assert_awaited_once()
     db.refresh.assert_awaited_once_with(rental)

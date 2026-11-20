@@ -46,7 +46,9 @@ async def start_rental(db: AsyncSession, renter_id: int, vehicle_id: int) -> Ren
     # i.e. HTTP 500 instead of the documented 404 (found by the Schemathesis contract test).
     if await db.get(Renter, renter_id) is None:
         raise NotFoundError(f"Renter {renter_id} not found")
-    vehicle = await db.get(Vehicle, vehicle_id)
+    # RFC-001 / ADR-0005: lock the vehicle row (SELECT ... FOR UPDATE) until commit, so a concurrent
+    # start for the same car waits, then sees `rented` and gets 409 instead of a second rental.
+    vehicle = await db.get(Vehicle, vehicle_id, with_for_update=True)
     if vehicle is None:
         raise NotFoundError(f"Vehicle {vehicle_id} not found")
     if vehicle.status != VehicleStatus.AVAILABLE:

@@ -4,6 +4,10 @@ All notable changes to this project, newest first. Entries are grouped by UTC da
 
 ## 2026-11-20
 
+### Prevent double rental of the same car — 12:07 UTC
+**Summary:** Two customers can no longer rent the same last car at the same moment; one gets it, the other is told it is taken.
+**Details:** Starting a rental now reserves the car in the database until the booking is saved, so a simultaneous second request waits and is rejected as "not available". Approved through change request RFC-001 by the change board, with a race test, contract check and backup before release. No data changes; rollback is a plain revert.
+
 ### Publish documentation site and API contract — 11:33 UTC
 **Summary:** All project documentation now lives on one searchable website that rebuilds itself, and the public API has an official, tested description.
 **Details:** Documentation is organised in four levels (overview, developer, API, architecture) with owners and review dates, published automatically and blocked when a link or page is broken. The public API is described in a contract that powers interactive docs and a client library. Checking it against the running system fixed wrong time formats and server errors on invalid or unknown ids.

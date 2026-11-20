@@ -1,0 +1,6 @@
+# RFC-001 condition 1: full test suite after the change, 2026-11-20T12:04:23Z
+$ pytest tests/integration/test_rental_concurrency.py -v
+tests/integration/test_rental_concurrency.py::test_race_for_last_vehicle_creates_exactly_one_active_rental PASSED [100%]
+============================== 1 passed in 1.59s ==============================
+$ pytest tests -q
+1505 passed in 119.08s (0:01:59)
