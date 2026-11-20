@@ -1,0 +1,22 @@
+$ python scripts/db_backup.py drill
+[2026-11-20T11:50:14Z] backup: pg_dump -Fc -> backups\fleet_20261120T115013Z.dump
+[2026-11-20T11:50:15Z] backup: done in 0.7 s, 131.3 KiB, sha256 eaa23269433f6a9b64817ffc2b6ac38395a7bda96f2eb6028bca50a3bb33aa2e
+[2026-11-20T11:50:15Z] checksum OK (eaa23269433f6a9b…)
+[2026-11-20T11:50:15Z] drill: throwaway postgres:16-alpine container 'fleet-restore-drill'
+table                   source(before)  source(after)  restored
+alembic_version                      1              1         1
+analytics_events                     0              0         0
+audit_events                         0              0         0
+consent_history                      0              0         0
+marketing_messages                   0              0         0
+rentals                             17             17        17
+renters                              3              3         3
+stations                             5              5         5
+telemetry_readings               10870          10880     10880
+user_activity                        3              3         3
+user_consents                        0              0         0
+users                                3              3         3
+vehicles                            10             10        10
+[2026-11-20T11:50:18Z] drill: pg_restore 0.4 s, alembic head e1f4a7c9b2d6, tables 13
+[2026-11-20T11:50:18Z] restore drill: PASS
+exit=0

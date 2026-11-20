@@ -1,0 +1,7 @@
+# RFC-001 assessment: reproduce the race on the current code (commit 56aa89e), 2026-11-20T12:01:40Z
+$ pytest tests/integration/test_rental_concurrency.py -q
+>       assert sorted(results) == ["201", "409"]
+E       AssertionError: assert ['201', '201'] == ['201', '409']
+E         At index 1 diff: '201' != '409'
+tests\integration\test_rental_concurrency.py:76: AssertionError
+1 failed in 0.74s

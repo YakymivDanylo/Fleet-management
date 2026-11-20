@@ -65,8 +65,19 @@ nav:
           - architecture/adr/adr-0005-row-lock-on-rental-start.md
       - "Архів (deprecated)":
           - architecture/k8s-raw-manifests.md
+  - "Експлуатація та супровід":
+      - maintenance-plan.md
+      - "SRE":
+          - operations/slo-policy.md
+          - runbooks/RB-001.md
+          - runbooks/alert-catalog.md
+      - "Управління змінами":
+          - changes/RFC-001.md
+          - changes/CCB-2026-11-20.md
+          - changes/release-checklist.md
   - "Звіти":
       - lab11/REPORT.md
+      - lab12/REPORT.md
   - tags.md
 
 # Obsidian-style [[wikilinks]] -> regular Markdown links, so one source serves both the Obsidian

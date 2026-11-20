@@ -199,38 +199,140 @@ flowchart LR
 | Метрики | `/metrics` → ServiceMonitor (15 с) → Prometheus (`kube-prometheus-stack`) | `http_requests_total`, `http_request_duration_seconds` |
 | Дашборд | ConfigMap з Grafana-дашбордом (`charts/.../dashboards/fleet-management.json`) | RPS, частка 5xx, p95 за репліками |
 | Логи | JSON-логи з correlation id і санітайзером PII → Alloy → Loki | пошук за `request_id`/`correlation_id` |
-| Алерт | PrometheusRule: частка 5xx > 5 % протягом 1 хв | реакція чергового < 15 хв |
+| Алерти | [[alert-catalog\|каталог алертів]] ALR-01…: PrometheusRule (5xx > 5 % за 1 хв), БД, свіжість копій, restore drill — кожен з runbook | реакція за [[maintenance-plan#матриця-ескалації\|матрицею ескалації]] |
 | Canary-аналіз | AnalysisTemplate `fleet-management-success-rate`: успішних ≥ 95 %, 4 виміри по 30 с, `failureLimit: 1` | автоматичний відкат поганого релізу |
 | Compose | `docker compose ps` (health), `python scripts/docker_stats.py` | — |
 
 <a id="isd-backup"></a>
 
-## 7. Резервне копіювання і відновлення
+## 7. Резервне копіювання (backup policy)
 
-| Дані | Метод | Частота | Зберігання | **RPO** | **RTO** |
+Політика ЛР№12. Операційні кроки — у [[RB-001|runbook RB-001]]; тут — *що*, *як часто* і *чому*.
+
+### 7.1 Обсяг даних
+
+| Дані | Сховище | Обсяг зараз (sandbox, 2026-11-20) | Модель production | Бекап |
+|---|---|---|---|---|
+| Довідники, оренди, користувачі, GDPR-журнали | PostgreSQL | < 1 МБ | десятки МБ | **так** — джерело істини |
+| Історія телеметрії `telemetry_readings` | PostgreSQL | 11 тис. рядків, 1,6 МБ на диску; дамп ~12 Б/рядок | 200 авто × 1 показ/10 с = 1,73 млн рядків/добу ≈ 260 МБ/добу на диску, ≈ 21 МБ/добу в дампі; 90 днів ≈ 1,9 ГБ дампу | **так** |
+| Черга `telemetry` | RabbitMQ | секунди потоку | — | лише definitions (черги, користувачі) |
+| `vehicle:{id}:state`, кеш списків | Redis | КБ | — | **ні** — похідні дані, відновлюються worker'ом і fallback на PostgreSQL ([[adr-0001-postgresql-redis-rabbitmq-storage\|ADR-0001]]) |
+| Конфігурація, маніфести, контракт | Git | — | — | Git = копія (GitHub + клони) |
+
+Вимір: `pg_database_size` = 9,98 МБ, дамп `pg_dump -Fc` = 131 КіБ (`docs/lab12/evidence/restore_drill_01.txt`).
+
+### 7.2 Розклад, типи копій, retention, шифрування
+
+| Тип | Як | Коли | Зберігання (retention) | Стан |
+|---|---|---|---|---|
+| **Повна логічна** | `python scripts/db_backup.py backup` (`pg_dump -Fc` + SHA-256) | щодня 02:00 UTC + **перед кожним релізом з міграцією** (Release Checklist) | 7 щоденних + 4 тижневі (`db_backup.py prune`) | реалізовано |
+| **Інкрементна** (PITR) | безперервне архівування WAL (`archive_mode=on`, `archive_timeout=300`) поверх щотижневого `pg_basebackup` | безперервно / щонеділі 03:00 UTC | WAL — 7 днів, base backup — 4 тижні | **заплановано** ([[maintenance-plan]], пріоритет P2): знижує RPO з 24 год до 5 хв |
+| Definitions RabbitMQ | `rabbitmqctl export_definitions` | при зміні черг | у Git поруч з чартом | вручну |
+
+**Шифрування.** У спокої на хості — шифрований том; копія, що покидає хост, шифрується асиметрично
+`age -r <public key команди>` (приватний ключ — у сховищі секретів, не на хості бекапів); у транзиті — TLS
+об'єктного сховища. Цілісність — `.sha256` поруч з кожною копією; `restore` і `drill` відмовляються працювати з
+пошкодженою копією.
+
+**Правило 3-2-1:**
+
+| | Копія | Носій | Де |
+|---|---|---|---|
+| 1 | робоча БД (том `pgdata` / PVC) | диск хоста БД | майданчик |
+| 2 | `backups/fleet_*.dump` | окремий диск хоста бекапів (інший тип носія) | майданчик |
+| 3 | зашифрована копія `*.dump.age` | об'єктне сховище (S3-сумісне, версіонування + object lock 30 днів) | **поза майданчиком**, інший регіон |
+
+<a id="isd-restore-drill"></a>
+
+### 7.3 Restore drill — тестове відновлення
+
+Копія, з якої ніколи не відновлювались, копією не вважається. Тому щомісяця (1-й робочий день, 10:00 UTC) і після
+кожної зміни схеми бекапу: `python scripts/db_backup.py drill` — свіжа копія відновлюється в одноразовий контейнер
+`postgres:16-alpine`, кожна таблиця порівнюється з джерелом (append-only таблиці — в межах лічильників до/після дампу),
+перевіряється head Alembic, фіксується час `pg_restore` (складова RTO). Критерій — `restore drill: PASS`; FAIL =
+інцидент SEV-2 (у нас немає робочої копії).
+
+| Дата (UTC) | Копія | Таблиць | Час `pg_restore` | Результат | Хто |
 |---|---|---|---|---|---|
-| PostgreSQL (prod) | `pg_dump -Fc` (логічний бекап) | щодня 02:00 + перед кожним релізом зі зміною схеми | 7 щоденних + 4 тижневі, поза хостом | **24 год** (до 0 перед релізом) | **30 хв** |
-| RabbitMQ | експорт definitions (`rabbitmqctl export_definitions`); повідомлення не бекапляться | при зміні черг | у репозиторії/поруч з бекапом БД | втрата повідомлень у дорозі ≤ 1 хв телеметрії (некритично) | 10 хв |
-| Redis | не бекапиться — дані похідні | — | — | n/a | 0 хв (fallback на PostgreSQL одразу; кеш наповнюється worker'ом) |
-| Конфігурація / маніфести | Git (GitOps) | кожен коміт | GitHub | 0 | 15 хв (re-sync Argo CD) |
+| 2026-11-14 | ручний `pg_dump`/`pg_restore` (ЛР№10) | — | — | PASS (дані відновлено) | @YakymivDanylo |
+| 2026-11-20 11:50 | `fleet_20261120T115013Z.dump`, 131 КіБ | 13 | 0,4 с | **PASS** (`docs/lab12/evidence/restore_drill_01.txt`) | @YakymivDanylo |
 
-**Процедура бекапу (compose):**
+<a id="isd-operations"></a>
 
-```bash
-docker compose -p fleet_production --env-file .env.production exec -T db \
-  sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > backups/fleet_production_$(date +%F).dump
+## 8. Експлуатаційний пакет: розгортання, оновлення, відновлення після відмови
+
+### 8.1 Розгортання версії (compose)
+
+```powershell
+git fetch --tags; git checkout vX.Y.Z
+docker compose -p fleet_production --env-file .env.production up -d --build
+docker compose -p fleet_production --env-file .env.production ps              # усі healthy
+curl -s http://localhost:8080/health                                          # {"status":"ok","db":"connected"}
+curl -s http://localhost:8080/version                                         # = X.Y.Z
 ```
 
-**Відновлення:**
+Health-перевірка вбудована: репліки API стають `healthy` лише після успішного `GET /health` (`SELECT 1` у БД),
+nginx стартує лише після трьох healthy реплік ([порядок старту](#isd-startup-order)).
 
-```bash
-docker compose -p fleet_production --env-file .env.production stop api1 api2 api3 worker
-docker compose -p fleet_production --env-file .env.production exec -T db \
-  sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists' < backups/fleet_production_YYYY-MM-DD.dump
-docker compose -p fleet_production --env-file .env.production up -d
+### 8.2 Оновлення з міграціями
+
+1. Прочитати запис релізу в `CHANGELOG.md` (чи є міграція схеми, чи вона зворотна).
+2. **Резервна копія перед міграцією**: `python scripts/db_backup.py backup` (пункт Release Checklist).
+3. `docker compose … up -d --build` — одноразовий сервіс `migrate` виконує `alembic upgrade head` **до** старту реплік
+   API і worker; якщо міграція падає, нова версія застосунку не стартує.
+4. Перевірити `select version_num from alembic_version` = head нової версії.
+5. Відкат: зворотна міграція — `docker compose … run --rm migrate alembic downgrade -1` і попередній тег; незворотна —
+   [[RB-001]] з копії кроку 2.
+
+### 8.3 Відновлення після відмови — порядок підняття
+
+Сервіси піднімаються **за залежностями знизу вгору**; кожен наступний крок — лише після healthy попереднього:
+
+```mermaid
+flowchart LR
+  DB[(1. PostgreSQL<br/>healthy: pg_isready)] --> MIG[2. migrate<br/>alembic upgrade head]
+  RD[(1. Redis<br/>для API не обов'язковий — fallback)] --> API
+  MQ[(1. RabbitMQ<br/>healthy: diagnostics ping)] --> W
+  MIG --> API[3. api1..3<br/>healthy: GET /health]
+  MIG --> W[3. worker]
+  API --> NG[4. nginx]
 ```
 
-У k8s та сама команда виконується через `kubectl exec deploy/<release>-postgres -n fleet -- pg_dump …`.
-Перевірка бекапу — щомісячне тестове відновлення в `sandbox`. Процедуру `pg_dump -Fc` → `DROP` → `pg_restore --clean`
-перевірено 2026-11-14 на тимчасовому контейнері `postgres:16` (дані відновлено повністю). Каталог `backups/` —
-поза Git.
+```powershell
+docker compose -p fleet_production --env-file .env.production up -d db redis rabbitmq
+docker compose -p fleet_production --env-file .env.production up -d migrate        # дочекатися Exit 0
+docker compose -p fleet_production --env-file .env.production up -d api1 api2 api3 worker
+docker compose -p fleet_production --env-file .env.production up -d nginx
+```
+
+Якщо БД не піднімається (пошкоджений том) — [[RB-001]], розділ «Повне відновлення».
+
+<a id="isd-rto-rpo"></a>
+
+### 8.4 Цільові RTO і RPO — розрахунок
+
+**RTO** (за який час система має повернутися в стрій) = виявлення + діагностика + відновлення + верифікація:
+
+| Складова | Обґрунтування | Хв |
+|---|---|---|
+| Виявлення | алерт `ALR-02` спрацьовує через 2 хв недоступності + доставка on-call | 5 |
+| Діагностика й рішення | логи `db`, спроба перезапуску, вибір копії (RB-001) | 10 |
+| Відновлення | `pg_restore` 131 КіБ = 0,4 с (drill 2026-11-20); модель 1,9 ГБ при ~20–50 МБ/с з перебудовою індексів ≈ 2–5 хв + підняття застосунку за §8.3 ≈ 2 хв | 7 |
+| Верифікація | таблиця «Верифікація» RB-001 | 5 |
+| Запас | | 3 |
+| **RTO** | | **30 хв** |
+
+**RPO** (скільки даних дозволено втратити) визначається частотою копій: щоденна повна копія → у найгіршому випадку
+втрачається все з моменту останньої копії, тобто **RPO = 24 год**; перед релізами з міграцією — **0** (копія робиться
+безпосередньо перед зміною). Для каршерінгу 24 год оренд — забагато (оренди довелося б відновлювати вручну), тому ціль
+після впровадження WAL-архівування (§7.2) — **RPO ≤ 5 хв** (`archive_timeout=300`).
+
+| Сховище | RPO | RTO |
+|---|---|---|
+| PostgreSQL | 24 год (ціль 5 хв) | 30 хв |
+| RabbitMQ | повідомлення в дорозі ≤ 1 хв (at-least-once від сенсорів) | 10 хв |
+| Redis | n/a (похідні дані) | 0 — fallback на PostgreSQL одразу |
+| Git / GitOps | 0 | 15 хв (re-sync Argo CD) |
+
+Узгодженість з SLO: RTO 30 хв вкладається в місячний бюджет помилок доступності (216 хв, [[slo-policy]]), але один
+такий інцидент з'їдає ~14 % бюджету.

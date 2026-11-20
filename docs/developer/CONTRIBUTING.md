@@ -32,7 +32,7 @@ Pull request, що **змінює публічну поведінку** — но
 - [ ] Spectral: `npx @stoplight/spectral-cli@6.17.1 lint docs/api/openapi.yaml` — 0 errors;
 - [ ] contract-тест Schemathesis проти запущеного API — без розбіжностей ([[contract-testing]]);
 - [ ] зачеплені сторінки `docs/` оновлено: SDD (компоненти, модель даних, інвентар маршрутів), ISD (розгортання,
-      змінні, CI/CD), runbook-и й алерти, новий ADR для
+      змінні, CI/CD), runbook-и й алерти ([[alert-catalog|каталог алертів]]), новий ADR для
       архітектурного рішення (старий → `Superseded`);
 - [ ] у кожній зміненій сторінці оновлено front matter: `owner`, `status`, `review_date`;
 - [ ] запис у `CHANGELOG.md`;
