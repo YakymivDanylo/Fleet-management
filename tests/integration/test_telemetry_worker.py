@@ -124,3 +124,20 @@ async def test_infrastructure_failure_requeues_message(session_factory, vehicle_
 
     assert message.outcome == ("nack", True)
     await unreachable_redis.aclose()
+
+
+async def test_cache_outage_does_not_block_ingestion(session_factory, vehicle_id, monkeypatch):
+    """INC-001 / CAPA-1: Redis holds only derived state (ADR-0001). When it is down, a reading that
+    is already stored in PostgreSQL must be acknowledged, not requeued: requeueing made the worker
+    replay the same messages once a second and starved the queue (incident 2026-11-20)."""
+    monkeypatch.setattr(worker, "NACK_DELAY_SECONDS", 0)
+    unreachable_redis = Redis.from_url("redis://localhost:1/0", decode_responses=True)
+    first = FakeMessage(telemetry_body(vehicle_id, "2026-11-20T12:00:00+00:00"))
+    second = FakeMessage(telemetry_body(vehicle_id, "2026-11-20T12:00:02+00:00"))
+
+    await worker.handle_message(first, session_factory, unreachable_redis)
+    await worker.handle_message(second, session_factory, unreachable_redis)
+
+    assert (first.outcome, second.outcome) == ("ack", "ack")
+    assert await count_readings(session_factory) == 2
+    await unreachable_redis.aclose()

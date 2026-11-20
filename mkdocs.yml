@@ -75,6 +75,9 @@ nav:
           - changes/RFC-001.md
           - changes/CCB-2026-11-20.md
           - changes/release-checklist.md
+      - "Legacy та інциденти":
+          - legacy/telemetry-worker.md
+          - incidents/INC-001.md
   - "Звіти":
       - lab11/REPORT.md
       - lab12/REPORT.md
