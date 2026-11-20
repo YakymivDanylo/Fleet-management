@@ -1,0 +1,24 @@
+{
+  "userIgnoreFilters": [
+    ".venv/",
+    "site/",
+    "sdkclient/",
+    "mutants/",
+    "loadtest/",
+    "charts/",
+    "k8s/",
+    "alembic/",
+    "monitoring/",
+    "src/",
+    "tests/",
+    "Lab ",
+    "Лабораторна",
+    "FINANCIAL_LEDGER.md",
+    "docs/lab11/evidence/",
+    "docs/lab12/evidence/"
+  ],
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "alwaysUpdateLinks": true,
+  "showFrontmatter": true
+}

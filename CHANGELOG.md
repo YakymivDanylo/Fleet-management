@@ -2,6 +2,12 @@
 
 All notable changes to this project, newest first. Entries are grouped by UTC date.
 
+## 2026-11-20
+
+### Publish documentation site and API contract — 11:33 UTC
+**Summary:** All project documentation now lives on one searchable website that rebuilds itself, and the public API has an official, tested description.
+**Details:** Documentation is organised in four levels (overview, developer, API, architecture) with owners and review dates, published automatically and blocked when a link or page is broken. The public API is described in a contract that powers interactive docs and a client library. Checking it against the running system fixed wrong time formats and server errors on invalid or unknown ids.
+
 ## 2026-11-14
 
 ### Add station availability and system documentation passport — 08:43 UTC

@@ -1,0 +1,408 @@
+openapi: 3.0.3
+info:
+  title: Fleet Management Public API
+  version: 1.0.0
+  description: |
+    API-first контракт публічної частини Fleet Management (станційний каршерінг з IoT-телеметрією).
+    Це **єдине джерело істини** для форматів запитів і відповідей: довідка на сайті документації
+    рендериться з цього файлу, клієнтський SDK генерується з нього ж, а contract-тест Schemathesis
+    перевіряє, що живий код йому відповідає.
+
+    Версія — SemVer: MINOR — additive-зміни (новий маршрут, нове необов'язкове поле),
+    MAJOR — breaking (видалення/перейменування поля, зміна типу чи коду відповіді).
+
+    Усі помилки мають спільну схему `Error`.
+  contact:
+    name: Danylo Yakymiv (власник контракту)
+    url: https://github.com/YakymivDanylo/Fleet-management
+  license:
+    name: Educational use
+    url: https://github.com/YakymivDanylo/Fleet-management
+servers:
+  - url: http://localhost:8000
+    description: sandbox (docker compose, nginx → 3 репліки API)
+tags:
+  - name: stations
+    description: Станції видачі та повернення авто.
+  - name: rentals
+    description: Життєвий цикл оренди.
+  - name: vehicles
+    description: Стан авто з IoT-телеметрії.
+
+paths:
+  /stations:
+    get:
+      tags: [stations]
+      operationId: listStations
+      summary: Список станцій
+      description: |
+        Повертає всі станції, впорядковані за `id`. Відповідь кешується в Redis (read-through, TTL 30 с),
+        тому нова станція може з'явитися у списку із затримкою до 30 с після створення.
+      responses:
+        "200":
+          description: Список станцій (порожній масив, якщо станцій немає).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Station"
+              example:
+                - {id: 1, address: "Київ, Майдан Незалежності, 1", capacity: 12}
+                - {id: 2, address: "Київ, вул. Хрещатик, 22", capacity: 8}
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /stations/{station_id}/availability:
+    get:
+      tags: [stations]
+      operationId: getStationAvailability
+      summary: Доступність станції
+      description: |
+        Скільки місць на станції зайнято і скільки авто готові до оренди — обчислюється на льоту з PostgreSQL
+        (без кешу). `parked_vehicles` — авто на станції в будь-якому статусі, крім `rented`;
+        `free_slots = max(capacity − parked_vehicles, 0)`; `available_vehicles` — авто зі статусом `available`.
+        Маршрут додано в краш-тесті ЛР№10.
+      parameters:
+        - $ref: "#/components/parameters/StationId"
+      responses:
+        "200":
+          description: Поточна доступність станції.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StationAvailability"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationFailed"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /rentals/start:
+    post:
+      tags: [rentals]
+      operationId: startRental
+      summary: Почати оренду
+      description: |
+        Створює активну оренду для орендаря і авто; авто переходить у статус `rented`, станцією старту
+        стає поточна станція авто. Авто має бути в статусі `available`, інакше — 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RentalStart"
+            example: {renter_id: 3, vehicle_id: 7}
+      responses:
+        "201":
+          description: Оренду створено.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+              example:
+                id: 42
+                renter_id: 3
+                vehicle_id: 7
+                start_station_id: 1
+                end_station_id: null
+                started_at: "2026-11-20T09:15:00Z"
+                ended_at: null
+                status: active
+                cost: null
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationFailed"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /rentals/{rental_id}/end:
+    post:
+      tags: [rentals]
+      operationId: endRental
+      summary: Завершити оренду
+      description: |
+        Завершує активну оренду на станції повернення: авто стає `available` і прив'язується до цієї станції,
+        у відповіді — підсумкова вартість (`RATE_PER_HOUR` = 5.00 за кожну розпочату годину, мінімум 1 година).
+        409 — оренда не активна або на станції немає вільного місця.
+      parameters:
+        - $ref: "#/components/parameters/RentalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RentalEnd"
+            example: {end_station_id: 2}
+      responses:
+        "200":
+          description: Оренду завершено, у полі `cost` — підсумкова вартість.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+              example:
+                id: 42
+                renter_id: 3
+                vehicle_id: 7
+                start_station_id: 1
+                end_station_id: 2
+                started_at: "2026-11-20T09:15:00Z"
+                ended_at: "2026-11-20T11:02:00Z"
+                status: completed
+                cost: 10.0
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationFailed"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /vehicles/{vehicle_id}/state:
+    get:
+      tags: [vehicles]
+      operationId: getVehicleState
+      summary: Останній стан авто
+      description: |
+        Останній відомий стан авто з телеметрії. Спершу читається Redis (`source: cache`); якщо Redis недоступний
+        або ключа немає — останній запис PostgreSQL (`source: database`, при збої Redis `degraded: true`).
+        404 — авто не існує або для нього ще немає жодного показника; 503 — недоступні і Redis, і PostgreSQL.
+      parameters:
+        - $ref: "#/components/parameters/VehicleId"
+      responses:
+        "200":
+          description: Останній стан авто.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleState"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationFailed"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+components:
+  parameters:
+    StationId:
+      name: station_id
+      in: path
+      required: true
+      description: Ідентифікатор станції.
+      schema: {type: integer, minimum: 1, maximum: 2147483647, example: 1}
+    RentalId:
+      name: rental_id
+      in: path
+      required: true
+      description: Ідентифікатор оренди.
+      schema: {type: integer, minimum: 1, maximum: 2147483647, example: 42}
+    VehicleId:
+      name: vehicle_id
+      in: path
+      required: true
+      description: Ідентифікатор авто.
+      schema: {type: integer, minimum: 1, maximum: 2147483647, example: 7}
+
+  schemas:
+    Station:
+      type: object
+      description: Фіксована станція видачі й повернення авто.
+      required: [id, address, capacity]
+      properties:
+        id: {type: integer, example: 1}
+        address: {type: string, example: "Київ, Майдан Незалежності, 1"}
+        capacity: {type: integer, description: "Кількість паркомісць.", example: 12}
+      example: {id: 1, address: "Київ, Майдан Незалежності, 1", capacity: 12}
+
+    StationAvailability:
+      type: object
+      description: Доступність станції на момент запиту.
+      required: [station_id, capacity, parked_vehicles, free_slots, available_vehicles]
+      properties:
+        station_id: {type: integer, example: 1}
+        capacity: {type: integer, example: 12}
+        parked_vehicles: {type: integer, minimum: 0, description: "Авто на станції, крім орендованих.", example: 9}
+        free_slots: {type: integer, minimum: 0, description: "Вільні місця для повернення.", example: 3}
+        available_vehicles: {type: integer, minimum: 0, description: "Авто зі статусом available.", example: 7}
+      example: {station_id: 1, capacity: 12, parked_vehicles: 9, free_slots: 3, available_vehicles: 7}
+
+    RentalStart:
+      type: object
+      description: Запит на старт оренди.
+      required: [renter_id, vehicle_id]
+      properties:
+        renter_id: {type: integer, minimum: 1, maximum: 2147483647, example: 3}
+        vehicle_id: {type: integer, minimum: 1, maximum: 2147483647, example: 7}
+      example: {renter_id: 3, vehicle_id: 7}
+
+    RentalEnd:
+      type: object
+      description: Запит на завершення оренди.
+      required: [end_station_id]
+      properties:
+        end_station_id: {type: integer, minimum: 1, maximum: 2147483647, example: 2}
+      example: {end_station_id: 2}
+
+    RentalStatus:
+      type: string
+      description: Стан оренди.
+      enum: [active, completed, cancelled]
+      example: active
+
+    Rental:
+      type: object
+      description: Оренда авто.
+      required: [id, renter_id, vehicle_id, start_station_id, end_station_id, started_at, ended_at, status]
+      properties:
+        id: {type: integer, example: 42}
+        renter_id: {type: integer, example: 3}
+        vehicle_id: {type: integer, example: 7}
+        start_station_id: {type: integer, example: 1}
+        end_station_id: {type: integer, nullable: true, example: 2}
+        started_at: {type: string, format: date-time, example: "2026-11-20T09:15:00Z"}
+        ended_at: {type: string, format: date-time, nullable: true, example: "2026-11-20T11:02:00Z"}
+        status:
+          $ref: "#/components/schemas/RentalStatus"
+        cost:
+          type: number
+          nullable: true
+          description: Вартість; для активної оренди у відповіді старту — null.
+          example: 10.0
+      example:
+        id: 42
+        renter_id: 3
+        vehicle_id: 7
+        start_station_id: 1
+        end_station_id: 2
+        started_at: "2026-11-20T09:15:00Z"
+        ended_at: "2026-11-20T11:02:00Z"
+        status: completed
+        cost: 10.0
+
+    VehicleState:
+      type: object
+      description: Останній стан авто з телеметрії.
+      required: [vehicle_id, recorded_at, latitude, longitude, fuel_level, is_locked, source, degraded]
+      properties:
+        vehicle_id: {type: integer, example: 7}
+        recorded_at: {type: string, format: date-time, example: "2026-11-20T08:00:00Z"}
+        latitude: {type: number, minimum: -90, maximum: 90, example: 50.4501}
+        longitude: {type: number, minimum: -180, maximum: 180, example: 30.5241}
+        fuel_level: {type: number, minimum: 0, maximum: 100, description: "Пальне або заряд, відсотки.", example: 63.5}
+        is_locked: {type: boolean, example: true}
+        source:
+          type: string
+          enum: [cache, database]
+          description: Звідки прочитано стан.
+          example: cache
+        degraded:
+          type: boolean
+          description: true — Redis недоступний, стан прочитано з PostgreSQL.
+          example: false
+      example:
+        vehicle_id: 7
+        recorded_at: "2026-11-20T08:00:00Z"
+        latitude: 50.4501
+        longitude: 30.5241
+        fuel_level: 63.5
+        is_locked: true
+        source: cache
+        degraded: false
+
+    Error:
+      type: object
+      description: Спільна схема помилки для всіх маршрутів і всіх кодів 4xx/5xx.
+      required: [detail]
+      properties:
+        detail:
+          description: |
+            Опис помилки: рядок для доменних помилок (404, 409, 500, 503) або масив порушень
+            `ValidationIssue` для 422 (формат валідації FastAPI/Pydantic).
+          oneOf:
+            - type: string
+              example: Station 999 not found
+            - type: array
+              items:
+                $ref: "#/components/schemas/ValidationIssue"
+          example: Station 999 not found
+        request_id:
+          type: string
+          description: Лише для 500 — ідентифікатор для пошуку traceback у логах.
+          example: 3f2a9c1e5b7d4e6f8a0b1c2d3e4f5a6b
+      example: {detail: Station 999 not found}
+
+    ValidationIssue:
+      type: object
+      description: Одне порушення схеми запиту (елемент `Error.detail` для 422).
+      required: [type, loc, msg]
+      properties:
+        type: {type: string, description: Код порушення Pydantic., example: missing}
+        loc:
+          type: array
+          description: Шлях до поля, напр. `["body", "renter_id"]`.
+          items:
+            oneOf:
+              - type: string
+              - type: integer
+          example: [body, renter_id]
+        msg: {type: string, example: Field required}
+        input: {description: "Отримане значення (будь-який JSON-тип).", example: null}
+        ctx: {type: object, description: Додатковий контекст порушення., additionalProperties: true, example: {ge: 1}}
+      example: {type: missing, loc: [body, renter_id], msg: Field required, input: null}
+
+  responses:
+    BadRequest:
+      description: Тіло запиту не є коректним JSON.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {detail: There was an error parsing the body}
+    NotFound:
+      description: Сутність не знайдено.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {detail: Station 999 not found}
+    Conflict:
+      description: Стан сутності не дозволяє операцію (авто не доступне, оренда не активна, станція повна).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {detail: Vehicle 7 is not available}
+    ValidationFailed:
+      description: Тіло або параметри запиту не відповідають схемі.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example:
+            detail:
+              - {type: missing, loc: [body, renter_id], msg: Field required, input: null}
+    InternalError:
+      description: Неочікувана помилка сервера; traceback — лише в логах за `request_id`.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {detail: Internal server error, request_id: 3f2a9c1e5b7d4e6f8a0b1c2d3e4f5a6b}
+    ServiceUnavailable:
+      description: Залежність недоступна і деградовану відповідь побудувати неможливо; повторити через `Retry-After`.
+      headers:
+        Retry-After:
+          description: Через скільки секунд повторити запит.
+          schema: {type: integer, example: 5}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {detail: Vehicle state is unavailable}

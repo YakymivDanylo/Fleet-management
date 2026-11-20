@@ -32,6 +32,16 @@ SUSPICIOUS_DAYS, STALE_DAYS, DRIFT_LIMIT = 90, 180, 20
 # doc path -> (code paths it describes, check API routes?)
 DOCS: dict[str, tuple[list[str], bool]] = {
     "README.md": (["src", "docker-compose.yml", "charts", "Dockerfile"], False),
+    # Lab 11: the passport lives in the MkDocs knowledge base; SDD keeps the full route inventory.
+    "docs/architecture/sdd.md": (["src/fleet_management"], True),
+    "docs/architecture/isd.md": (
+        ["docker-compose.yml", "charts", ".github/workflows", "nginx"],
+        False,
+    ),
+    "docs/api/openapi.yaml": (
+        ["src/fleet_management/api", "src/fleet_management/schemas.py"],
+        False,
+    ),
     "k8s/README.md": (["k8s"], False),
     "charts/fleet-management/README.md": (["charts/fleet-management"], False),
     "CHANGELOG.md": (["src", "charts"], False),

@@ -19,3 +19,11 @@ coverage.json
 loadtest/results/lab4/k6*.csv
 loadtest/results/lab7/**/k6*.csv
 backups/
+.schemathesis/
+sdkclient/
+openapitools.json
+
+# Lab 11: MkDocs build output and local Obsidian workspace state
+site/
+.obsidian/workspace*.json
+.obsidian/cache

@@ -1,0 +1,10 @@
+# Lab 11: knowledge base build (MkDocs Material). Same pins locally and in .github/workflows/docs.yml.
+mkdocs==1.6.1
+mkdocs-material==9.8.2
+mkdocs-mermaid2-plugin==1.2.3
+mkdocs-git-revision-date-localized-plugin==1.7.0
+mkdocs-swagger-ui-tag==0.8.1
+mkdocstrings==1.0.8
+mkdocstrings-python==2.0.11
+pymdown-extensions==13.1
+PyYAML==6.0.3
