@@ -58,5 +58,6 @@ flowchart LR
 - **MINOR** — additive: новий маршрут, нове необов'язкове поле відповіді, новий код помилки.
 - **MAJOR** — breaking: видалення чи перейменування поля, зміна типу, обов'язкове нове поле запиту.
   Breaking-зміна вимагає міграційного гайду в цьому розділі та запису в `CHANGELOG.md`.
+  Приклад: [міграційний гайд 1.x → 2.0](migration-guide-v2.md).
 
 Пов'язано: [[openapi-reference]] · [[contract-testing]] · [[sdk]] · [[python-reference]] · [[sdd]] · #api
