@@ -19,28 +19,37 @@ def _session(*objects):
 
 async def test_start_rental_marks_vehicle_rented():
     vehicle = MagicMock(status=VehicleStatus.AVAILABLE, station_id=7)
-    db = _session(vehicle)
+    db = _session(MagicMock(), vehicle)
 
     rental = await rental_service.start_rental(db, renter_id=3, vehicle_id=5)
 
     assert (rental.renter_id, rental.vehicle_id, rental.start_station_id) == (3, 5, 7)
     assert rental.status == RentalStatus.ACTIVE
     assert vehicle.status == VehicleStatus.RENTED
-    db.get.assert_awaited_once_with(rental_service.Vehicle, 5)
+    assert db.get.await_args_list[0].args == (rental_service.Renter, 3)
+    assert db.get.await_args_list[1].args == (rental_service.Vehicle, 5)
+    assert db.get.await_args_list[1].kwargs == {"with_for_update": True}  # RFC-001 row lock
     db.add.assert_called_once_with(rental)
     db.commit.assert_awaited_once()
     db.refresh.assert_awaited_once_with(rental)
 
 
+async def test_start_rental_rejects_missing_renter():
+    db = _session(None)
+    with pytest.raises(NotFoundError, match="Renter 3 not found"):
+        await rental_service.start_rental(db, renter_id=3, vehicle_id=5)
+    db.commit.assert_not_awaited()
+
+
 async def test_start_rental_rejects_missing_vehicle():
     with pytest.raises(NotFoundError, match="Vehicle 5 not found"):
-        await rental_service.start_rental(_session(None), renter_id=3, vehicle_id=5)
+        await rental_service.start_rental(_session(MagicMock(), None), renter_id=3, vehicle_id=5)
 
 
 async def test_start_rental_rejects_unavailable_vehicle():
     vehicle = MagicMock(status=VehicleStatus.RENTED)
     with pytest.raises(VehicleNotAvailableError, match="Vehicle 5 is not available"):
-        await rental_service.start_rental(_session(vehicle), renter_id=3, vehicle_id=5)
+        await rental_service.start_rental(_session(MagicMock(), vehicle), renter_id=3, vehicle_id=5)
 
 
 async def test_end_rental_returns_vehicle_to_station(monkeypatch):

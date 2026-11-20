@@ -1,0 +1,18 @@
+$ mkdocs build   # non-strict preview; temporary page docs/orphan-demo.md is outside nav
+  To disable this warning, set NO_MKDOCS_2_WARNING=1.
+
+WARNING -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - orphan-demo.md
+WARNING -  Wikilink [[no-such-page]] in 'orphan-demo.md': not found
+INFO    -  MERMAID2  - Found superfences config: {'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': functools.partial(<function fence_mermaid at 0x000001E96186F600>, custom=True)}]}
+INFO    -  Documentation built in 4.03 seconds
+
+$ mkdocs build --strict
+  To disable this warning, set NO_MKDOCS_2_WARNING=1.
+
+WARNING -  The following pages exist in the docs directory, but are not included in the "nav" configuration:
+  - orphan-demo.md
+WARNING -  Wikilink [[no-such-page]] in 'orphan-demo.md': not found
+INFO    -  MERMAID2  - Found superfences config: {'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': functools.partial(<function fence_mermaid at 0x000002B1EAC1B600>, custom=True)}]}
+Aborted with 2 warnings in strict mode!
+exit=1

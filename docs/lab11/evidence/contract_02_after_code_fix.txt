@@ -1,0 +1,231 @@
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from docs/api/openapi.yaml (in 0.49s)
+
+     Base URL:         http://localhost:8000
+     Specification:    Open API 3.0.3
+     Operations:       5 selected / 5 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ✅  Examples (in 0.59s)
+
+     ✅ 4 passed  ⏭  1 skipped
+
+ ❌  Coverage (in 0.24s)
+
+     ❌ 5 failed
+
+ ❌  Fuzzing (in 3.82s)
+
+     ✅ 4 passed  ❌ 1 failed
+
+ ✅  Stateful (in 1.58s)
+
+     Scenarios:    43
+     API Links:    1 covered / 2 selected / 2 total (2 inferred)
+
+     ✅ 43 passed
+
+=================================== FAILURES ===================================
+________________________ POST /rentals/{rental_id}/end _________________________
+1. Test Case ID: ve3S4q
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 200, 404, 409, 422, 500
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d $'ӳ��\x06' http://localhost:8000/rentals/8/end
+
+    st replay ve3S4q
+
+_____________________________ TRACE /rentals/start _____________________________
+1. Test Case ID: xdOnnt
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Content-Type: application/json' -d '{"renter_id": 3, "vehicle_id": 7}' http://localhost:8000/rentals/start
+
+    st replay xdOnnt
+
+________________________ TRACE /rentals/{rental_id}/end ________________________
+1. Test Case ID: VjFkjY
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Content-Type: application/json' -d '{"end_station_id": 2}' http://localhost:8000/rentals/8/end
+
+    st replay VjFkjY
+
+_______________________________ TRACE /stations ________________________________
+1. Test Case ID: UDlM9T
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/stations
+
+    st replay UDlM9T
+
+__________________ TRACE /stations/{station_id}/availability ___________________
+1. Test Case ID: dEdsYe
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/stations/2/availability
+
+    st replay dEdsYe
+
+______________________ TRACE /vehicles/{vehicle_id}/state ______________________
+1. Test Case ID: 6ex0Z2
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/vehicles/7/state
+
+    st replay 6ex0Z2
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ✅ Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ✅ Stateful
+
+Failures:
+  ❌ ST103 Undocumented status code: 1
+  ❌ ST204 Wrong response to undeclared method: 5
+
+For more information, run `st explain <code>` for ST103, ST204.
+
+Test cases:
+  382 generated, 6 found 6 unique failures
+
+Seed: 42
+
+============================= 6 failures in 6.33s ==============================

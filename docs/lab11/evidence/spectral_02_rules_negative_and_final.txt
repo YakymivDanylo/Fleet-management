@@ -1,0 +1,17 @@
+# Negative test: the custom ruleset .spectral.yaml applied to a deliberately broken copy of the contract
+# (TODO description, Station without example, ad-hoc 404 without the shared Error, no 500, version 'v1')
+$ spectral lint openapi.yaml
+
+c:/Users/dryak/AppData/Local/Temp/claude/358d4ce63fe9ae50/eebfcbfd-5c96-420d-ad4c-c4fca3b28266/scratchpad/neg/openapi.yaml
+  4:12   error  fm-version-is-semver                     info.version follows SemVer MAJOR.MINOR.PATCH.                                                info.version
+  38:20  error  fm-operation-description-not-empty       Operation description must be a real sentence, not a placeholder.                             paths./stations.get.description
+  66:17  error  fm-operation-declares-500                Every operation documents the 500 response (unexpected server error).                         paths./stations/{station_id}/availability.get.responses
+  73:15  error  fm-error-responses-use-shared-component  Every 4xx/5xx response of an operation references a shared response in components/responses.  paths./stations/{station_id}/availability.get.responses[404]
+ 219:13  error  fm-schema-has-example                    Every component schema has at least one example.                                              components.schemas.Station
+
+✖ 5 problems (5 errors, 0 warnings, 0 infos, 0 hints)
+spectral exit code: 1
+
+$ npx @stoplight/spectral-cli@6.17.1 lint docs/api/openapi.yaml --fail-severity=hint   # real contract
+No results with a severity of 'hint' or higher found!
+exit=0

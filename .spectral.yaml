@@ -1,0 +1,71 @@
+# Lab 11: quality rules of the API contract (docs/api/openapi.yaml). Pass threshold: 0 errors.
+#   npx @stoplight/spectral-cli@6.17.1 lint docs/api/openapi.yaml
+extends: ["spectral:oas"]
+
+rules:
+  # Built-in rules promoted from warning to error — a contract without them is not done.
+  operation-description: error
+  operation-operationId: error
+  operation-tags: error
+  info-contact: error
+  oas3-valid-media-example: error
+  oas3-valid-schema-example: error
+
+  fm-schema-has-example:
+    description: Every component schema has at least one example.
+    severity: error
+    given: "$.components.schemas[*]"
+    then:
+      field: example
+      function: truthy
+
+  fm-operation-description-not-empty:
+    description: Operation description must be a real sentence, not a placeholder.
+    severity: error
+    given: "$.paths[*][get,put,post,patch,delete]"
+    then:
+      field: description
+      function: length
+      functionOptions: {min: 30}
+
+  fm-error-responses-use-shared-component:
+    description: Every 4xx/5xx response of an operation references a shared response in components/responses.
+    severity: error
+    resolved: false
+    given: "$.paths[*][get,put,post,patch,delete].responses[?(@property.match(/^[45]/))]"
+    then:
+      # `pattern` ignores a missing field, so presence is asserted separately.
+      - field: $ref
+        function: truthy
+      - field: $ref
+        function: pattern
+        functionOptions: {match: "^#/components/responses/"}
+
+  fm-shared-error-responses-use-error-schema:
+    description: Every shared error response returns the common Error schema.
+    severity: error
+    resolved: false
+    given: "$.components.responses[*].content.application/json.schema"
+    then:
+      # `pattern` ignores a missing field, so presence is asserted separately.
+      - field: $ref
+        function: truthy
+      - field: $ref
+        function: pattern
+        functionOptions: {match: "^#/components/schemas/Error$"}
+
+  fm-operation-declares-500:
+    description: Every operation documents the 500 response (unexpected server error).
+    severity: error
+    given: "$.paths[*][get,put,post,patch,delete].responses"
+    then:
+      field: "500"
+      function: truthy
+
+  fm-version-is-semver:
+    description: info.version follows SemVer MAJOR.MINOR.PATCH.
+    severity: error
+    given: "$.info.version"
+    then:
+      function: pattern
+      functionOptions: {match: "^\\d+\\.\\d+\\.\\d+$"}

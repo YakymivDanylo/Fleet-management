@@ -1,0 +1,90 @@
+# Lab 12: service level specification "as code" for Fleet Management (public API + telemetry).
+# Single source of truth for SLI definitions, internal SLO targets and the external SLA promise.
+# Error budget = (100 % - SLO) x window; window = 30 calendar days = 43 200 minutes.
+# Explanation, budget policy and change-freeze rule: docs/operations/slo-policy.md
+version: 1
+service: fleet-management
+owner: "@YakymivDanylo"
+review_date: 2027-02-18
+window:
+  type: rolling
+  days: 30
+  minutes: 43200
+measurement:
+  source: Prometheus (`/metrics` of api1..api3, ServiceMonitor 15 s) and PostgreSQL (telemetry freshness probe)
+  excluded_routes: ["/metrics", "/health", "/livez"]   # not counted by MetricsMiddleware (SKIPPED_PATHS)
+  excluded_time: announced maintenance windows (CCB-approved change windows, Sat 22:00-24:00 UTC)
+
+slis:
+  - id: SLI-1
+    name: availability
+    description: Share of HTTP requests to the public API that were not answered with a server error.
+    good_events: requests with status not matching 5xx
+    valid_events: all HTTP requests counted by MetricsMiddleware (4xx are client errors and count as good)
+    promql:
+      good: sum(increase(http_requests_total{status!~"5.."}[30d]))
+      valid: sum(increase(http_requests_total[30d]))
+    baseline: "100.00 % (Lab 7 k6 run 'after': 11 556 requests, 0 errors; Lab 11 contract test: 0 x 5xx after fixes)"
+    slo:
+      target: 99.5
+      error_budget:
+        fraction: 0.005
+        minutes: 216          # 0.005 x 43 200
+        requests_per_million: 5000
+    sla:
+      target: 99.0
+      allowed_downtime_minutes: 432   # 0.010 x 43 200
+      buffer_minutes: 216             # SLA allowance - SLO budget = team reliability buffer
+      remedy: 10 % service credit for the month when breached
+
+  - id: SLI-2
+    name: latency
+    description: Share of successful requests to read endpoints answered in under 250 ms (server-side).
+    good_events: requests with duration <= 0.25 s
+    valid_events: non-5xx GET requests to /stations*, /vehicles*, /rentals* (auth/login excluded - Argon2 is slow by design)
+    threshold_ms: 250       # 0.25 is a bucket boundary of the default prometheus_client histogram, so the SLI is exact
+    promql:
+      good: sum(increase(http_request_duration_seconds_bucket{route=~"/(stations|vehicles|rentals).*",le="0.25"}[30d]))
+      valid: sum(increase(http_request_duration_seconds_count{route=~"/(stations|vehicles|rentals).*"}[30d]))
+    baseline: "p95 = 40-50 ms for /stations, /vehicles, /vehicles/{id}/state at 50-100 VUs (Lab 7 k6 run 'after')"
+    slo:
+      target: 99.0
+      error_budget:
+        fraction: 0.01
+        minutes: 432          # 0.01 x 43 200 (equivalent: 1 % of requests may be slow)
+        requests_per_million: 10000
+    sla:
+      target: 97.0
+      allowed_minutes: 1296   # 0.03 x 43 200
+      buffer_minutes: 864
+      remedy: 5 % service credit
+
+  - id: SLI-3
+    name: telemetry_freshness
+    description: >-
+      Share of minutes in which the newest telemetry reading stored in PostgreSQL is at most 60 s old,
+      i.e. the background telemetry pipeline (RabbitMQ -> telemetry-worker -> PostgreSQL) completes its job.
+    good_events: minutes where now() - max(telemetry_readings.recorded_at) <= 60 s
+    valid_events: minutes in which at least one vehicle publishes telemetry (simulator or fleet active)
+    probe_sql: SELECT extract(epoch FROM now() - max(recorded_at)) FROM telemetry_readings
+    probe_interval_s: 60
+    baseline: "max lag 2-4 s in normal operation (Lab 12 incident probe, 2026-11-20 before the fault)"
+    slo:
+      target: 99.0
+      error_budget:
+        fraction: 0.01
+        minutes: 432          # 0.01 x 43 200
+    sla:
+      target: 98.0
+      allowed_minutes: 864    # 0.02 x 43 200
+      buffer_minutes: 432
+      remedy: 5 % service credit
+
+error_budget_policy:
+  document: docs/operations/slo-policy.md
+  burn_rate_alerts:
+    fast: {window: 1h, burn_rate: 14.4, action: page on-call}     # 2 % of the monthly budget in 1 h
+    slow: {window: 6h, burn_rate: 6, action: ticket for the owner}  # 5 % of the monthly budget in 6 h
+  on_exhausted:
+    - change freeze: only CCB-approved emergency changes and reliability fixes are deployed
+    - the freeze is lifted when the rolling 30-day SLI is back above the SLO

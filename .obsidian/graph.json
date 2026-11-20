@@ -1,0 +1,18 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "colorGroups": [
+    {"query": "tag:#adr", "color": {"a": 1, "rgb": 15105570}},
+    {"query": "tag:#architecture", "color": {"a": 1, "rgb": 3447003}},
+    {"query": "tag:#api", "color": {"a": 1, "rgb": 3066993}},
+    {"query": "tag:#ops", "color": {"a": 1, "rgb": 10181046}}
+  ],
+  "showArrow": true,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1
+}

@@ -1,0 +1,4 @@
+ACTION 12:18:26 CA-1 effectiveness check: repeat the same fault — docker compose stop redis
+ACTION 12:20:40 observed 2 min of Redis outage with CA-1: queue_ready 0, db_lag <= 2 s, worker log: 640 x 'Vehicle state cache unavailable', 0 x 'requeueing'
+worker-1  | 2026-11-20 12:20:39,623 WARNING telemetry.worker [-]: Vehicle state cache unavailable, vehicle 10 reading stored without cache: Error -3 connecting to redis:6379. Temporary failure in name resolution.
+ACTION 12:20:41 docker compose start redis (end of check)

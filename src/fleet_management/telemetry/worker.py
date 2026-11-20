@@ -6,6 +6,7 @@ import aio_pika
 from aio_pika.abc import AbstractIncomingMessage, AbstractRobustConnection
 from pydantic import ValidationError
 from redis.asyncio import Redis
+from redis.exceptions import RedisError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ..config import settings
@@ -37,16 +38,29 @@ async def handle_message(
     try:
         async with session_factory() as db:
             await save_reading(db, telemetry)
-        await update_vehicle_state(redis, telemetry)
     except NotFoundError as exc:
         logger.warning("Dropping telemetry for unknown vehicle: %s", exc)
         await message.reject(requeue=False)
+        return
     except Exception:
-        logger.exception("Failed to process telemetry, requeueing")
+        # PostgreSQL is the source of truth: without a stored reading the message must be retried.
+        logger.exception("Failed to store telemetry, requeueing")
         await asyncio.sleep(NACK_DELAY_SECONDS)
         await message.nack(requeue=True)
-    else:
-        await message.ack()
+        return
+
+    # INC-001 / CAPA-1: Redis holds only derived state (ADR-0001). The reading is already in
+    # PostgreSQL, so a cache outage must not block the queue; the API falls back to the database
+    # (degraded=true) and the next reading refreshes the cache once Redis is back.
+    try:
+        await update_vehicle_state(redis, telemetry)
+    except (RedisError, OSError) as exc:
+        logger.warning(
+            "Vehicle state cache unavailable, vehicle %s reading stored without cache: %s",
+            telemetry.vehicle_id,
+            exc,
+        )
+    await message.ack()
 
 
 async def connect_rabbitmq() -> AbstractRobustConnection:

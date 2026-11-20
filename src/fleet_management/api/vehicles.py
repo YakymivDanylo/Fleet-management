@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Path, Response
 from pydantic import TypeAdapter
 from redis.asyncio import Redis
 from sqlalchemy import select
@@ -9,8 +11,10 @@ from ..cache import VEHICLES_LIST_KEY, get_redis, get_retry_policy, invalidate, 
 from ..database import get_db
 from ..models import Vehicle
 from ..resilience import RetryPolicy
-from ..schemas import FleetPositionsRead, VehicleCreate, VehicleRead, VehicleStateRead
+from ..schemas import DB_ID_MAX, FleetPositionsRead, VehicleCreate, VehicleRead, VehicleStateRead
 from ..services import station_service, vehicle_state_service
+
+PathId = Annotated[int, Path(ge=1, le=DB_ID_MAX)]
 
 router = APIRouter(prefix="/vehicles", tags=["vehicles"])
 
@@ -55,7 +59,7 @@ async def fleet_positions(db: AsyncSession = Depends(get_db), redis: Redis = Dep
 
 
 @router.get("/{vehicle_id}", response_model=VehicleRead)
-async def get_vehicle(vehicle_id: int, db: AsyncSession = Depends(get_db)):
+async def get_vehicle(vehicle_id: PathId, db: AsyncSession = Depends(get_db)):
     vehicle = await db.get(Vehicle, vehicle_id)
     if vehicle is None:
         raise HTTPException(status_code=404, detail="Vehicle not found")
@@ -64,7 +68,7 @@ async def get_vehicle(vehicle_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.get("/{vehicle_id}/state", response_model=VehicleStateRead)
 async def get_vehicle_state(
-    vehicle_id: int,
+    vehicle_id: PathId,
     db: AsyncSession = Depends(get_db),
     redis: Redis = Depends(get_redis),
     policy: RetryPolicy | None = Depends(get_retry_policy),

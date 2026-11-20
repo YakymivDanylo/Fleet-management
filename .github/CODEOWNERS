@@ -1,0 +1,23 @@
+# Lab 11: owners of the knowledge base. With branch protection "Require review from Code Owners"
+# a change under these paths cannot be merged without the owner's approval.
+# Later, more specific rules win.
+
+*                               @YakymivDanylo
+
+# Documentation as Code: every page, the site config and the build hook
+/docs/                          @YakymivDanylo
+/mkdocs.yml                     @YakymivDanylo
+/docs_hooks/                    @YakymivDanylo
+/README.md                      @YakymivDanylo
+/CHANGELOG.md                   @YakymivDanylo
+
+# API-first contract and its quality rules: the integration surface for clients
+/docs/api/openapi.yaml          @YakymivDanylo
+/.spectral.yaml                 @YakymivDanylo
+
+# Architecture decisions are immutable records: the architect reviews every new ADR
+/docs/architecture/             @YakymivDanylo
+
+# Docs pipeline
+/.github/workflows/docs.yml     @YakymivDanylo
+/.markdownlint-cli2.yaml        @YakymivDanylo

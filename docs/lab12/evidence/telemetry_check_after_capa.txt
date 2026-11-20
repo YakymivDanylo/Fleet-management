@@ -1,0 +1,2 @@
+queue_ready=0 newest_reading_lag_s=2
+telemetry pipeline: PASS

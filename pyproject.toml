@@ -65,5 +65,6 @@ source_paths = [
   "src/fleet_management/services/rental_service.py",
   "src/fleet_management/privacy/sanitizer.py",
 ]
-also_copy = ["src/fleet_management/", "scripts/"]
+# docs/ — Lab 11 unit test validates the real knowledge base passports.
+also_copy = ["src/fleet_management/", "scripts/", "docs/"]
 pytest_add_cli_args_test_selection = ["tests/unit/"]

@@ -1,0 +1,22 @@
+# RFC-001 condition 2: contract 1.0.1 vs live API with the row lock, 2026-11-20T12:07:08Z
+$ spectral lint docs/api/openapi.yaml
+No results with a severity of 'error' found!
+$ st run docs/api/openapi.yaml --url http://localhost:8000 --checks all --exclude-checks unsupported_method,allow_header_conformance --max-examples 100 --seed 42
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ✅ Examples
+  ✅ Coverage
+  ✅ Fuzzing
+  ✅ Stateful
+
+Test cases:
+  1030 generated, 1030 passed
+
+Seed: 42
+
+========================== No issues found in 18.47s ===========================

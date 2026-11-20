@@ -1,0 +1,5 @@
+2026-11-20T11:37:05.7977045Z ##[group]Run mkdocs build --strict --site-dir site
+2026-11-20T11:37:06.1716268Z ^[[90m  To disable this warning, set NO_MKDOCS_2_WARNING=1.^[[0m
+2026-11-20T11:37:06.9927914Z WARNING -  Doc file 'api/api-overview.md' contains a link 'migration-guide-v2.md', but the target 'api/migration-guide-v2.md' is not found among documentation files.
+2026-11-20T11:37:08.7904472Z Aborted with 1 warnings in strict mode!
+2026-11-20T11:37:08.8885287Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,47 @@
+$ python scripts/docs_review_audit.py --strict   # real run, today
+## Documentation review audit — today 2026-11-20
+
+Pages: 24; overdue: 1 (live 0, deprecated 1); invalid passports: 0
+
+| Page | Owner | Status | review_date | Overdue, d | Action |
+|---|---|---|---|---|---|
+| `architecture/k8s-raw-manifests.md` | @YakymivDanylo | deprecated | 2026-11-14 | 6 | history, see `architecture/isd.md` |
+
+Deprecated pages (kept, redirect to the replacement):
+- `architecture/k8s-raw-manifests.md` -> `architecture/isd.md`
+- `developer/documentation-regime.md` -> `developer/CONTRIBUTING.md`
+
+review audit: PASS
+exit=0
+
+$ python scripts/docs_review_audit.py --strict --today 2027-02-20   # time travel: the next quarterly review
+## Documentation review audit — today 2027-02-20
+
+Pages: 24; overdue: 17 (live 15, deprecated 2); invalid passports: 0
+
+| Page | Owner | Status | review_date | Overdue, d | Action |
+|---|---|---|---|---|---|
+| `architecture/k8s-raw-manifests.md` | @YakymivDanylo | deprecated | 2026-11-14 | 98 | history, see `architecture/isd.md` |
+| `developer/documentation-regime.md` | @YakymivDanylo | deprecated | 2026-11-20 | 92 | history, see `developer/CONTRIBUTING.md` |
+| `lab11/REPORT.md` | @YakymivDanylo | draft | 2026-12-01 | 81 | review now: update content + review_date, or deprecate |
+| `architecture/adr/adr-0005-row-lock-on-rental-start.md` | @YakymivDanylo | in-review | 2026-12-04 | 78 | review now: update content + review_date, or deprecate |
+| `api/api-overview.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `api/contract-testing.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `api/openapi-reference.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `api/python-reference.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `api/sdk.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `architecture/isd.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `developer/code-standards.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `developer/CONTRIBUTING.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `developer/developer-index.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `developer/handover.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `developer/local-setup.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `index.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+| `tags.md` | @YakymivDanylo | published | 2027-02-18 | 2 | review now: update content + review_date, or deprecate |
+
+Deprecated pages (kept, redirect to the replacement):
+- `architecture/k8s-raw-manifests.md` -> `architecture/isd.md`
+- `developer/documentation-regime.md` -> `developer/CONTRIBUTING.md`
+
+review audit: FAIL
+exit=1

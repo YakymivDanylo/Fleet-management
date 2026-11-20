@@ -1,0 +1,4 @@
+queue_ready=420 newest_reading_lag_s=95
+ALERT TelemetryQueueBacklog: newest reading is 95 s old > 60 s (SLI-3)
+telemetry pipeline: FAIL
+exit=1

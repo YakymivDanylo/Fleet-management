@@ -1,0 +1,14 @@
+ACTION 12:11:18 docker compose stop redis  (fault injection: external dependency of telemetry-worker unavailable)
+ACTION 12:11:19 redis stopped
+ACTION 12:12:09 DETECT (manual, no alert exists): GET /vehicles/1/state shows degraded=true, newest reading 41 s old and growing; queue_ready 150 and growing
+ACTION 12:12:09 DIAGNOSE: worker logs + queue depth
+--- docker compose logs worker --since 3m | tail
+worker-1  |            ^^^^^^^^^^
+worker-1  |   File "/opt/venv/lib/python3.13/site-packages/redis/asyncio/connection.py", line 876, in connect_check_health
+worker-1  |     raise e
+worker-1  | redis.exceptions.ConnectionError: Error -3 connecting to redis:6379. Temporary failure in name resolution.
+--- count of 'requeueing' in the last 3 min: 49
+ACTION 12:12:22 WORKAROUND attempt #1: docker compose restart worker (hypothesis: stuck consumer)
+ACTION 12:12:23 worker restarted
+ACTION 12:13:17 ROOT-CAUSE HYPOTHESIS: Redis down -> every reading nacked+requeued (worker.handle_message), restart did not help; MITIGATION: restore Redis
+ACTION 12:13:17 redis started (temporary workaround = remove the trigger; defect in worker remains)

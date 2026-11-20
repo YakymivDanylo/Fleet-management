@@ -1,0 +1,314 @@
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from docs/api/openapi.yaml (in 0.52s)
+
+     Base URL:         http://localhost:8000
+     Specification:    Open API 3.0.3
+     Operations:       5 selected / 5 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ❌  Examples (in 0.28s)
+
+     ✅ 2 passed  ❌ 2 failed  ⏭  1 skipped
+
+ ❌  Coverage (in 1.38s)
+
+     ❌ 5 failed
+
+ ❌  Fuzzing (in 1.42s)
+
+     ✅ 3 passed  ❌ 2 failed
+
+ ✅  Stateful (in 1.60s)
+
+     Scenarios:    43
+     API Links:    1 covered / 2 selected / 2 total (2 inferred)
+
+     ✅ 43 passed
+
+=================================== FAILURES ===================================
+_____________________________ POST /rentals/start ______________________________
+1. Test Case ID: vse880
+
+- ST108 Response violates schema
+
+    "2026-11-20T11:13:57.158655" is not a "date-time"
+
+    Validated against the response schema for status code 201.
+
+    Schema at /components/schemas/Rental/properties/started_at:
+
+        {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-11-20T09:15:00Z"
+        }
+
+    Value:
+
+        "2026-11-20T11:13:57.158655"
+
+[201] Created:
+
+    `{"id":6,"renter_id":3,"vehicle_id":7,"start_station_id":3,"end_station_id":null,"started_at":"2026-11-20T11:13:57.158655","ended_at":null,"status":"active","cost":null}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"renter_id": 3, "vehicle_id": 7}' http://localhost:8000/rentals/start
+
+    st replay vse880
+
+2. Test Case ID: hPCX00
+
+- ST108 Response violates schema
+
+    [{"input":null,"loc":["body"],"msg":"Field required","type":"missing"}] is not of type "string"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /properties/detail:
+
+        {
+            "type": "string",
+            "description": "\u041b\u044e\u0434\u0438\u043d\u043e\u0447\u0438\u0442\u0...
+            "example": "Station 999 not found"
+        }
+
+    Value:
+
+        [
+            {
+                "type": "missing",
+                "loc": [
+                    "body"
+                ],
+                "msg": "Field required",
+                "input": null
+            }
+        ]
+
+[422] Unprocessable Content:
+
+    `{"detail":[{"type":"missing","loc":["body"],"msg":"Field required","input":null}]}`
+
+Reproduce with:
+
+    curl -X POST http://localhost:8000/rentals/start
+
+    st replay hPCX00
+
+________________________ POST /rentals/{rental_id}/end _________________________
+1. Test Case ID: orMwi3
+
+- ST108 Response violates schema (2 violations)
+
+    "2026-11-20T11:13:57.158655" is not a "date-time"
+
+    Validated against the response schema for status code 200.
+
+    Schema at /components/schemas/Rental/properties/started_at:
+
+        {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-11-20T09:15:00Z"
+        }
+
+    Value:
+
+        "2026-11-20T11:13:57.158655"
+
+    "2026-11-20T11:13:57.266312" is not valid under any of the schemas listed in the 'anyOf' keyword
+
+    Validated against the response schema for status code 200.
+
+    Schema at /components/schemas/Rental/properties/ended_at:
+
+        {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2026-11-20T11:02:00Z"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        }
+
+    Value:
+
+        "2026-11-20T11:13:57.266312"
+
+[200] OK:
+
+    `{"id":6,"renter_id":3,"vehicle_id":7,"start_station_id":3,"end_station_id":2,"started_at":"2026-11-20T11:13:57.158655","ended_at":"2026-11-20T11:13:57.266312","status":"completed","cost":5.0}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"end_station_id": 2}' http://localhost:8000/rentals/6/end
+
+    st replay orMwi3
+
+2. Test Case ID: i1iHWs
+
+- ST108 Response violates schema
+
+    [{"input":null,"loc":["body"],"msg":"Field required","type":"missing"}] is not of type "string"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /properties/detail:
+
+        {
+            "type": "string",
+            "description": "\u041b\u044e\u0434\u0438\u043d\u043e\u0447\u0438\u0442\u0...
+            "example": "Station 999 not found"
+        }
+
+    Value:
+
+        [
+            {
+                "type": "missing",
+                "loc": [
+                    "body"
+                ],
+                "msg": "Field required",
+                "input": null
+            }
+        ]
+
+[422] Unprocessable Content:
+
+    `{"detail":[{"type":"missing","loc":["body"],"msg":"Field required","input":null}]}`
+
+Reproduce with:
+
+    curl -X POST http://localhost:8000/rentals/6/end
+
+    st replay i1iHWs
+
+_______________________________ TRACE /stations ________________________________
+1. Test Case ID: mkzdz2
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/stations
+
+    st replay mkzdz2
+
+__________________ TRACE /stations/{station_id}/availability ___________________
+1. Test Case ID: v4LWuy
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/stations/2/availability
+
+    st replay v4LWuy
+
+______________________ TRACE /vehicles/{vehicle_id}/state ______________________
+1. Test Case ID: NbyQo5
+
+- ST204 Wrong response to undeclared method
+
+    TRACE returned 405 without required `Allow` header
+
+    Add `Allow` header listing supported methods (required by RFC 9110)
+
+[405] Method Not Allowed:
+
+    `<html>
+
+    <head><title>405 Not Allowed</title></head>
+
+    <body>
+
+    <center><h1>405 Not Allowed</h1></center>
+
+    <hr><center>nginx/1.27.5</center>
+
+    </body>
+
+    </html>`
+
+Reproduce with:
+
+    curl -X TRACE http://localhost:8000/vehicles/7/state
+
+    st replay NbyQo5
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 5/5
+  Tested: 5
+
+Test Phases:
+  ❌ Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ✅ Stateful
+
+Failures:
+  ❌ ST108 Response violates schema: 5
+  ❌ ST204 Wrong response to undeclared method: 3
+
+For more information, run `st explain <code>` for ST108, ST204.
+
+Test cases:
+  329 generated, 7 found 8 unique failures
+
+Seed: 42
+
+============================= 8 failures in 4.77s ==============================

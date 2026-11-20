@@ -1,0 +1,9 @@
+API contract (Spectral) | Spectral lint docs/api/openapi.yaml (0 errors) | 2026-11-20T11:39:10.3009763Z No results with a severity of 'error' found!
+Currency audit (review_date) | Overdue review_date pages | 2026-11-20T11:39:07.8295790Z review audit: PASS
+Currency audit (review_date) | Knowledge graph has no islands | 2026-11-20T11:39:07.8759673Z knowledge graph: CONNECTED
+Markdown style (markdownlint) | markdownlint-cli2 (README + docs/, rules in .markdownlint-cli2.yaml) | 2026-11-20T11:39:07.4540429Z Summary: 0 issues in 0 files
+Strict build (mkdocs build --strict) | mkdocs build --strict | ﻿2026-11-20T11:39:22.6688264Z ##[group]Run mkdocs build --strict --site-dir site
+Strict build (mkdocs build --strict) | mkdocs build --strict | 2026-11-20T11:39:23.0767924Z INFO    -  Building documentation to directory: /home/runner/work/Fleet-management/Fleet-management/site
+Strict build (mkdocs build --strict) | mkdocs build --strict | 2026-11-20T11:39:24.1361575Z INFO    -  Documentation built in 1.20 seconds
+Deploy to GitHub Pages | Deploy | 2026-11-20T11:39:41.0900000Z Created deployment for 0b176c064f9b49ebc4ded8e510105db3a48efd23, ID: 0b176c064f9b49ebc4ded8e510105db3a48efd23
+Deploy to GitHub Pages | Deploy | 2026-11-20T11:39:46.4382505Z Reported success!

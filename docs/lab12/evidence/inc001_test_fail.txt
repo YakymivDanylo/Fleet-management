@@ -1,0 +1,5 @@
+# INC-001 FAIL state: regression test on the code at the time of the incident, 2026-11-20T12:15:59Z
+$ pytest tests/integration/test_telemetry_worker.py -q
+E       AssertionError: assert (('nack', Tru...'nack', True)) == ('ack', 'ack')
+FAILED tests/integration/test_telemetry_worker.py::test_cache_outage_does_not_block_ingestion
+1 failed, 6 passed in 15.82s
